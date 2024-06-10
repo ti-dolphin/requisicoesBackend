@@ -1,0 +1,23 @@
+REQUISITION ITEMS
+
+        GET /:requisitonID/requisitionItems
+
+        POST /:requisitionID/requisitionItems
+
+        PUT /:requisitionID/requisitionItems/requisitionItemID
+
+        DELETE /:requisitionID/requisitionItems/requisitionItemID
+
+REQUISITION 
+        
+        GET /requisition/
+
+        GET /requisition/:osID
+
+        POST /requisition/:osID
+
+        PUT /requistion/:requisitionID
+
+        delete /requisition/:requisitionID
+
+
