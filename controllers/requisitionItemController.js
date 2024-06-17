@@ -8,7 +8,7 @@ const requisitionItemController = {
         const productId = "web_requisicao_items.id_produto".toUpperCase();
         const itemsTable = "dsecombr_controle." + "web_requisicao_items".toUpperCase();
         const productsTable = "web_produtos".toUpperCase();
-        const query = `SELECT ${id}, quantidade, id_requisicao, nome, ${productId} FROM ${itemsTable} inner join ${productsTable} where ${productsTable}.id_produto = ${itemsTable}.id_produto and id_requisicao = ${requisitionID}`;
+        const query = `SELECT ${id}, QUANTIDADE, ID_REQUISICAO, NOME, ${productId} FROM ${itemsTable} inner join ${productsTable} where ${productsTable}.ID_PRODUTO = ${itemsTable}.id_produto and ID_REQUISICAO = ${requisitionID}`;
         console.log(query);
         try{
             const result = await requisitionItemController.executeQuery(query);
@@ -20,7 +20,7 @@ const requisitionItemController = {
         }
     },
     createRequisitionItems: async (json, requisitionID) =>{
-      const values = json.map(( item ) => `( ${item.quantidade }, ${ requisitionID }, ${item.id_produto} )`
+      const values = json.map(( item ) => `( ${item.QUANTIDADE }, ${ requisitionID }, ${item.ID_PRODUTO} )`
       );
       const query = `INSERT INTO WEB_REQUISICAO_ITEMS (QUANTIDADE, ID_REQUISICAO, ID_PRODUTO) VALUES ${values};`;
       try{
@@ -31,6 +31,33 @@ const requisitionItemController = {
         console.log(err);
         return null;
       }
+    },
+    deleteRequisitionItem_by_reqID: async (requisitionID, productID ) => { 
+      const query = `DELETE FROM WEB_REQUISICAO_ITEMS WHERE ID_REQUISICAO = ${requisitionID} AND ID_PRODUTO = ${productID}`;
+      try{ 
+        const [result] = await requisitionItemController.executeQuery(query);
+     
+        return result;
+      }catch(err){
+        console.log(err);
+        return null
+      }
+    },
+    updateRequisitionItems: async (items) =>{ 
+
+        let resultCount = 0;
+        items.map(async(item) => { 
+           resultCount++;
+            const query = `UPDATE WEB_REQUISICAO_ITEMS SET QUANTIDADE = ${item.QUANTIDADE} WHERE ID = ${item.ID}`;
+            try{ 
+              const [result] = await requisitionItemController.executeQuery(query);
+            }catch(e){
+              resultCount--;
+              console.log(e);
+            }
+        });
+        console.log('count: ', resultCount);
+        return resultCount;
     },
 
     executeQuery: async (query) => {

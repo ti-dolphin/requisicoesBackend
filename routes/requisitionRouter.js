@@ -26,6 +26,7 @@ router.post("/", async (req, res, next) => {
 // PUT /requistion/:requisitionID
 router.put("/:requisitionID", async (req, res, next) => {
   console.log('PUT');
+  console.log('body', req.body);
   const result = await requisitonController.updateRequisitonById(
     req.body,
     req.params.requisitionID

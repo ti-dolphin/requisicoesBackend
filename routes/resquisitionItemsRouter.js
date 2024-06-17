@@ -24,10 +24,16 @@ router.post("/:requisitionID", async (req, res) => {
   if (result) res.status(200).send(`${result.insertId}`);
   else res.status(404).send("Ops, algo deu errado");
 });
+router.delete("/:requisitionID/:productID", async ( req, res ) =>  {
+  const result = await requisitionItemController.deleteRequisitionItem_by_reqID(req.params.requisitionID, req.params.productID);
+  if(result.affectedRows > 0) res.status(200).send();
+  else res.status(404).send();
+})
 
-router.put("/:requisitionID/:id", async (req, res) => {
+router.put("/:requisitionID", async (req, res) => {
   console.log("PUT");
-  const result = await requisitionController;
-  res.send("update all requisition items with the received requisition ID");
+  const result = await requisitionItemController.updateRequisitionItems(req.body);
+  if(result === req.body.length) res.status(200).send();
+  else res.status(404).send();
 });
 module.exports = router;

@@ -15,8 +15,8 @@ const requisitonController = {
     }
   },
 
-  getRequisitionByID: async (id) => { 
-     const query = "SELECT * from WEB_REQUISICAO where ID_REQUISICAO =" + id;
+  getRequisitionByID: async (id) => {
+    const query = "SELECT * from WEB_REQUISICAO where ID_REQUISICAO =" + id;
     try {
       const result = await requisitonController.executeQuery(query);
       console.log(result);
@@ -35,12 +35,12 @@ const requisitonController = {
       return null;
     }
   },
-  insertRequisitions: async (json) => { 
+  insertRequisitions: async (json) => {
     //{status : cotação, description: 'tal', id_projeto: 1944, id_responsavel: 46}
     const items = json.map((item) => `('${item.status}','${item.description}', ${item.id_projeto}, ${item.id_responsavel})`);
     const query = "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL ) VALUES " + items;
     try {
-      const [resultSetHeader, rows ]= await requisitonController.executeQuery(query);
+      const [resultSetHeader, rows] = await requisitonController.executeQuery(query);
       console.log(resultSetHeader)
       return resultSetHeader;
     } catch (err) {
@@ -48,17 +48,23 @@ const requisitonController = {
       return null;
     }
   },
-  updateRequisitonById: async (json, id) => {
+  updateRequisitonById: async (requisition, id) => {
     try {
-       const query = await requisitonController.setQueryUpdate(json, id);
-       console.log(query);
-       const result = await requisitonController.executeQuery(query); 
+      console.log('requisition body: ', requisition);
+      const query = await requisitonController.setQueryUpdate(requisition, id);
+      console.log(query);
+      const result = await requisitonController.executeQuery(query);
       return result;
     } catch (err) {
       console.log("erro no execute / setquery: ", err);
       return null;
     }
   },
+
+  setQueryUpdate: async (requisition, id) => {
+    return `UPDATE WEB_REQUISICAO SET DESCRIPTION = '${requisition.DESCRIPTION}', STATUS = '${requisition.STATUS}' where ID_REQUISICAO = ${id}`;
+  },
+
   deleteRequisitionById: async (requisitionID) => {
     const query =
       "DELETE from WEB_REQUISICAO WHERE ID_REQUISICAO = " + requisitionID;
@@ -70,16 +76,7 @@ const requisitonController = {
     }
   },
 
-  setQueryUpdate: async (json, id) => {
-    //update format body [{responsable: json, description: 'text'} ]
-    const responsableName = json[0].id_responsavel;
-    const description = json[0].description;
-    helpQuery = `SELECT CODPESSOA FROM PESSOA WHERE NOME = '${responsableName}'`;
-    const [personCodesArr, columns] = await requisitonController.executeQuery(helpQuery);
-    const personCode = personCodesArr[0].CODPESSOA;
-    return `UPDATE WEB_REQUISICAO SET DESCRIPTION = '${description}', ID_RESPONSAVEL = ${personCode} where ID_REQUISICAO = ${id}`;
 
-  },
 
   executeQuery: async (query) => {
     const connection = pool.getConnection();
