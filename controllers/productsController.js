@@ -3,8 +3,10 @@ const pool = require("../database");
 
 
 const productsController = { 
-    getAllProducts: async () => {
-        const query = 'SELECT ID_PRODUTO,CODIGO, NOME FROM WEB_PRODUTOS';
+    getAllProducts: async (limit, offSet) => {
+        console.log('Limit: ', limit);
+        console.log('OffSet ',  offSet);
+        const query = `SELECT ID_PRODUTO,CODIGO, NOME FROM WEB_PRODUTOS LIMIT ${limit} OFFSET ${offSet}`;
         try{
             const  result  = await productsController.executeQuery(query);
             console.log(result);
