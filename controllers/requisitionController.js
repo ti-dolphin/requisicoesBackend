@@ -41,7 +41,6 @@ const requisitonController = {
     const query = "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL ) VALUES " + items;
     try {
       const [resultSetHeader, rows] = await requisitonController.executeQuery(query);
-      console.log(resultSetHeader)
       return resultSetHeader;
     } catch (err) {
       console.log(err);
@@ -52,7 +51,6 @@ const requisitonController = {
     try {
       console.log('requisition body: ', requisition);
       const query = await requisitonController.setQueryUpdate(requisition, id);
-      console.log(query);
       const result = await requisitonController.executeQuery(query);
       return result;
     } catch (err) {
@@ -72,6 +70,7 @@ const requisitonController = {
       const result = await requisitonController.executeQuery(query);
       return result;
     } catch (err) {
+      console.log('err: ', err)
       return null;
     }
   },
@@ -85,6 +84,7 @@ const requisitonController = {
       (await connection).release();
       return result;
     } catch (queryError) {
+      (await connection).release();
       throw queryError;
     }
   },

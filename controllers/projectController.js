@@ -28,6 +28,7 @@ const projectController = {
       (await connection).release();
       return result;
     } catch (queryError) {
+      (await connection).release();
       throw queryError;
     }
   }

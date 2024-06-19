@@ -37,6 +37,7 @@ router.put("/:requisitionID", async (req, res, next) => {
 
 //delete /requisition/:requisitionID
 router.delete("/:requisitionID", async (req, res, next) => {
+    console.log('requisição: ', req);
     const result = await requisitonController.deleteRequisitionById( req.params.requisitionID );
     if(result) res.status(200).send("success");
     else res.status(404).send("Algo deu errado, não foi possível deletar o registro");

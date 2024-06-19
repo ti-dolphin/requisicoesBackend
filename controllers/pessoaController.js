@@ -32,8 +32,8 @@ const pessoaController = {
       (await connection).release();
       return result;
     } catch (queryError) {
-      console.log("ERROOO query: " + queryError);
-      throw queryError;
+       (await connection).release();
+       throw queryError;
     }
   },
 };

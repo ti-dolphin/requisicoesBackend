@@ -7,6 +7,7 @@ const requisitionItemController = require("../controllers/requisitionItemControl
 
 // GET requisition/requisitionItems/:requisitionID
 router.get("/:requisitionID", async function (req, res, next) {
+  console.log('caiu no get');
   const [result] = await requisitionItemController.getRequisitionItem_by_reqID(
     req.params.requisitionID
   );
