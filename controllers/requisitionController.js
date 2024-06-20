@@ -74,6 +74,7 @@ const requisitonController = {
       (await connection).release();
       return result;
     } catch (queryError) {
+      console.log('queryErro: ', queryError)
       (await connection).release();
       throw queryError;
     }
