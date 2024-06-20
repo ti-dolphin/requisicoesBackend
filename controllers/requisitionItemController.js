@@ -7,7 +7,7 @@ const requisitionItemController = {
     const query = `SELECT
 	        dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, ID_REQUISICAO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, NOME
           FROM
-          dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID_PRODUTO = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
+          dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
           WHERE ID_REQUISICAO = ${requisitionID}`
     try {
       const result = await requisitionItemController.executeQuery(query);
@@ -18,6 +18,7 @@ const requisitionItemController = {
       return null;
     }
   },
+  
   createRequisitionItems: async (json, requisitionID) => {
     const values = json.map((item) => `( ${item.QUANTIDADE}, ${requisitionID}, ${item.ID_PRODUTO} )`
     );
@@ -31,6 +32,7 @@ const requisitionItemController = {
       return null;
     }
   },
+
   deleteRequisitionItem_by_reqID: async (requisitionID, productID) => {
     const query = `DELETE FROM WEB_REQUISICAO_ITEMS WHERE ID_REQUISICAO = ${requisitionID} AND ID_PRODUTO = ${productID}`;
     try {
@@ -41,6 +43,7 @@ const requisitionItemController = {
       return null
     }
   },
+
   updateRequisitionItems: async (items) => {
     let resultCount = 0;
     items.map(async (item) => {
