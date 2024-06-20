@@ -6,9 +6,8 @@ const requisitonController = {
   getRequisitions: async () => {
     const query = "SELECT * from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
     try {
-      const result = await requisitonController.executeQuery(query);
-      console.log('result: ', result);
-      return result;
+      const [rows, fields] = await requisitonController.executeQuery(query);
+      return rows;
     } catch (err) {
       console.log(err);
       return null;
@@ -18,20 +17,11 @@ const requisitonController = {
   getRequisitionByID: async (id) => {
     const query = "SELECT * from WEB_REQUISICAO where ID_REQUISICAO =" + id;
     try {
-      const result = await requisitonController.executeQuery(query);
-      console.log(result);
-      return result;
+      const [rows, fields] = await requisitonController.executeQuery(query);
+      console.log(rows);
+      return rows;
     } catch (err) {
       console.log(err);
-      return null;
-    }
-  },
-  get_requisitions_by_osID: async (osID) => {
-    const query = "SELECT * from WEB_REQUISICAO where ID_OS =" + osID;
-    try {
-      const result = await requisitonController.executeQuery(query);
-      return result;
-    } catch (err) {
       return null;
     }
   },

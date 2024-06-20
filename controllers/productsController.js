@@ -6,9 +6,9 @@ const productsController = {
      getAllProducts: async (limit, offSet) => {
          const query = `SELECT ID ,codigo, NOME FROM produtos where inativo = 0 LIMIT ${limit} OFFSET ${offSet} `;
          try{
-             const  result  = await productsController.executeQuery(query);
-             console.log(result);
-             return result;
+             const  [rows, fields]  = await productsController.executeQuery(query);
+             console.log(rows);
+             return rows;
          }catch(e){
            console.log(e);
              return null;
@@ -17,8 +17,8 @@ const productsController = {
     getProductsBySearch : async (search) => { 
       const query = `SELECT ID,codigo,NOME FROM produtos WHERE NOME LIKE '%${search}%' and inativo = 0`;
       try{ 
-        const result = await productsController.executeQuery(query);
-        return result;
+        const [rows, fields] = await productsController.executeQuery(query);
+        return rows;
       }catch(e){ 
         console.log(e);
         return null

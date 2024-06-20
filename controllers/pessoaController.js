@@ -7,8 +7,8 @@ const pessoaController = {
     const personTable = 'pessoa'.toUpperCase();
         const query = `SELECT NOME, CODPESSOA FROM ${personTable}`;
         try{ 
-            const result = await pessoaController.executeQuery(query);
-            return result;
+            const [rows, fields] = await pessoaController.executeQuery(query);
+            return rows;
         }catch(e){
             console.log(e);
             return null
@@ -18,8 +18,8 @@ const pessoaController = {
         const personTable = 'pessoa'.toUpperCase();
         const query = `SELECT NOME, CODPESSOA FROM ${personTable} where CODPESSOA = ${id} `;
         try{ 
-            const result = await pessoaController.executeQuery(query);
-            return result;
+            const [rows, fields] = await pessoaController.executeQuery(query);
+            return rows;
         }catch(e){
             console.log(e);
             return null;

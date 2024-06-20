@@ -10,11 +10,10 @@ const requisitionItemController = {
           dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
           WHERE ID_REQUISICAO = ${requisitionID}`
     try {
-      const result = await requisitionItemController.executeQuery(query);
-      console.log('RESULT: ', result);
-      return result;
+      const [rows, fields] = await requisitionItemController.executeQuery(query);
+      return  rows;
     } catch (err) {
-      console.log(err);
+       console.log('Erro na query', err);
       return null;
     }
   },
@@ -25,7 +24,6 @@ const requisitionItemController = {
     const query = `INSERT INTO WEB_REQUISICAO_ITEMS (QUANTIDADE, ID_REQUISICAO, ID_PRODUTO) VALUES ${values};`;
     try {
       const [resulSetHeader, rows] = await requisitionItemController.executeQuery(query);
-      console.log(resulSetHeader);
       return resulSetHeader;
     } catch (err) {
       console.log(err);
@@ -62,15 +60,9 @@ const requisitionItemController = {
 
   executeQuery: async (query) => {
     const connection = pool.getConnection();
-    try {
       const result = (await connection).query(query);
       (await connection).release();
       return result;
-    } catch (queryError) {
-      (await connection).release();
-      console.log("ERROOO query: " + queryError);
-      throw queryError;
-    }
   },
 }
 module.exports = requisitionItemController;

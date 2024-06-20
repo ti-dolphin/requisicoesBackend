@@ -5,14 +5,13 @@ const pool = require("../database");
 
 // GET /requisition/
 router.get('/', async (req, res, next) => {
-    const [ result ] = await requisitonController.getRequisitions();
-
+    const  result  = await requisitonController.getRequisitions();
     if (result && result.length) res.status(200).send(result);
     else  res.status(404).send("Ops, algo deu errado!");
 });
 
 router.get('/:id', async ( req, res ) => { 
-    const [result] = await requisitonController.getRequisitionByID(req.params.id);
+    const result= await requisitonController.getRequisitionByID(req.params.id);
     console.log(result);
     if (result && result.length) res.status(200).send(result[0]);
     else res.status(404).send("Ops, algo deu errado!");

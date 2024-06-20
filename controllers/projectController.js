@@ -4,10 +4,10 @@ const pool = require("../database");
 
 const projectController = { 
     getAllProjects : async  () => {
-        const query  = 'SELECT * FROM PROJETOS';
+        const query  = 'SELECT * FROM PROJETO';
         try {
-          const result = await projectController.executeQuery(query);
-          return result;
+          const [rows, fields] = await projectController.executeQuery(query);
+          return rows;
         } catch (err) {
           return null;
     }
@@ -15,8 +15,8 @@ const projectController = {
     getProjectById: async (id) => { 
         const query  = `SELECT * FROM PROJETOS WHERE ID = ${id}`;
         try {
-          const result = await projectController.executeQuery(query);
-          return result;
+          const [rows, fields] = await projectController.executeQuery(query);
+          return rows;
         } catch (err) {
           return null;
     }

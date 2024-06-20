@@ -8,11 +8,12 @@ const requisitionItemController = require("../controllers/requisitionItemControl
 // GET requisition/requisitionItems/:requisitionID
 router.get("/:requisitionID", async function (req, res, next) {
   console.log('caiu no get');
-  const [result] = await requisitionItemController.getRequisitionItem_by_reqID(
+  const result = await requisitionItemController.getRequisitionItem_by_reqID(
     req.params.requisitionID
   );
   if (result && result.length) res.status(200).send(result);
   else res.status(404).send();
+
 });
 
 
