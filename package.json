@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm install pm2@latest -g",
     "start": "nodemon ./bin/www",
     "build" : "node ./bin/www"
   },
