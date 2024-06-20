@@ -4,11 +4,12 @@ const pool = require("../database");
 
 const projectController = { 
     getAllProjects : async  () => {
-        const query  = 'SELECT * FROM PROJETO';
+        const query  = 'SELECT * FROM PROJETOS';
         try {
           const [rows, fields] = await projectController.executeQuery(query);
           return rows;
         } catch (err) {
+          console.log(err);
           return null;
     }
 },
