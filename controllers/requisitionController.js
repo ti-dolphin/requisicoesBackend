@@ -27,7 +27,7 @@ const requisitonController = {
   },
   insertRequisitions: async (json) => {
     //{status : cotação, description: 'tal', id_projeto: 1944, id_responsavel: 46}
-    const items = json.map((item) => `('${item.STAUTS}','${item.DESCRIPTION}', ${item.ID_PROJETO}, ${item.ID_RESPONSAVEL})`);
+    const items = json.map((item) => `('${item.STATUS}','${item.DESCRIPTION}', ${item.ID_PROJETO}, ${item.ID_RESPONSAVEL})`);
     const query = "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL ) VALUES " + items;
     try {
       const [resultSetHeader, rows] = await requisitonController.executeQuery(query);
