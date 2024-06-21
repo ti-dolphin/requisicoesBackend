@@ -4,7 +4,7 @@ const pool = require("../database");
 
 const productsController = { 
      getAllProducts: async (limit, offSet) => {
-         const query = `SELECT ID ,codigo, NOME FROM produtos where inativo = 0 LIMIT ${limit} OFFSET ${offSet} `;
+         const query = `SELECT ID ,codigo, nome_fantasia FROM produtos where inativo = 0 LIMIT ${limit} OFFSET ${offSet} `;
          try{
              const  [rows, fields]  = await productsController.executeQuery(query);
              console.log(rows);
@@ -15,7 +15,7 @@ const productsController = {
          }
      },
     getProductsBySearch : async (search) => { 
-      const query = `SELECT ID,codigo,NOME FROM produtos WHERE NOME LIKE '%${search}%' and inativo = 0`;
+      const query = `SELECT ID,codigo,nome_fantasia FROM produtos WHERE nome_fantasia LIKE '%${search}%' and inativo = 0`;
       try{ 
         const [rows, fields] = await productsController.executeQuery(query);
         return rows;
