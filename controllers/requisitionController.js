@@ -4,7 +4,7 @@ const { executeQuery } = require("./requisitionItemController");
 
 const requisitonController = {
   getRequisitions: async () => {
-    const query = "SELECT * from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
+    const query = "SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
     try {
       const [rows, fields] = await requisitonController.executeQuery(query);
       return rows;
@@ -15,7 +15,8 @@ const requisitonController = {
   },
 
   getRequisitionByID: async (id) => {
-    const query = "SELECT * from WEB_REQUISICAO where ID_REQUISICAO =" + id;
+    const query = `SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID WHERE ID_REQUISICAO = ${id}`;
+   
     try {
       const [rows, fields] = await requisitonController.executeQuery(query);
       console.log(rows);
