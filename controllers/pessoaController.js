@@ -5,7 +5,7 @@ const pool = require("../database");
 const pessoaController = {
   getAllPersons: async () => {
     const personTable = 'pessoa'.toUpperCase();
-        const query = `SELECT NOME, CODPESSOA FROM ${personTable}`;
+        const query = `SELECT NOME, CODPESSOA FROM ${personTable} WHERE ATIVO = 1`;
         try{ 
             const [rows, fields] = await pessoaController.executeQuery(query);
             return rows;
