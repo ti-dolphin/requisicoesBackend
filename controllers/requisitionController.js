@@ -5,7 +5,7 @@ const { options } = require("../routes/requisitionRouter");
 
 const requisitonController = {
   getRequisitions: async () => {
-    const query = "SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
+    const query = "SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, CREATED_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
     try {
       const [rows, fields] = await requisitonController.executeQuery(query);
       return rows;
@@ -16,7 +16,7 @@ const requisitonController = {
   },
 
   getRequisitionByID: async (id) => {
-    const query = `SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID WHERE ID_REQUISICAO = ${id}`;
+    const query = `SELECT ID_REQUISICAO, STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, CREATED_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID WHERE ID_REQUISICAO = ${id}`;
    
     try {
       const [rows, fields] = await requisitonController.executeQuery(query);
