@@ -1,6 +1,7 @@
 const { json } = require("express");
 const pool = require("../database");
 const { executeQuery } = require("./requisitionItemController");
+const { options } = require("../routes/requisitionRouter");
 
 const requisitonController = {
   getRequisitions: async () => {
@@ -27,9 +28,27 @@ const requisitonController = {
     }
   },
   insertRequisitions: async (json) => {
-    //{status : cotação, description: 'tal', id_projeto: 1944, id_responsavel: 46}
-    const items = json.map((item) => `('${item.STATUS}','${item.DESCRIPTION}', ${item.ID_PROJETO}, ${item.ID_RESPONSAVEL})`);
-    const query = "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL ) VALUES " + items;
+      const nowDateTime = new Date();
+      const opcoes = {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+
+      const nowDateTimeInBrazil = nowDateTime
+        .toLocaleString("sv-SE", opcoes)
+        .replace("T", " ");
+        const items = json.map(
+          (item) =>
+            `('${item.STATUS}','${item.DESCRIPTION}', ${item.ID_PROJETO}, ${item.ID_RESPONSAVEL}, '${nowDateTimeInBrazil}')`
+        );
+      
+    const query = "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, CREATED_ON ) VALUES " + items;
     try {
       const [resultSetHeader, rows] = await requisitonController.executeQuery(query);
       return resultSetHeader;
@@ -38,9 +57,9 @@ const requisitonController = {
       return null;
     }
   },
+
   updateRequisitonById: async (requisition, id) => {
     try {
-      console.log('requisition body: ', requisition);
       const query = await requisitonController.setQueryUpdate(requisition, id);
       const result = await requisitonController.executeQuery(query);
       return result;
@@ -51,7 +70,20 @@ const requisitonController = {
   },
 
   setQueryUpdate: async (requisition, id) => {
-    return `UPDATE WEB_REQUISICAO SET DESCRIPTION = '${requisition.DESCRIPTION}', STATUS = '${requisition.STATUS}' where ID_REQUISICAO = ${id}`;
+      const nowDateTime = new Date();
+      const opcoes = {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      const nowDateTimeInBrazil = nowDateTime.toLocaleString("sv-SE", opcoes).replace("T", " ");;
+
+    return `UPDATE WEB_REQUISICAO SET DESCRIPTION = '${requisition.DESCRIPTION}', STATUS = '${requisition.STATUS}', LAST_UPDATE_ON = '${nowDateTimeInBrazil}' where ID_REQUISICAO = ${id}`;
   },
 
   deleteRequisitionById: async (requisitionID) => {
