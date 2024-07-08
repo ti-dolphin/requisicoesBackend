@@ -33,7 +33,8 @@ app.use('/requisition/requisitionItems', requisitionItemsRouter);
 app.use('/products', productsRouter);
 app.use('/pessoa', pessoaRouter);
 app.use('/project', projectRouter);
- app.use('/requisitionFiles', requisitionFilesRouter);
+app.use('/requisitionFiles', requisitionFilesRouter);
+require("dotenv").config();
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
