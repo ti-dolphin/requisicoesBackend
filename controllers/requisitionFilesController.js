@@ -6,7 +6,11 @@ const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const { create } = require("domain");
 const { error } = require("console");
+
 require("dotenv").config();
+
+
+
 const serviceAccount = {
   type: process.env.TYPE,
   project_id: process.env.PROJECT_ID,
@@ -21,6 +25,7 @@ const serviceAccount = {
   universe_domain: process.env.UNIVERSE_DOMAIN
 
 };
+console.log("SERVICE ACCOUNT: ", serviceAccount);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
