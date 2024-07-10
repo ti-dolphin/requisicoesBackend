@@ -39,6 +39,26 @@ require("dotenv").config();
 app.use(function(req, res, next) {
   next(createError(404));
 });
+console.log("TYPE:", process.env.TYPE);
+console.log("PROJECT_ID:", process.env.PROJECT_ID);
+console.log("PRIVATE_KEY_ID:", process.env.PRIVATE_KEY_ID);
+console.log(
+  "PRIVATE_KEY:",
+  process.env.PRIVATE_KEY
+    ? process.env.PRIVATE_KEY.replace(/\\n/g, "\n")
+    : "undefined"
+);
+console.log("CLIENT_EMAIL:", process.env.CLIENT_EMAIL);
+console.log("CLIENT_ID:", process.env.CLIENT_ID);
+console.log("AUTH_URI:", process.env.AUTH_URI);
+console.log("TOKEN_URI:", process.env.TOKEN_URI);
+console.log(
+  "AUTH_PROVIDER_X509_CERT_URL:",
+  process.env.AUTH_PROVIDER_X509_CERT_URL
+);
+console.log("CLIENT_X509_CERT_URL:", process.env.CLIENT_X509_CERT_URL);
+console.log("UNIVERSE_DOMAIN:", process.env.UNIVERSE_DOMAIN);
+
 
 // error handler
 app.use(function(err, req, res, next) {
