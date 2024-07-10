@@ -3,11 +3,12 @@ const pool = require("../database");
 
 const requisitionItemController = {
   getRequisitionItem_by_reqID: async (requisitionID) => {
-    const query = `SELECT
-	        dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, ID_REQUISICAO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia
-          FROM
-          dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
-          WHERE ID_REQUISICAO = ?`;
+    const query = `
+          SELECT
+            dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, ID_REQUISICAO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia, codigo
+            FROM
+            dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
+            WHERE ID_REQUISICAO = ?`;
     try {
       const [rows, fields] = await requisitionItemController.executeQuery(
         query,
