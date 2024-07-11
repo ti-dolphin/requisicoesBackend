@@ -39,25 +39,28 @@ require("dotenv").config();
 app.use(function(req, res, next) {
   next(createError(404));
 });
-console.log("TYPE:", process.env.TYPE);
-console.log("PROJECT_ID:", process.env.PROJECT_ID);
-console.log("PRIVATE_KEY_ID:", process.env.PRIVATE_KEY_ID);
+console.log("TYPE:", process.env.TYPE !== undefined);
+console.log("PROJECT_ID:", process.env.PROJECT_ID !== undefined);
+console.log("PRIVATE_KEY_ID:", process.env.PRIVATE_KEY_ID !== undefined);
 console.log(
   "PRIVATE_KEY:",
   process.env.PRIVATE_KEY
-    ? process.env.PRIVATE_KEY.replace(/\\n/g, "\n")
+    ? process.env.PRIVATE_KEY.replace(/\\n/g, "\n") !== undefined
     : "undefined"
 );
-console.log("CLIENT_EMAIL:", process.env.CLIENT_EMAIL);
-console.log("CLIENT_ID:", process.env.CLIENT_ID);
-console.log("AUTH_URI:", process.env.AUTH_URI);
-console.log("TOKEN_URI:", process.env.TOKEN_URI);
+console.log("CLIENT_EMAIL:", process.env.CLIENT_EMAIL !== undefined);
+console.log("CLIENT_ID:", process.env.CLIENT_ID !== undefined);
+console.log("AUTH_URI:", process.env.AUTH_URI !== undefined);
+console.log("TOKEN_URI:", process.env.TOKEN_URI !== undefined);
 console.log(
   "AUTH_PROVIDER_X509_CERT_URL:",
-  process.env.AUTH_PROVIDER_X509_CERT_URL
+  process.env.AUTH_PROVIDER_X509_CERT_URL !== undefined
 );
-console.log("CLIENT_X509_CERT_URL:", process.env.CLIENT_X509_CERT_URL);
-console.log("UNIVERSE_DOMAIN:", process.env.UNIVERSE_DOMAIN);
+console.log(
+  "CLIENT_X509_CERT_URL:",
+  process.env.CLIENT_X509_CERT_URL !== undefined
+);
+console.log("UNIVERSE_DOMAIN:", process.env.UNIVERSE_DOMAIN !== undefined);
 
 
 // error handler
