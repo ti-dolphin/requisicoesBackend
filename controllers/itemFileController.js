@@ -8,7 +8,7 @@ const itemFileController = {
     const filePath = file.path;
     console.log("fileName: ", file.filename);
     const query =
-      "INSERT INTO ANEXOS_ITEM (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
+      "INSERT INTO anexos_item (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
      try {
        const transaction = await fireBaseService.uploadFileToFireBase(filePath);
        const [allFiles] = await fireBaseService.getFilesFromFirebase();
@@ -27,7 +27,7 @@ const itemFileController = {
      }
   },
    deleteItemFile: async(id ) => { 
-        const query = `DELETE FROM ANEXOS_ITEM WHERE id = ?`;
+        const query = `DELETE FROM anexos_item WHERE id = ?`;
         try{ 
             const result = await itemFileController.executeQuery(query, [id]);
             return result;
@@ -38,7 +38,7 @@ const itemFileController = {
     },
   getItemFilesByFileId: async (itemID) => {
     console.log("getItemFilesByFileId");
-    const query = `SELECT * FROM ANEXOS_ITEM WHERE id_item = ?`;
+    const query = `SELECT * FROM anexos_item WHERE id_item = ?`;
     const [result] = await itemFileController.executeQuery(query, [itemID]);
     console.log("result: ", result);
     return result;
