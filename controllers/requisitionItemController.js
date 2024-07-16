@@ -5,7 +5,7 @@ const requisitionItemController = {
   getRequisitionItem_by_reqID: async (requisitionID) => {
     const query = `
           SELECT
-            dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, OBSERVACAO, ID_REQUISICAO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia, codigo
+            dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, OBSERVACAO, OC, ID_REQUISICAO, ATIVO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia, codigo
             FROM
             dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
             WHERE ID_REQUISICAO = ?`;
@@ -54,9 +54,12 @@ const requisitionItemController = {
     let resultCount = 0;
     items.map(async (item) => {
       resultCount++;
-      const query = item.OBSERVACAO
-        ? `UPDATE WEB_REQUISICAO_ITEMS SET QUANTIDADE = ${item.QUANTIDADE}, OBSERVACAO = '${item.OBSERVACAO}' WHERE ID = ${item.ID} `
-        : `UPDATE WEB_REQUISICAO_ITEMS SET QUANTIDADE = ${item.QUANTIDADE} WHERE ID = ${item.ID}`;
+      const query = 
+      `UPDATE WEB_REQUISICAO_ITEMS 
+       SET QUANTIDADE = ${item.QUANTIDADE},
+         OBSERVACAO = '${item.OBSERVACAO}',
+           OC = ${item.OC},
+            ATIVO = ${item.ATIVO} WHERE ID = ${item.ID} `;
       try {
         const [result] = await requisitionItemController.executeQuery(query);
       } catch (e) {
