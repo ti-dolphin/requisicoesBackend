@@ -13,7 +13,7 @@ var requisitionFilesRouter = require( './routes/requisitionFilesRouter');
 var productsRouter = require('./routes/productsRouter');
 var pessoaRouter = require('./routes/pessoaRouter');
 var projectRouter = require('./routes/projectRouter');
-
+var itemFileRouter = require('./routes/itemFileRouter');
 var app = express();
 app.disable('etag');
 // view engine setup
@@ -34,33 +34,34 @@ app.use('/products', productsRouter);
 app.use('/pessoa', pessoaRouter);
 app.use('/project', projectRouter);
 app.use('/requisitionFiles', requisitionFilesRouter);
+app.use('/itemFiles', itemFileRouter);
 require("dotenv").config();
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
-console.log("TYPE:", process.env.TYPE !== undefined);
-console.log("PROJECT_ID:", process.env.PROJECT_ID !== undefined);
-console.log("PRIVATE_KEY_ID:", process.env.PRIVATE_KEY_ID !== undefined);
-console.log(
-  "PRIVATE_KEY:",
-  process.env.PRIVATE_KEY
-    ? process.env.PRIVATE_KEY.replace(/\\n/g, "\n") !== undefined
-    : "undefined"
-);
-console.log("CLIENT_EMAIL:", process.env.CLIENT_EMAIL !== undefined);
-console.log("CLIENT_ID:", process.env.CLIENT_ID !== undefined);
-console.log("AUTH_URI:", process.env.AUTH_URI !== undefined);
-console.log("TOKEN_URI:", process.env.TOKEN_URI !== undefined);
-console.log(
-  "AUTH_PROVIDER_X509_CERT_URL:",
-  process.env.AUTH_PROVIDER_X509_CERT_URL !== undefined
-);
-console.log(
-  "CLIENT_X509_CERT_URL:",
-  process.env.CLIENT_X509_CERT_URL !== undefined
-);
-console.log("UNIVERSE_DOMAIN:", process.env.UNIVERSE_DOMAIN !== undefined);
+// console.log("TYPE:", process.env.TYPE !== undefined);
+// console.log("PROJECT_ID:", process.env.PROJECT_ID !== undefined);
+// console.log("PRIVATE_KEY_ID:", process.env.PRIVATE_KEY_ID !== undefined);
+// console.log(
+//   "PRIVATE_KEY:",
+//   process.env.PRIVATE_KEY
+//     ? process.env.PRIVATE_KEY.replace(/\\n/g, "\n") !== undefined
+//     : "undefined"
+// );
+// console.log("CLIENT_EMAIL:", process.env.CLIENT_EMAIL !== undefined);
+// console.log("CLIENT_ID:", process.env.CLIENT_ID !== undefined);
+// console.log("AUTH_URI:", process.env.AUTH_URI !== undefined);
+// console.log("TOKEN_URI:", process.env.TOKEN_URI !== undefined);
+// console.log(
+//   "AUTH_PROVIDER_X509_CERT_URL:",
+//   process.env.AUTH_PROVIDER_X509_CERT_URL !== undefined
+// );
+// console.log(
+//   "CLIENT_X509_CERT_URL:",
+//   process.env.CLIENT_X509_CERT_URL !== undefined
+// );
+// console.log("UNIVERSE_DOMAIN:", process.env.UNIVERSE_DOMAIN !== undefined);
 
 
 // error handler
