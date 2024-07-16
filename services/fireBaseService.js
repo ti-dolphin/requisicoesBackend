@@ -29,7 +29,6 @@ admin.initializeApp({
 
 const fireBaseService = {
   uploadFileToFireBase: async (filePath) => {
-    console.log("1 - UPLOADFILES TO FIREBASE");
     try {
       const bucket = admin.storage().bucket();
       await bucket.upload(filePath, {

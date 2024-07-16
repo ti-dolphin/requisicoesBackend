@@ -5,7 +5,7 @@ const requisitionItemController = {
   getRequisitionItem_by_reqID: async (requisitionID) => {
     const query = `
           SELECT
-            dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, OBSERVACAO, OC, ID_REQUISICAO, ATIVO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia, codigo
+            dsecombr_controle.WEB_REQUISICAO_ITEMS.ID, QUANTIDADE, OBSERVACAO, UNIDADE, OC, ID_REQUISICAO, ATIVO, WEB_REQUISICAO_ITEMS.ID_PRODUTO, nome_fantasia, codigo
             FROM
             dsecombr_controle.WEB_REQUISICAO_ITEMS inner join produtos ON produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO 
             WHERE ID_REQUISICAO = ?`;
@@ -67,7 +67,6 @@ const requisitionItemController = {
         console.log(e);
       }
     });
-    console.log("count: ", resultCount);
     return resultCount;
   },
 

@@ -23,7 +23,6 @@ const requisitonController = {
       const [rows, fields] = await requisitonController.executeQuery(query, [
         id
       ]);
-      console.log(rows);
       return rows;
     } catch (err) {
       console.log(err);

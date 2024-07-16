@@ -6,7 +6,6 @@ const utils = require('../utils');
 const itemFileController = {
   createItemFile: async (itemID, file) => {
     const filePath = file.path;
-    console.log("fileName: ", file.filename);
     const query =
       "INSERT INTO anexos_item (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
      try {
@@ -37,10 +36,8 @@ const itemFileController = {
         }
     },
   getItemFilesByFileId: async (itemID) => {
-    console.log("getItemFilesByFileId");
     const query = `SELECT * FROM anexos_item WHERE id_item = ?`;
     const [result] = await itemFileController.executeQuery(query, [itemID]);
-    console.log("result: ", result);
     return result;
   },
 

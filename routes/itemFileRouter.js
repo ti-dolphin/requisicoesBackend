@@ -17,14 +17,12 @@ router.post('/:itemID', upload.single("file"), async(req, res) => {
 });
 
 router.get('/:itemID', async(req, res) => { 
-    console.log('GET - itemFileController')
     const response = await itemFileController.getItemFilesByFileId(req.params.itemID);
     if(response && response.length) res.status(200).send(response);
     else res.status(404).send();
 });
 
 router.delete('/:id', async(req, res ) => { 
-  console.log("DELETE - itemFileController");
   const response = await itemFileController.deleteItemFile(req.params.id);
   if(response) res.status(200).send('deleted successfully');
   else response.status(404).send();
