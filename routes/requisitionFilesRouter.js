@@ -16,7 +16,7 @@ router.post("/:requisitionID", upload.single("file"), async (req, res) => {
           );
           if(response) res.status(200).send(response);
         }
-        else res.send(404);
+        else res.status(404).send();
 });
 
 router.get("/:requisitionID", async (req, res) => {

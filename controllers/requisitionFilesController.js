@@ -6,6 +6,7 @@ const utils = require('../utils');
 const requisitionFilesController = {
   createRequisitionFile: async (requisitionID, file) => {
     const filePath = file.path;
+    // console.log("file - createRequisitionFile: ", file);
     const query = `INSERT INTO
           dsecombr_controle.anexos_requisicao
           (id_requisicao, arquivo, nome_arquivo)

@@ -7,13 +7,13 @@ const upload = multer({ storage: multerConfig });
 
 router.post('/:itemID', upload.single("file"), async(req, res) => { 
      if (req.file) {
+       console.log('router');
        const response = await itemFileController.createItemFile(
          req.params.itemID,
          req.file
        );
        if (response) res.status(200).send(response);
-     } else res.send(404);
-
+     } else res.status(404).send();
 });
 
 router.get('/:itemID', async(req, res) => { 
