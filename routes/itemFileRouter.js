@@ -15,7 +15,17 @@ router.post('/:itemID', upload.single("file"), async(req, res) => {
        if (response) res.status(200).send(response);
      } else res.status(404).send();
 });
-
+router.post("/link/:itemID", async (req, res) => {
+  console.log('1 - ', req.body);
+   if (req) {
+     console.log("router");
+     const response = await itemFileController.createItemFileFromLink(
+       req.params.itemID,
+       req
+     );
+     if (response) res.status(200).send(response);
+   } else res.status(404).send();
+});
 router.get('/:itemID', async(req, res) => { 
     const response = await itemFileController.getItemFilesByFileId(req.params.itemID);
     if(response && response.length) res.status(200).send(response);
