@@ -1,12 +1,10 @@
 const { json } = require("express");
 const pool = require("../database");
-const { executeQuery } = require("./requisitionItemController");
-const { options } = require("../routes/requisitionRouter");
 
 const requisitonController = {
   getRequisitions: async () => {
     const query =
-    "SELECT ID_REQUISICAO, STATUS, OBSERVACAO, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, CREATED_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
+      "SELECT ID_REQUISICAO, STATUS, OBSERVACAO, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, CREATED_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID";
     try {
       const [rows, fields] = await requisitonController.executeQuery(query);
       return rows;
@@ -21,7 +19,7 @@ const requisitonController = {
 
     try {
       const [rows, fields] = await requisitonController.executeQuery(query, [
-        id
+        id,
       ]);
       return rows;
     } catch (err) {
@@ -96,7 +94,7 @@ const requisitonController = {
         STATUS = '${requisition.STATUS}',
          LAST_UPDATE_ON = '${nowDateTimeInBrazil}',
            OBSERVACAO = '${requisition.OBSERVACAO}'
-          where ID_REQUISICAO = ${id}`;
+            where ID_REQUISICAO = ${id}`;
   },
 
   deleteRequisitionById: async (requisitionID) => {

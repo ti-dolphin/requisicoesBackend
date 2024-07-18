@@ -1,7 +1,7 @@
 const { json } = require("express");
 const pool = require("../database");
-const fireBaseService = require('../services/fireBaseService');
-const utils = require('../utils');
+const fireBaseService = require("../services/fireBaseService");
+const utils = require("../utils");
 
 const requisitionFilesController = {
   createRequisitionFile: async (requisitionID, file) => {
@@ -21,12 +21,31 @@ const requisitionFilesController = {
         fileUrl,
         file.filename,
       ]);
-      if(fileUrl) utils.removeFile(filePath);
+      if (fileUrl) utils.removeFile(filePath);
       return fileUrl;
     } catch (e) {
       console.log("erro: ", e);
       return null;
     }
+  },
+
+  createRequisitionFileFromLink: async (id, req) => {
+    const { link } = req.body;
+    const query = `INSERT INTO
+          dsecombr_controle.anexos_requisicao
+          (id_requisicao, arquivo, nome_arquivo)
+           VALUES (?, ?, ?)`;
+        try {
+          const [result] = await requisitionFilesController.executeQuery(query, [
+            id,
+            link,
+            link,
+          ]);
+          if (result) return result;
+        } catch (e) {
+          console.log(e);
+          return null;
+        }
   },
 
   getRequisitionFiles: async (requisitionID) => {
@@ -43,13 +62,15 @@ const requisitionFilesController = {
     }
   },
 
-  deleteRequisitionFile: async (fileID) => { 
+  deleteRequisitionFile: async (fileID) => {
     const query = `DELETE FROM dsecombr_controle.anexos_requisicao where id = ?`;
-    try{ 
-      const [result] = await requisitionFilesController.executeQuery(query, [fileID]);
-      if(result.affectedRows > 0) return result;
-      else throw new Error('Something went wrong');
-    }catch(e){ 
+    try {
+      const [result] = await requisitionFilesController.executeQuery(query, [
+        fileID,
+      ]);
+      if (result.affectedRows > 0) return result;
+      else throw new Error("Something went wrong");
+    } catch (e) {
       console.log(e);
       return null;
     }

@@ -19,6 +19,17 @@ router.post("/:requisitionID", upload.single("file"), async (req, res) => {
         else res.status(404).send();
 });
 
+router.post("/link/:requisitionID", async (req, res) => {
+  if (req.body) {
+    const response = await requisitionFilesController.createRequisitionFileFromLink(
+      req.params.requisitionID,
+      req
+    );
+    if (response) res.status(200).send(response);
+  } else res.status(404).send();
+});
+
+
 router.get("/:requisitionID", async (req, res) => {
         const result = await requisitionFilesController.getRequisitionFiles(
           req.params.requisitionID

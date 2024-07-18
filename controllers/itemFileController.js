@@ -44,6 +44,7 @@ const itemFileController = {
       return null;
     }
   },
+  
   deleteItemFile: async (id) => {
     const query = `DELETE FROM anexos_item WHERE id = ?`;
     try {
@@ -54,6 +55,7 @@ const itemFileController = {
       return null;
     }
   },
+
   getItemFilesByFileId: async (itemID) => {
     const query = `SELECT * FROM anexos_item WHERE id_item = ?`;
     const [result] = await itemFileController.executeQuery(query, [itemID]);
