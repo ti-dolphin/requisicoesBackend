@@ -58,6 +58,7 @@ const requisitionItemController = {
       `UPDATE WEB_REQUISICAO_ITEMS 
        SET QUANTIDADE = ${item.QUANTIDADE},
          OBSERVACAO = '${item.OBSERVACAO}',
+          ID_PRODUTO = ${item.ID_PRODUTO},
            OC = ${item.OC},
             ATIVO = ${item.ATIVO} WHERE ID = ${item.ID} `;
       try {
