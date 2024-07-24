@@ -40,8 +40,8 @@ const requisitionItemController = {
     const query = `DELETE FROM WEB_REQUISICAO_ITEMS WHERE ID_REQUISICAO = ? AND ID_PRODUTO = ?`;
     try {
       const [result] = await requisitionItemController.executeQuery(query, [
-        requisitionID,
-        productID
+        Number(requisitionID),
+        Number(productID),
       ]);
       return result;
     } catch (err) {
