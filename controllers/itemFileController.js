@@ -33,7 +33,6 @@ const itemFileController = {
   },
   createItemFileFromLink: async (itemID, req) => {
     const { link } = req.body;
-    console.log(" 2 - link ", link);
     const query =
       "INSERT INTO anexos_item (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
     try {
@@ -67,7 +66,6 @@ const itemFileController = {
     try {
       const result = (await connection).query(query, params);
       (await connection).release();
-      // console.log('result: itemFileController ', result);
       return result;
     } catch (queryError) {
       console

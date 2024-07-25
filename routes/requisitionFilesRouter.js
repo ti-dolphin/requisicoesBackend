@@ -8,7 +8,7 @@ const requisitonController = require("../controllers/requisitionController");
 
 const upload = multer({ storage: multerConfig });
 
-router.post("/:requisitionID", upload.single("file"), async (req, res) => {
+router.post("/:requisitionID", upload.single("file"), async (req, res, next) => {
         if (req.file){ 
           const response = await requisitionFilesController.createRequisitionFile(
             req.params.requisitionID,

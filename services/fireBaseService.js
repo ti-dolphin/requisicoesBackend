@@ -38,7 +38,6 @@ const fireBaseService = {
       });
       return "file uploaded!";
     } catch (e) {
-      console.log("2 - error");
     }
   },
   getFilesFromFirebase: async () => {

@@ -10,7 +10,7 @@ router.get('/', async (req, res, next) => {
     else  res.status(404).send("Ops, algo deu errado!");
 });
 
-router.get('/:id', async ( req, res ) => { 
+router.get('/:id', async ( req, res, next ) => { 
     const result= await requisitonController.getRequisitionByID(req.params.id);
     if (result && result.length) res.status(200).send(result[0]);
     else res.status(404).send("Ops, algo deu errado!");

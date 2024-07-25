@@ -16,7 +16,7 @@ router.get("/:requisitionID", async function (req, res, next) {
 });
 
 
-router.post("/:requisitionID", async (req, res) => {
+router.post("/:requisitionID", async (req, res, next) => {
   const result = await requisitionItemController.createRequisitionItems(
     req.body,
     req.params.requisitionID
@@ -24,14 +24,13 @@ router.post("/:requisitionID", async (req, res) => {
   if (result) res.status(200).send(`${result.insertId}`);
   else res.status(404).send("Ops, algo deu errado");
 });
-router.delete("/:requisitionID/:productID", async ( req, res ) =>  {
+router.delete("/:requisitionID/:productID", async ( req, res, next ) =>  {
   const result = await requisitionItemController.deleteRequisitionItem_by_reqID(req.params.requisitionID, req.params.productID);
   if(result.affectedRows > 0) res.status(200).send();
   else res.status(404).send();
 })
 
-router.put("/:requisitionID", async (req, res) => {
-  console.log("PUT");
+router.put("/:requisitionID", async (req, res, next) => {
   const result = await requisitionItemController.updateRequisitionItems(req.body);
   if(result === req.body.length) res.status(200).send();
   else res.status(404).send();

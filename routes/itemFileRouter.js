@@ -16,9 +16,7 @@ router.post('/:itemID', upload.single("file"), async(req, res) => {
      } else res.status(404).send();
 });
 router.post("/link/:itemID", async (req, res) => {
-  console.log('1 - ', req.body);
    if (req) {
-     console.log("router");
      const response = await itemFileController.createItemFileFromLink(
        req.params.itemID,
        req
