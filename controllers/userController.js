@@ -8,6 +8,7 @@ const userController = {
     const { username, password } = req.body;
     const verification = await userController.verifyCredentials(username, password);
     if(verification.user){ 
+       console.log("verification.user: ", verification.user);
        const expiresIn = '1d'
         try{ 
           const token = jwt.sign(
@@ -19,7 +20,8 @@ const userController = {
           return token
           
         }catch(e){ 
-            return null;
+          console.log('authorization error: ', e);
+           return null;
         }
     }
     return null;
