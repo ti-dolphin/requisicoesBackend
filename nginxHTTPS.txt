@@ -9,7 +9,7 @@ server {
 server {
 	listen 80;
 	listen [::]:80;
-  server_name apicontrolehomologacao.com.br;
+  server_name apicontrolehomologacao.dse.com.br;
   return 301 https://$host$request_uri;
 }
 
@@ -18,16 +18,16 @@ server {
 	listen 443 ssl http2;
 	listen [::]:443 ssl http2;
 
-	server_name apicontrolehomologacao.com.br;
+	server_name apicontrolehomologacao.dse.com.br;
 
 	# O servidor só vai responder pra este domínio
-  if ($host != "apicontrolehomologacao.com.br") {
+  if ($host != "apicontrolehomologacao.dse.com.br") {
     return 404;
   }
 	
-	ssl_certificate /etc/letsencrypt/live/apicontrolehomologacao.com.br/fullchain.pem; # managed by Certbot
-	ssl_certificate_key /etc/letsencrypt/live/apicontrolehomologacao.com.br/privkey.pem; # managed by Certbot
-	ssl_trusted_certificate /etc/letsencrypt/live/apicontrolehomologacao.com.br/chain.pem;
+	ssl_certificate /etc/letsencrypt/live/apicontrolehomologacao.dse.com.br/fullchain.pem; # managed by Certbot
+	ssl_certificate_key /etc/letsencrypt/live/apicontrolehomologacao.dse.com.br/privkey.pem; # managed by Certbot
+	ssl_trusted_certificate /etc/letsencrypt/live/apicontrolehomologacao.dse.com.br/chain.pem;
 
 	# Improve HTTPS performance with session resumption
 	ssl_session_cache shared:SSL:10m;
@@ -101,8 +101,8 @@ server {
 		image/svg+xml;
 
 	access_log off;
-	#access_log  /var/log/nginx/apicontrolehomologacao.com.br-access.log;
-	error_log   /var/log/nginx/apicontrolehomologacao.com.br-error.log;
+	#access_log  /var/log/nginx/apicontrolehomologacao.dse.com.br-access.log;
+	error_log   /var/log/nginx/apicontrolehomologacao.dse.com.br-error.log;
 
 	#include /etc/nginx/common/protect.conf;
 }
