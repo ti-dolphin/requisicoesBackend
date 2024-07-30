@@ -1,28 +1,31 @@
 const crypto = require("crypto");
 const pool = require("../database");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const userController = {
   login: async (req) => {
     const { username, password } = req.body;
-    const verification = await userController.verifyCredentials(username, password);
-    if(verification.user){ 
-       console.log("verification.user: ", verification.user);
-       const expiresIn = '1d'
-        try{ 
-          const token = jwt.sign(
-          {username, password},
+    const verification = await userController.verifyCredentials(
+      username,
+      password
+    );
+    if (verification.user) {
+      const expiresIn = "1d";
+      try {
+        const token = jwt.sign(
+          { username, password },
           process.env.SECRET_TOKEN,
-          { 
-            expiresIn : '1 day',
-          });
-          return token
-          
-        }catch(e){ 
-          console.log('authorization error: ', e);
-           return null;
-        }
+          {
+            expiresIn: "1 day",
+          }
+        );
+        console.log({ user: verification.user, token: token });
+        return {user: verification.user[0], token: token}
+      } catch (e) {
+        console.log("authorization error: ", e);
+        return null;
+      }
     }
     return null;
   },
@@ -46,16 +49,15 @@ const userController = {
         };
       }
     } catch (error) {
-        return {
-          message: "An error occurred",
-          error: error.message,
-        };
+      return {
+        message: "An error occurred",
+        error: error.message,
+      };
     }
   },
 
   findOne: async (username, encryptedPassword) => {
-    const query =
-      "SELECT LOGIN, SENHA FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
+    const query = "SELECT CODPESSOA, LOGIN, SENHA FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
     const [result] = await userController.executeQuery(query, [
       username,
       encryptedPassword,
