@@ -12,7 +12,7 @@ router.post('/login', async(req, res, next) => {
        userID: user.CODPESSOA,
        message: "Login Successful",
      });
-      res.status(201).send({token : token, userID : user.CODPESSOA, message: 'Login Successful'});
+      res.status(201).send({token : token, user: user, message: 'Login Successful'});
   }else{ 
       res.status(400).send({ message: "Login not succesful" });
   }

@@ -1,7 +1,6 @@
 const { json } = require("express");
 const pool = require("../database");
 
-
 const projectController = {
   getAllProjects: async () => {
     const query = "SELECT * FROM PROJETOS";

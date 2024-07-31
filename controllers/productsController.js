@@ -6,9 +6,7 @@ const productsController = {
   getProductsBySearch: async (search) => {
     const query = `SELECT ID,codigo,nome_fantasia FROM produtos WHERE nome_fantasia LIKE '%${search}%' and inativo = 0 and ultimo_nivel = 0`;
     try {
-      const [rows, fields] = await productsController.executeQuery(query, [
-        ''
-      ]);
+      const [rows, fields] = await productsController.executeQuery(query, ['']);
       return rows;
     } catch (e) {
       console.log(e);

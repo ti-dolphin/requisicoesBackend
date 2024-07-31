@@ -1,7 +1,7 @@
 # O servidor não vai responder via IP
 server {
-  listen 80 default_server;
-  server_name _;
+  listen 80;
+  server_name apicontrolehomologacao.dse.com.br;
   return 404;
 }
 

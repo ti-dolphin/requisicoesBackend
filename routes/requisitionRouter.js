@@ -5,10 +5,8 @@ const pool = require("../database");
 
 // GET /requisition/
 router.get('/', async (req, res, next) => {
-    console.log('get requisitions');
-    const  result  = await requisitonController.getRequisitions();
+    const  result = await requisitonController.getRequisitions(req);
     if (result && result.length) { 
-      console.log('result: ', result);
       res.status(200).send(result)
     }
     else  res.status(404).send("Ops, algo deu errado!");

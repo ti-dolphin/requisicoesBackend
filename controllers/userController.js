@@ -20,7 +20,6 @@ const userController = {
             expiresIn: "1 day",
           }
         );
-        console.log({ user: verification.user, token: token });
         return {user: verification.user[0], token: token}
       } catch (e) {
         console.log("authorization error: ", e);
@@ -28,6 +27,11 @@ const userController = {
       }
     }
     return null;
+  },
+  getManagerCode  : async  (userID) => { 
+    const query = 'SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?';
+    const [result] = await userController.executeQuery(query, [userID]);
+    return result[0].CODGERENTE;
   },
 
   verifyCredentials: async (username, password) => {
@@ -55,14 +59,42 @@ const userController = {
       };
     }
   },
+  
+  isPurchaser: async( userID) => { 
+    const query = 'SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND PERM_COMPRADOR = 1'
+    try{ 
+      const [result] = await userController.executeQuery(query, [userID]);
+      if(result.length) { 
+        return true;
+      }
+      return false;
+    }catch(e){ 
+      console.log('isPurchaser error: ', e)
+      return null
+    }
+  },
+  isManager: async (userID ) => { 
+    console.log('isManager - userID: ', userID)
+      const query =
+        "SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND CODGERENTE != 'null'";
+      try {
+        const [result] = await userController.executeQuery(query, [userID]);
+        console.log('result isManager: ', result);
+        if (result.length) return true;
+        return false;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+  },
 
   findOne: async (username, encryptedPassword) => {
-    const query = "SELECT CODPESSOA, LOGIN, SENHA FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
+    const query =
+      "SELECT CODPESSOA, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
     const [result] = await userController.executeQuery(query, [
       username,
       encryptedPassword,
     ]);
-    console.log("findOne result:  ", result);
     if (result.length) {
       return result;
     }
