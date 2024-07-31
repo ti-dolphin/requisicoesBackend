@@ -74,12 +74,10 @@ const userController = {
     }
   },
   isManager: async (userID ) => { 
-    console.log('isManager - userID: ', userID)
       const query =
         "SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND CODGERENTE != 'null'";
       try {
         const [result] = await userController.executeQuery(query, [userID]);
-        console.log('result isManager: ', result);
         if (result.length) return true;
         return false;
       } catch (e) {

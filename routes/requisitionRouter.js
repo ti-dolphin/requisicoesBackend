@@ -1,46 +1,17 @@
 var express = require("express");
 var router = express.Router();
-const requisitonController = require("../controllers/requisitionController");
+const RequisitionController = require("../controllers/requisitionController");
 const pool = require("../database");
 
 // GET /requisition/
-router.get('/', async (req, res, next) => {
-    const  result = await requisitonController.getRequisitions(req);
-    if (result && result.length) { 
-      res.status(200).send(result)
-    }
-    else  res.status(404).send("Ops, algo deu errado!");
-});
+router.get("/", RequisitionController.getRequisitions);
 
-router.get('/:id', async ( req, res, next ) => { 
-    const result= await requisitonController.getRequisitionByID(req.params.id);
-    if (result && result.length) res.status(200).send(result[0]);
-    else res.status(404).send("Ops, algo deu errado!");
-});
+router.get("/:id", RequisitionController.getRequisitionByID);
 
-router.post("/", async (req, res, next) => {
-  const result = await requisitonController.insertRequisitions(req.body);
-  if (result) res.status(200).send(`${result.insertId}`);
-  else res.status(404).send();
-});
+router.post("/", RequisitionController.insertRequisitions);
 
+router.put("/:requisitionID", RequisitionController.updateRequisitionById);
 
-// PUT /requistion/:requisitionID
-router.put("/:requisitionID", async (req, res, next) => {
- 
-  const result = await requisitonController.updateRequisitonById(
-    req.body,
-    req.params.requisitionID
-  );
-  if (result) res.status(200).send("success");
-  else res.status(404).send("Algo deu errado, não foi possível atualizar o registro");
-});
+router.delete("/:requisitionID", RequisitionController.deleteRequisitionById);
 
-//delete /requisition/:requisitionID
-router.delete("/:requisitionID", async (req, res, next) => {
-    const result = await requisitonController.deleteRequisitionById( req.params.requisitionID );
-    if(result) res.status(200).send("success");
-    else res.status(404).send("Algo deu errado, não foi possível deletar o registro");
-
-});
 module.exports = router;

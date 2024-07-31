@@ -1,81 +1,72 @@
-const { json } = require("express");
-const pool = require("../database");
-const fireBaseService = require("../services/fireBaseService");
-const utils = require("../utils");
 
-const itemFileController = {
-  createItemFile: async (itemID, file) => {
-    if (file) {
-      const filePath = file.path;
-      const query =
-        "INSERT INTO anexos_item (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
-      try {
-        const transaction = await fireBaseService.uploadFileToFireBase(
-          filePath
-        );
-        const [allFiles] = await fireBaseService.getFilesFromFirebase();
-        const createdFile = allFiles.find(
-          (item) => item.name === file.filename
-        );
-        const fileUrl = createdFile.publicUrl();
-        await itemFileController.executeQuery(query, [
-          fileUrl,
-          itemID,
-          file.filename,
-        ]);
-        if (fileUrl) utils.removeFile(filePath);
-        return fileUrl;
-      } catch (e) {
-        console.log("erro: ", e);
-        return null;
+const ItemFileService = require("../services/ItemFileService");
+class ItemFileController {
+  static async createItemFile(req, res) {
+    const { itemID } = req.params;
+    const file = req.file;
+      if (!file) {
+        return res.status(400).send("No file uploaded");
       }
-    }
-  },
-  createItemFileFromLink: async (itemID, req) => {
+      try {
+        const fileUrl = await ItemFileService.createItemFile(itemID, file);
+        if (fileUrl) {
+          res.status(200).send({ fileUrl });
+        } else {
+          res.status(500).send("Failed to upload file");
+        }
+      } catch (e) {
+        console.log("Error in createItemFile: ", e);
+        res.status(500).send("Internal Server Error");
+      }
+  }
+
+  static async createItemFileFromLink(req, res) {
+    const { itemID } = req.params;
     const { link } = req.body;
-    const query =
-      "INSERT INTO anexos_item (arquivo, id_item, nome_arquivo) VALUES (?, ?, ? )";
-    try {
-      const [result] = await itemFileController.executeQuery(query, [link, itemID, link]);
-      if (result ) return result;
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-  },
-  
-  deleteItemFile: async (id) => {
-    const query = `DELETE FROM anexos_item WHERE id = ?`;
-    try {
-      const result = await itemFileController.executeQuery(query, [id]);
-      return result;
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-  },
 
-  getItemFilesByFileId: async (itemID) => {
-    const query = `SELECT * FROM anexos_item WHERE id_item = ?`;
-    const [result] = await itemFileController.executeQuery(query, [itemID]);
-    return result;
-  },
-
-  executeQuery: async (query, params) => {
-    const connection = pool.getConnection();
     try {
-      const result = (await connection).query(query, params);
-      (await connection).release();
-      return result;
-    } catch (queryError) {
-      console
-        .log(
-          "queryErro: ",
-          queryError
-        )(await connection)
-        .release();
-      throw queryError;
+      const result = await ItemFileService.createItemFileFromLink(itemID, link);
+      if (result) {
+        res.status(200).send({ id: result.insertId });
+      } else {
+        res.status(500).send("Failed to create file from link");
+      }
+    } catch (e) {
+      console.log("Error in createItemFileFromLink: ", e);
+      res.status(500).send("Internal Server Error");
     }
-  },
-};
-module.exports = itemFileController;
+  }
+
+  static async deleteItemFile(req, res) {
+    const { id } = req.params;
+
+    try {
+      const result = await ItemFileService.deleteItemFile(id);
+      if (result.affectedRows > 0) {
+        res.status(200).send("File deleted successfully");
+      } else {
+        res.status(404).send("File not found");
+      }
+    } catch (e) {
+      console.log("Error in deleteItemFile: ", e);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
+  static async getItemFilesByFileId(req, res) {
+    const { itemID } = req.params;
+    try {
+      const files = await ItemFileService.getItemFilesByFileId(itemID);
+      if (files.length) {
+        res.status(200).send(files);
+      } else {
+        res.status(404).send("No files found");
+      }
+    } catch (e) {
+      console.log("Error in getItemFilesByFileId: ", e);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+}
+
+module.exports = ItemFileController;

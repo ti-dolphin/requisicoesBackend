@@ -39,7 +39,6 @@ router.get("/:requisitionID", async (req, res) => {
 });
 
 router.delete('/:fileID', async(req, res) =>  {
-  console.log('id da requisição: ', req.params.fileID);
       const result = await requisitionFilesController.deleteRequisitionFile(req.params.fileID);
       if(result) res.status(200).send('success');
       else res.status(404).send('something went wrong');

@@ -1,38 +1,28 @@
 var express = require("express");
 var router = express.Router();
-const pool = require("../database");
-const requisitionItemController = require("../controllers/requisitionItemController");
+const RequisitionItemController = require("../controllers/requisitionItemController");
 
-/* GET home page. */
-
-// GET requisition/requisitionItems/:requisitionID
+// GET /requisitionItems/:requisitionID
 router.get("/:requisitionID", async function (req, res, next) {
-  const result = await requisitionItemController.getRequisitionItem_by_reqID(
-    req.params.requisitionID
-  );
-  if (result && result.length) res.status(200).send(result);
-  else res.status(404).send();
-
+  console.log('req params: ', req.params)
+  await RequisitionItemController.getRequisitionItemByReqID(req, res);
 });
 
-
+// POST /requisitionItems/:requisitionID
 router.post("/:requisitionID", async (req, res, next) => {
-  const result = await requisitionItemController.createRequisitionItems(
-    req.body,
-    req.params.requisitionID
-  );
-  if (result) res.status(200).send(`${result.insertId}`);
-  else res.status(404).send("Ops, algo deu errado");
+   await RequisitionItemController.createRequisitionItems(req, res);
+  //  next();
 });
-router.delete("/:requisitionID/:productID", async ( req, res, next ) =>  {
-  const result = await requisitionItemController.deleteRequisitionItem_by_reqID(req.params.requisitionID, req.params.productID);
-  if(result.affectedRows > 0) res.status(200).send();
-  else res.status(404).send();
-})
 
-router.put("/:requisitionID", async (req, res, next) => {
-  const result = await requisitionItemController.updateRequisitionItems(req.body);
-  if(result === req.body.length) res.status(200).send();
-  else res.status(404).send();
+// DELETE /requisitionItems/:requisitionID/:productID
+router.delete("/:requisitionID/:productID", async (req, res, next) => {
+   await RequisitionItemController.deleteRequisitionItem( req, res );
+  //  next();
 });
+
+// PUT /requisitionItems/:requisitionID
+router.put("/:requisitionID", async (req, res, next) => {
+   await RequisitionItemController.updateRequisitionItems(req, res);
+});
+
 module.exports = router;
