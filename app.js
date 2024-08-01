@@ -19,6 +19,7 @@ app.disable('etag');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(cors());
+require("dotenv").config();
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(express.json());
@@ -34,7 +35,7 @@ app.use('/project', authorize, projectRouter);
 app.use('/requisitionFiles', authorize, requisitionFilesRouter);
 app.use('/itemFiles', authorize, itemFileRouter);
 
-require("dotenv").config();
+
 
 
 app.use(function(req, res, next) {

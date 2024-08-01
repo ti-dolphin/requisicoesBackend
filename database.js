@@ -4,10 +4,10 @@ const mysql = require('mysql2/promise');
 //   database: "dsecombr_controle",
 //   password: "dse54@74",
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "dudu",
+  host: "10.0.0.3",
+  user: "root",
   database: "dsecombr_controle",
-  password: "247156",
+  password: "masterkey",
   port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
