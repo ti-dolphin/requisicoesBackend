@@ -1,97 +1,90 @@
-const { json } = require("express");
-const pool = require("../database");
-const fireBaseService = require("../services/fireBaseService");
-const utils = require("../utils");
+const RequisitionFilesService = require("../services/RequisitionFileService");
 
-const requisitionFilesController = {
-  createRequisitionFile: async (requisitionID, file) => {
-    const filePath = file.path;
-    // console.log("file - createRequisitionFile: ", file);
-    const query = `INSERT INTO
-          dsecombr_controle.anexos_requisicao
-          (id_requisicao, arquivo, nome_arquivo)
-           VALUES (?, ?, ?)`;
+class RequisitionFilesController {
+
+  static async createRequisitionFile(req, res) {
+    const { requisitionID } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).send("File is required.");
+    }
+
     try {
-      const transaction = await fireBaseService.uploadFileToFireBase(filePath);
-      const [allFiles] = await fireBaseService.getFilesFromFirebase();
-      const createdFile = allFiles.find((item) => item.name === file.filename);
-      const fileUrl = createdFile.publicUrl();
-      await requisitionFilesController.executeQuery(query, [
+      const fileUrl = await RequisitionFilesService.createRequisitionFile(
         requisitionID,
-        fileUrl,
-        file.filename,
-      ]);
-      if (fileUrl) utils.removeFile(filePath);
-      return fileUrl;
-    } catch (e) {
-      console.log("erro: ", e);
-      return null;
-    }
-  },
-
-  createRequisitionFileFromLink: async (id, req) => {
-    const { link } = req.body;
-    const query = `INSERT INTO
-          dsecombr_controle.anexos_requisicao
-          (id_requisicao, arquivo, nome_arquivo)
-           VALUES (?, ?, ?)`;
-        try {
-          const [result] = await requisitionFilesController.executeQuery(query, [
-            id,
-            link,
-            link,
-          ]);
-          if (result) return result;
-        } catch (e) {
-          console.log(e);
-          return null;
-        }
-  },
-
-  getRequisitionFiles: async (requisitionID) => {
-    const query = `SELECT * FROM dsecombr_controle.anexos_requisicao where id_requisicao = ?`;
-    try {
-      const [rows, fields] = await requisitionFilesController.executeQuery(
-        query,
-        [requisitionID]
+        file
       );
-      return rows;
-    } catch (e) {
-      console.log("erro getRequisitionFiles: ", e);
-      return null;
+      if (fileUrl) {
+        res.status(200).send(fileUrl);
+      } else {
+        res.status(500).send("Error uploading file.");
+      }
+    } catch (error) {
+      console.log("Error in createRequisitionFile:", error);
+      res.status(500).send("Internal Server Error.");
     }
-  },
+  }
 
-  deleteRequisitionFile: async (fileID) => {
-    const query = `DELETE FROM dsecombr_controle.anexos_requisicao where id = ?`;
+  static async createRequisitionFileFromLink(req, res) {
+    const { requisitionID } = req.params;
+    const { link } = req.body;
+
+    if (!link) {
+      return res.status(400).send("Link is required.");
+    }
     try {
-      const [result] = await requisitionFilesController.executeQuery(query, [
-        fileID,
-      ]);
-      if (result.affectedRows > 0) return result;
-      else throw new Error("Something went wrong");
-    } catch (e) {
-      console.log(e);
-      return null;
+      const result =
+        await RequisitionFilesService.createRequisitionFileFromLink(
+          requisitionID,
+          link
+        );
+      if (result) {
+        res.status(200).send(result);
+      } else {
+        res.status(500).send("Error uploading file from link.");
+      }
+    } catch (error) {
+      console.log("Error in createRequisitionFileFromLink:", error);
+      res.status(500).send("Internal Server Error.");
     }
-  },
+  }
 
-  executeQuery: async (query, params) => {
-    const connection = pool.getConnection();
+  static async getRequisitionFiles(req, res) {
+    const { requisitionID } = req.params;
+
     try {
-      const result = (await connection).query(query, params);
-      (await connection).release();
-      return result;
-    } catch (queryError) {
-      console
-        .log(
-          "queryError: ",
-          queryError
-        )(await connection)
-        .release();
-      throw queryError;
+      const files = await RequisitionFilesService.getRequisitionFiles(
+        requisitionID
+      );
+      if (files && files.length) {
+        res.status(200).send(files);
+      } else {
+        res.status(404).send("No files found.");
+      }
+    } catch (error) {
+      console.log("Error in getRequisitionFiles:", error);
+      res.status(500).send("Internal Server Error.");
     }
-  },
-};
+  }
 
-module.exports = requisitionFilesController;
+  static async deleteRequisitionFile(req, res) {
+    const { fileID } = req.params;
+
+    try {
+      const result = await RequisitionFilesService.deleteRequisitionFile(
+        fileID
+      );
+      if (result.affectedRows > 0) {
+        res.status(200).send("File deleted successfully.");
+      } else {
+        res.status(404).send("File not found.");
+      }
+    } catch (error) {
+      console.log("Error in deleteRequisitionFile:", error);
+      res.status(500).send("Internal Server Error.");
+    }
+  }
+}
+
+module.exports = RequisitionFilesController;

@@ -1,28 +1,8 @@
 const pool = require("../database");
-
+const ItemRepository = require('../repositories/ItemRepository');
 class RequisitionItemService {
   async getRequisitionItems(requisitionID) {
-    const query = `
-      SELECT
-        dsecombr_controle.WEB_REQUISICAO_ITEMS.ID,
-        QUANTIDADE,
-        OBSERVACAO,
-        UNIDADE,
-        OC,
-        ID_REQUISICAO,
-        ATIVO,
-        WEB_REQUISICAO_ITEMS.ID_PRODUTO,
-        nome_fantasia,
-        codigo
-      FROM
-        dsecombr_controle.WEB_REQUISICAO_ITEMS
-      INNER JOIN
-        produtos
-      ON
-        produtos.ID = dsecombr_controle.WEB_REQUISICAO_ITEMS.ID_PRODUTO
-      WHERE
-        ID_REQUISICAO = ?;
-    `;
+    const query = ItemRepository.getItemsByRequisitionID(requisitionID);
     const connection = await pool.getConnection();
     try {
       const [rows] = await connection.query(query, [requisitionID]);
@@ -36,16 +16,7 @@ class RequisitionItemService {
   }
 
   async createRequisitionItems(items, requisitionID) {
-    const values = items
-      .map(
-        (item) => `( ${item.QUANTIDADE}, ${requisitionID}, ${item.ID_PRODUTO} )`
-      )
-      .join(", ");
-
-    const query = `
-      INSERT INTO WEB_REQUISICAO_ITEMS (QUANTIDADE, ID_REQUISICAO, ID_PRODUTO)
-      VALUES ${values};
-    `;
+    const query = ItemRepository.createItems(items, requisitionID);
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.query(query);
@@ -59,13 +30,9 @@ class RequisitionItemService {
   }
 
   async deleteRequisitionItem(requisitionID, productID) {
-    const query = `
-      DELETE FROM WEB_REQUISICAO_ITEMS
-      WHERE ID_REQUISICAO = ? AND ID_PRODUTO = ?;
-    `;
     const connection = await pool.getConnection();
     try {
-      const [result] = await connection.query(query, [
+      const [result] = await connection.query(ItemRepository.delete(), [
         requisitionID,
         productID,
       ]);
@@ -79,25 +46,9 @@ class RequisitionItemService {
   }
 
   async updateRequisitionItems(items) {
-    const queries = items
-      .map(
-        (item) => `
-      UPDATE WEB_REQUISICAO_ITEMS
-      SET
-        QUANTIDADE = ${item.QUANTIDADE},
-        OBSERVACAO = '${item.OBSERVACAO}',
-        ID_PRODUTO = ${item.ID_PRODUTO},
-        OC = ${item.OC},
-        ATIVO = ${item.ATIVO}
-      WHERE
-        ID = ${item.ID};
-    `
-      )
-      .join("\n");
-
     const connection = await pool.getConnection();
     try {
-      const result = await connection.query(queries);
+      const result = await connection.query(ItemRepository.update(items));
       return result.length;
     } catch (err) {
       console.error("Erro na query", err);

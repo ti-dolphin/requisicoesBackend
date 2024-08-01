@@ -1,41 +1,37 @@
 const { json } = require("express");
 const pool = require("../database");
 
-const projectController = {
-  getAllProjects: async () => {
-    const query = "SELECT * FROM PROJETOS";
+const ProjectService = require("../services/ProjectService");
+
+class ProjectController {
+  static async getAllProjects(req, res) {
     try {
-      const [rows, fields] = await projectController.executeQuery(query);
-      return rows;
+      const projects = await ProjectService.getAllProjects();
+      if (projects) {
+        res.status(200).send(projects);
+      } else {
+        res.status(404).send("Projects not found");
+      }
     } catch (err) {
-      console.log(err);
-      return null;
+      console.log("Error in getAllProjects: ", err);
+      res.status(500).send("Internal Server Error");
     }
-  },
-  getProjectById: async (id) => {
-    const query = `SELECT * FROM PROJETOS WHERE ID = ?`;
+  }
+
+  static async getProjectById(req, res) {
+    const { id } = req.params;
     try {
-      const [rows, fields] = await projectController.executeQuery(query, [id]);
-      return rows;
+      const project = await ProjectService.getProjectById(id);
+      if (project) {
+        res.status(200).send(project);
+      } else {
+        res.status(404).send("Project not found");
+      }
     } catch (err) {
-      return null;
+      console.log("Error in getProjectById: ", err);
+      res.status(500).send("Internal Server Error");
     }
-  },
-  executeQuery: async (query, params) => {
-    const connection = pool.getConnection();
-    try {
-      const result = (await connection).query(query, params);
-      (await connection).release();
-      return result;
-    } catch (queryError) {
-      console
-        .log(
-          "queryErro: ",
-          queryError
-        )(await connection)
-        .release();
-      throw queryError;
-    }
-  },
-};
-module.exports = projectController;
+  }
+}
+
+module.exports = ProjectController;

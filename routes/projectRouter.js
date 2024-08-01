@@ -1,16 +1,15 @@
 var express = require("express");
 var router = express.Router();
-var projectController = require('../controllers/projectController');
+const ProjectController = require("../controllers/projectController");
 
-router.get('/', async (req, res ) =>  {
-     const result = await projectController.getAllProjects();
-     if (result && result.length) res.status(200).send(result);
-     else res.status(404).send("Ops, algo deu errado!");
+// GET /projects
+router.get("/", (req, res) => {
+  ProjectController.getAllProjects(req, res);
 });
-router.get('/:id', async ( req, res ) => { 
-    const result  = await projectController.getProjectById(req.params.id);
-    if (result && result.length) res.status(200).send(result);
-    else res.status(404).send();
+
+// GET /projects/:id
+router.get("/:id", (req, res) => {
+  ProjectController.getProjectById(req, res);
 });
 
 module.exports = router;

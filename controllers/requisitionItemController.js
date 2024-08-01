@@ -35,10 +35,11 @@ class RequisitionItemController {
         requisitionID,
         productID
       );
-      if (result) res.status(200).send("Item deletado com sucesso");
-      else res.status(404).send("Item não encontrado");
+      if (result) return res.status(200).send("Item deletado com sucesso");
+      else return res.status(404).send("Item não encontrado");
     } catch (err) {
-      res.status(500).send("Erro ao deletar item de requisição");
+      console.log("Erro ao deletar item de requisição: ", err);
+      return res.status(500).send("Erro ao deletar item de requisição");
     }
   }
 

@@ -9,9 +9,9 @@ class RequisitionController {
       currentKanbanFilter
     );
     if (requisitions) {
-      res.status(200).json(requisitions);
+      return res.status(200).json(requisitions);
     } else {
-      res.status(500).json({ error: "Erro ao buscar requisições" });
+      return res.status(500).json({ error: "Erro ao buscar requisições" });
     }
   }
 
@@ -19,27 +19,27 @@ class RequisitionController {
     const { id } = req.params;
     const requisition = await RequisitionService.getRequisitionByID(id);
     if (requisition) {
-      res.status(200).json(requisition);
+      return res.status(200).json(requisition);
     } else {
-      res.status(500).json({ error: "Erro ao buscar requisição" });
+      return res.status(500).json({ error: "Erro ao buscar requisição" });
     }
   }
 
   static async insertRequisitions(req, res) {
     const result = await RequisitionService.insertRequisitions(req.body);
     if (result) {
-      res.status(201).json(result.insertId);
+      return res.status(201).json(result.insertId);
     } else {
-      res.status(500).json({ error: "Erro ao inserir requisições" });
+      return res.status(500).json({ error: "Erro ao inserir requisições" });
     }
   }
 
   static async updateRequisitionById(req, res) {
     const result = await RequisitionService.updateRequisitionById(req.body);
     if (result) {
-      res.status(200).json(result);
+      return res.status(200).json(result);
     } else {
-      res.status(500).json({ error: "Erro ao atualizar requisição" });
+      return res.status(500).json({ error: "Erro ao atualizar requisição" });
     }
   }
 
@@ -49,9 +49,9 @@ class RequisitionController {
       requisitionID
     );
     if (result) {
-      res.status(200).json(result);
+      return res.status(200).json(result);
     } else {
-      res.status(500).json({ error: "Erro ao deletar requisição" });
+      return res.status(500).json({ error: "Erro ao deletar requisição" });
     }
   }
 }

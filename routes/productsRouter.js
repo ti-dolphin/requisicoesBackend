@@ -1,22 +1,9 @@
-var express = require("express");
-var router = express.Router();
-const pool = require("../database");
-const productsController = require('../controllers/productsController');
+const express = require("express");
+const router = express.Router();
+const ProductsController = require("../controllers/productsController");
 
-router.get('/',  async ( req, res ) => { 
-    
-    const { limit, offSet } = req.query;
-    if(limit && offSet){ 
-          const  result   = await productsController.getAllProducts(limit, offSet);
-          if (result && result.length) {
-            res.status(200).send(result);
-          } else res.status(404).send("Ops, algo deu errado!");
-    }else{ 
-        const { search } = req.query;
-        const result  = await productsController.getProductsBySearch(search);
-        if(result && result.length) res.status(200).send(result);
-        else res.status(404).send("Ops, algo deu errado!");
-    }
-   
+router.get('/', async (req, res) => { 
+    await ProductsController.getProductsBySearch(req, res);
 });
+
 module.exports = router;

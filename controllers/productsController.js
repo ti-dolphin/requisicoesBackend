@@ -1,33 +1,20 @@
-const { json } = require("express");
-const pool = require("../database");
+const ProductService = require("../services/ProductService");
 
-const productsController = {
-
-  getProductsBySearch: async (search) => {
-    const query = `SELECT ID,codigo,nome_fantasia FROM produtos WHERE nome_fantasia LIKE '%${search}%' and inativo = 0 and ultimo_nivel = 0`;
+class ProductsController {
+  static async getProductsBySearch(req, res) {
+    const { search } = req.query;
     try {
-      const [rows, fields] = await productsController.executeQuery(query, ['']);
-      return rows;
+      const products = await ProductService.getProductsBySearch(search);
+      if (products) {
+        res.status(200).send(products);
+      } else {
+        res.status(404).send("Products not found");
+      }
     } catch (e) {
-      console.log(e);
-      return null;
+      console.log("Error in getProductsBySearch: ", e);
+      res.status(500).send("Internal Server Error");
     }
-  },
-  executeQuery: async (query, params) => {
-    const connection = pool.getConnection();
-    try {
-      const result = (await connection).query(query, params);
-      (await connection).release();
-      return result;
-    } catch (queryError) {
-      console
-        .log(
-          "queryErro: ",
-          queryError
-        )(await connection)
-        .release();
-      throw queryError;
-    }
-  },
-};
-module.exports = productsController;
+  }
+}
+
+module.exports = ProductsController;
