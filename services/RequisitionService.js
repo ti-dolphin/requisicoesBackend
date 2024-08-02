@@ -11,6 +11,7 @@ class RequisitionService {
     );
     try {
       const rows = await this.executeQuery(query, params);
+      console.log("rows - RequisitionService.getRequisitions -> ", rows);
       return rows;
     } catch (err) {
       console.log(err);
@@ -88,9 +89,9 @@ class RequisitionService {
     }
   }
 
-  static async updateRequisitionById(requisition, id) {
+  static async updateRequisitionById(codpessoa, requisition) {
     try {
-      const query = await RequisitionRepository.update(requisition);
+      const query = await RequisitionRepository.update(codpessoa, requisition);
       const result = await this.executeQuery(query);
       return result;
     } catch (err) {

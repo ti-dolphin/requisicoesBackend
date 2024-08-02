@@ -14,12 +14,15 @@ class RequisitionRepository {
                             LAST_UPDATE_ON,
                             CREATED_ON,
                             DESCRICAO,
-                            NOME
+                             PESSOA.NOME AS NOME_RESPONSAVEL,
+                             PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
                         FROM   WEB_REQUISICAO
                             INNER JOIN PROJETOS
                                     ON ID_PROJETO = PROJETOS.ID
                             INNER JOIN PESSOA
                                     ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                            INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
                         WHERE   STATUS != ?
                                 AND (PROJETOS.CODGERENTE = ?  OR ID_RESPONSAVEL = ?)
                                
@@ -36,12 +39,15 @@ class RequisitionRepository {
                  LAST_UPDATE_ON,
                  CREATED_ON,
                  DESCRICAO,
-                 NOME
+                PESSOA.NOME AS NOME_RESPONSAVEL,
+                PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID    
                  INNER JOIN PESSOA
                          ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                 INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
           WHERE STATUS != ? AND ID_RESPONSAVEL = ?`;
   }
 
@@ -55,12 +61,15 @@ class RequisitionRepository {
                  LAST_UPDATE_ON,
                  CREATED_ON,
                  DESCRICAO,
-                 NOME
+                PESSOA.NOME AS NOME_RESPONSAVEL,
+                 PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID
                  INNER JOIN PESSOA
-                         ON PESSOA.CODPESSOA = ID_RESPONSAVEL`;
+                         ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY `;
   }
 
   static getPurchaser_toDo() {
@@ -73,12 +82,15 @@ class RequisitionRepository {
                  LAST_UPDATE_ON,
                  CREATED_ON,
                  DESCRICAO,
-                 NOME
+                  PESSOA.NOME AS NOME_RESPONSAVEL,
+                 PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID
                  INNER JOIN PESSOA
                          ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                  INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
                 WHERE STATUS = ?`;
   }
 
@@ -91,12 +103,16 @@ class RequisitionRepository {
                  ID_RESPONSAVEL,
                  LAST_UPDATE_ON,
                  CREATED_ON,
-                 DESCRICAO
+                 DESCRICAO,
+                  PESSOA.NOME AS NOME_RESPONSAVEL,
+                 PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID
                  INNER JOIN PESSOA
                          ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                  INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
           WHERE  STATUS = ?
                  OR STATUS = ?`;
   }
@@ -110,12 +126,16 @@ class RequisitionRepository {
                  ID_RESPONSAVEL,
                  LAST_UPDATE_ON,
                  CREATED_ON,
-                 DESCRICAO
+                 DESCRICAO,
+                 PESSOA.NOME AS NOME_RESPONSAVEL,
+                 PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID
                  INNER JOIN PESSOA
                          ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                  INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
           WHERE  STATUS = ?`;
   }
 
@@ -129,12 +149,16 @@ class RequisitionRepository {
                  LAST_UPDATE_ON,
                  CREATED_ON,
                  DESCRICAO,
-                 NOME
+                 PESSOA.NOME AS NOME_RESPONSAVEL,
+                 PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
           FROM   WEB_REQUISICAO
                  INNER JOIN PROJETOS
                          ON ID_PROJETO = PROJETOS.ID
                  INNER JOIN PESSOA
-                         ON PESSOA.CODPESSOA = ID_RESPONSAVEL`;
+                         ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                  INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY`;
+                 
   }
 
   static getNonPurchaser_backlog() {
@@ -147,12 +171,15 @@ class RequisitionRepository {
                             LAST_UPDATE_ON,
                             CREATED_ON,
                             DESCRICAO,
-                            NOME
+                            PESSOA.NOME AS NOME_RESPONSAVEL,
+                            PESSOA2.NOME AS LAST_MODIFIED_BY_NAME
                         FROM   WEB_REQUISICAO
                             INNER JOIN PROJETOS
                                     ON ID_PROJETO = PROJETOS.ID
                             INNER JOIN PESSOA
                                     ON PESSOA.CODPESSOA = ID_RESPONSAVEL
+                            INNER JOIN PESSOA AS PESSOA2
+                                    ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY 
                         WHERE  STATUS = ?
                             AND ID_RESPONSAVEL = ?`;
   }
@@ -184,7 +211,7 @@ class RequisitionRepository {
     );
   }
 
-  static async update(requisition) {
+  static async update(codpessoa, requisition) {
     const nowDateTime = new Date();
     const opcoes = {
       timeZone: "America/Sao_Paulo",
@@ -200,9 +227,10 @@ class RequisitionRepository {
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");
     return `UPDATE WEB_REQUISICAO
-       SET DESCRIPTION = '${requisition.DESCRIPTION}',
+           SET DESCRIPTION = '${requisition.DESCRIPTION}',
            STATUS = '${requisition.STATUS}',
            LAST_UPDATE_ON = '${nowDateTimeInBrazil}',
+           LAST_MODIFIED_BY = ${codpessoa},
            OBSERVACAO = '${requisition.OBSERVACAO}'
        WHERE ID_REQUISICAO = ${requisition.ID_REQUISICAO}`;
   }
