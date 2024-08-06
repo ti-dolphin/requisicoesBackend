@@ -7,6 +7,7 @@ class ProjectService {
         * 
       FROM 
         PROJETOS
+      WHERE ATIVO = 1
     `;
     try {
       const [rows, fields] = await this.executeQuery(query);

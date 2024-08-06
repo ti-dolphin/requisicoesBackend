@@ -209,7 +209,7 @@ class RequisitionRepository {
                    ${item.ID_RESPONSAVEL})`
       )
       .join(", ");
-    return (
+      return (
       "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, CREATED_ON, LAST_UPDATE_ON, LAST_MODIFIED_BY ) VALUES " +
       items
     );
