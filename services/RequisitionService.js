@@ -56,10 +56,10 @@ class RequisitionService {
         console.log('gerente')
         query = RequisitionRepository.getManagerRequisitions_monitoring();
         const codgerente = await userController.getManagerCode(userID);
-        params = ["Em edição", codgerente, userID];
+        params = ["Em edição", "Concluído", codgerente, userID];
       } else {
         query = RequisitionRepository.getNonPurchaser_monitoring();
-        params = ["Em edição", userID];
+        params = ["Em edição", "Concluído", userID];
       }
     } else if (currentKanbanFilter.toUpperCase() === "TUDO") {
       query = RequisitionRepository.getNonPurchaser_all();

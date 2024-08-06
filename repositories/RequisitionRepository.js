@@ -22,7 +22,7 @@ class RequisitionRepository {
                                     ON PESSOA.CODPESSOA = ID_RESPONSAVEL
                             INNER JOIN PESSOA AS PESSOA2
                                     ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
-                        WHERE   STATUS != ?
+                        WHERE   STATUS != ? AND STATUS != ?
                                 AND (PROJETOS.CODGERENTE = ?  OR ID_RESPONSAVEL = ?)
                                
 `;
@@ -47,7 +47,7 @@ class RequisitionRepository {
                          ON PESSOA.CODPESSOA = ID_RESPONSAVEL
                  INNER JOIN PESSOA AS PESSOA2
                                     ON PESSOA2.CODPESSOA = LAST_MODIFIED_BY
-          WHERE STATUS != ? AND ID_RESPONSAVEL = ?`;
+          WHERE STATUS != ? AND STATUS != ? AND ID_RESPONSAVEL = ?`;
   }
 
   static getNonPurchaser_all() {
@@ -227,12 +227,14 @@ class RequisitionRepository {
       second: "2-digit",
       hour12: false,
     };
+    console.log('requisition: ', requisition);
     const nowDateTimeInBrazil = nowDateTime
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");
     return `UPDATE WEB_REQUISICAO
            SET DESCRIPTION = '${requisition.DESCRIPTION}',
            STATUS = '${requisition.STATUS}',
+           ID_PROJETO = ${requisition.ID_PROJETO},
            LAST_UPDATE_ON = '${nowDateTimeInBrazil}',
            LAST_MODIFIED_BY = ${codpessoa},
            OBSERVACAO = '${requisition.OBSERVACAO}'
