@@ -10,7 +10,6 @@ class RequisitionFilesService {
       (id_requisicao, arquivo, nome_arquivo) 
       VALUES (?, ?, ?)
     `;
-
     try {
       await fireBaseService.uploadFileToFireBase(filePath);
       const [allFiles] = await fireBaseService.getFilesFromFirebase();
