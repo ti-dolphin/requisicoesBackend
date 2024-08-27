@@ -1,18 +1,76 @@
 const PatrimonyRepository = require("../repositories/PatrimonyRepository");
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
-  const opcoes = {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  };
+const opcoes = {
+  timeZone: "America/Sao_Paulo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+};
 
 class PatrimonyService {
+  static async deletePatrimony(patrimonyId) {
+    try {
+      const result = await this.executeQuery(
+        PatrimonyRepository.deletePatrimonyQuery(),
+        [patrimonyId]
+      );
+      return result.affectedRows;
+    } catch (e) {
+      console.error("Error in PatrimonyService.deletePatrimony:", e);
+      throw e;
+    }
+  }
+
+  static async getInactivePatrymonyInfo() {
+    const getInactivePatrymonyInfoQuery = await this.executeQuery(
+      PatrimonyRepository.getInactivePatrymonyInfoQuery()
+    );
+    console.log("inactive: ", getInactivePatrymonyInfoQuery);
+    return getInactivePatrymonyInfoQuery;
+  }
+
+  static async updatePatrimonies(ids, active) {
+    console.log('ids: ', ids);
+    if( !active){ 
+          const affectedRows = await this.executeQuery(
+            PatrimonyRepository.updatePatrimonies(),
+            [0, ids]
+          );
+            return affectedRows;
+    }
+     const affectedRows = await this.executeQuery(
+       PatrimonyRepository.updatePatrimonies(),
+       [1, ids]
+     );
+    return affectedRows;
+  }
+
+  static async getPatrimonyResponsable(patrimonyId) {
+    console.log("id patrimonio passado: ", patrimonyId);
+    const responsable = await this.executeQuery(
+      PatrimonyRepository.getPatrimonyResponsable(),
+      [patrimonyId]
+    );
+    console.log("result query getPatrimonyResponsable: ", responsable);
+    return responsable;
+  }
+
+  static async getPatrimonyType() {
+    try {
+      const patrimonyTypes = await this.executeQuery(
+        PatrimonyRepository.getPatrimonyTypeQuery()
+      );
+      return patrimonyTypes;
+    } catch (error) {
+      throw new Error("Error fetching patrimony types from repository");
+    }
+  }
+
   static async deletePatrimonyFile(patrimonyFileId) {
     const result = await this.executeQuery(
       PatrimonyRepository.deletePatrimonyFileQuery(),
@@ -93,6 +151,7 @@ class PatrimonyService {
       nserie,
       descricao,
       pat_legado,
+      tipo,
     } = newPatrimony;
     console.log({
       nome,
@@ -102,7 +161,6 @@ class PatrimonyService {
       pat_legado,
     });
 
-  
     const purchaseDate = new Date(data_compra)
       .toLocaleDateString("sv-SE", opcoes)
       .replace("T", " ")
@@ -111,7 +169,7 @@ class PatrimonyService {
       //PARAMS: nome, data_compra, nserie, descricao, pat_legado
       const result = await this.executeQuery(
         PatrimonyRepository.createPatrimonyQuery(),
-        [nome, purchaseDate, nserie, descricao, pat_legado]
+        [nome, purchaseDate, nserie, descricao, pat_legado, tipo]
       );
       if (result) return result.insertId;
     } catch (e) {

@@ -99,7 +99,6 @@ class MovementationService {
       MovementationRepository.getMovementationsByPatrimonyId_Query(),
       [patrimonyId]
     );
-    console.log("\ngetMovementationsByPatrimonyId - result\n", result );
     return result;
   }
 
