@@ -1,6 +1,11 @@
 
 
 class MovementationRepository {
+
+  static  setLastMovementationIdQuery(){
+    return `UPDATE movimentacao_patrimonio set id_ultima_movimentacao = ? WHERE id_movimentacao = ?`;
+  }
+
   static createMovementationQuery() {
     return `
             INSERT INTO movimentacao_patrimonio 
@@ -14,9 +19,11 @@ class MovementationRepository {
       DELETE FROM anexo_movimentacao WHERE id_anexo_movimentacao = ?
     `;
   }
+
   static deleteMovementationQuery(){
     return `DELETE FROM movimentacao_patrimonio WHERE id_movimentacao = ?`
   };
+  
   static updateMovementationQuery() {
     // id_movimentacao, data, id_patrimonio, id_projeto, id_responsavel, id_ultima_movimentacao, observacao ]
     return `
@@ -34,31 +41,33 @@ class MovementationRepository {
   static getMovementationsByPatrimonyId_Query() {
     return `
           SELECT 
-          id_movimentacao, 
-          data, 
-          id_patrimonio, 
-          id_projeto, 
-          id_responsavel,
-          id_ultima_movimentacao,
+          movimentacao_patrimonio.id_movimentacao, 
+           movimentacao_patrimonio.data, 
+           movimentacao_patrimonio.id_patrimonio, 
+           movimentacao_patrimonio.id_projeto, 
+           movimentacao_patrimonio.id_responsavel,
+           movimentacao_patrimonio.id_ultima_movimentacao,
           NOME as responsavel,
           PROJETOS.DESCRICAO as projeto,
-          observacao 
+          movimentacao_patrimonio.observacao,
+          movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel
         from 
           movimentacao_patrimonio 
           INNER JOIN PESSOA ON PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel 
           INNER JOIN PROJETOS ON PROJETOS.ID = movimentacao_patrimonio.id_projeto
+          INNER JOIN movimentacao_patrimonio AS movimentacao_patrimonio2 ON movimentacao_patrimonio2.id_movimentacao = movimentacao_patrimonio.id_ultima_movimentacao
         WHERE 
-          id_patrimonio = ?
+          movimentacao_patrimonio.id_patrimonio = ?
     `;
   }
 
   static getLastMovementationQuery(patrimonyId) {
     return `
-    SELECT id_movimentacao 
+    SELECT id_movimentacao, id_responsavel
         FROM movimentacao_patrimonio 
         WHERE id_patrimonio = ${patrimonyId}
         ORDER BY data DESC 
-        LIMIT 1;
+        LIMIT 2;
     `;
   }
 

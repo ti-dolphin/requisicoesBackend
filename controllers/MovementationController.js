@@ -1,6 +1,7 @@
 const MovementationService = require("../services/MovementationService");
 
 class MovementationController {
+  
   static async createMovementation(req, res) {
     const movementation = req.body;
     try {

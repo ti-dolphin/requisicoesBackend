@@ -23,8 +23,6 @@ class MovementationService {
     return result;
   }
 
-
-
   static async updateMovementation(movementation) {
     const {
       id_movimentacao,
@@ -80,6 +78,7 @@ class MovementationService {
     const id_ultima_movimentacao = await this.getLastMovementationByPatrimonyId(
       id_patrimonio
     );
+    console.log("id_ultima_movimentacao: ", id_ultima_movimentacao);
     const result = await this.executeQuery(
       MovementationRepository.createMovementationQuery(),
       [
@@ -91,6 +90,12 @@ class MovementationService {
         id_ultima_movimentacao,
       ]
     );
+     if (!id_ultima_movimentacao) {
+       await this.executeQuery(
+         MovementationRepository.setLastMovementationIdQuery(),
+         [result.insertId, result.insertId]
+       );
+     }
     return result.insertId;
   }
 
@@ -106,7 +111,8 @@ class MovementationService {
     const result = await this.executeQuery(
       MovementationRepository.getLastMovementationQuery(patrimonyId)
     );
-    if (result && result[0]) return result.id_movimentacao;
+    console.log('result: ', result)
+    if (result && result[0]) return result[0].id_movimentacao;
     else return 0;
   }
 

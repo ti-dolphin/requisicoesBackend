@@ -57,7 +57,7 @@ class PatrimonyController {
       const responsableId = await PatrimonyService.getPatrimonyResponsable(
         patrimonyId
       );
-      console.log(`o responsável é: ${responsableId}`);
+      console.log(`o responsável é: `, responsableId);
       return res.status(200).send(responsableId);
     } catch (e) {
       console.log("error in getPatrimonyResponsable");

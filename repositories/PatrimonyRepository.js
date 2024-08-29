@@ -35,9 +35,12 @@ class PatrimonyRepository {
 
   static getPatrimonyResponsable() {
     return `
-      SELECT id_responsavel
-       from movimentacao_patrimonio where id_patrimonio = ?
-        and id_movimentacao IN (SELECT max(id_movimentacao))
+     SELECT id_responsavel, id_movimentacao, id_patrimonio
+        FROM movimentacao_patrimonio
+        WHERE id_patrimonio = ?
+        ORDER BY id_movimentacao DESC
+        LIMIT 1;
+
     `;
   }
 
