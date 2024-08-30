@@ -35,7 +35,7 @@ class RequisitionController {
   }
 
   static async updateRequisitionById(req, res) {
-    const {codpessoa, requisition} = req.body
+    const {codpessoa, requisition} = req.body;
     const result = await RequisitionService.updateRequisitionById(codpessoa, requisition);
     if (result) {
       return res.status(200).json(result);

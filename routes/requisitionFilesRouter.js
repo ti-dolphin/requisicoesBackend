@@ -16,7 +16,7 @@ router.post("/link/:requisitionID", RequisitionFilesController.createRequisition
 
 router.get("/:requisitionID", RequisitionFilesController.getRequisitionFiles);
 
-router.delete("/:fileID", RequisitionFilesController.deleteRequisitionFile);
+router.delete("/:filename/:fileID", RequisitionFilesController.deleteRequisitionFile);
 
 
 // router.post("/:requisitionID", upload.single("file"), async (req, res, next) => {

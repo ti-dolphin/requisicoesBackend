@@ -69,11 +69,11 @@ class RequisitionFilesController {
   }
 
   static async deleteRequisitionFile(req, res) {
-    const { fileID } = req.params;
+    const { filename, fileID } = req.params;
 
     try {
       const result = await RequisitionFilesService.deleteRequisitionFile(
-        fileID
+        filename, fileID
       );
       if (result.affectedRows > 0) {
         res.status(200).send("File deleted successfully.");
