@@ -194,9 +194,7 @@ class RequisitionRepository {
       second: "2-digit",
       hour12: false,
     };
-    const nowDateTimeInBrazil = nowDateTime
-      .toLocaleString("sv-SE", opcoes)
-      .replace("T", " ");
+    const nowDateTimeInBrazil = nowDateTime.toLocaleString("sv-SE", opcoes).replace("T", " ");
     const items = json
       .map(
         (item) =>

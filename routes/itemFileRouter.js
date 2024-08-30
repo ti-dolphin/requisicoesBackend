@@ -22,7 +22,7 @@ router.get("/:itemID", (req, res) => {
 });
 
 // DELETE /item/:id
-router.delete("/:id", (req, res) => {
+router.delete("/:filename/:id", (req, res) => {
   ItemFileController.deleteItemFile(req, res);
 });
 

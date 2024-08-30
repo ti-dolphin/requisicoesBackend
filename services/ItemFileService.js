@@ -7,6 +7,7 @@ class ItemFileService {
     if (!file) {
       throw new Error("File not provided");
     }
+    console.log('FILENAME: ', file.filename);
     const filePath = file.path;
     const query = `
       INSERT INTO anexos_item (arquivo, id_item, nome_arquivo)
@@ -16,7 +17,7 @@ class ItemFileService {
     try {
       await fireBaseService.uploadFileToFireBase(filePath);
       const [allFiles] = await fireBaseService.getFilesFromFirebase();
-      const createdFile = allFiles.find((item) => item.name === file.filename);
+      const createdFile = await fireBaseService.getFileByName(file.filename);
       const fileUrl = createdFile ? createdFile.publicUrl() : null;
 
       if (fileUrl) {
@@ -45,11 +46,12 @@ class ItemFileService {
     }
   }
 
-  static async deleteItemFile(id) {
+  static async deleteItemFile(filename, id) {
     const query = `DELETE FROM anexos_item WHERE id = ?`;
-
+    console.log('filename: ', filename);
     try {
       const result = await this.executeQuery(query, [id]);
+      await fireBaseService.deleteFileByName(filename);
       return result;
     } catch (e) {
       console.log("Error in deleteItemFile: ", e);

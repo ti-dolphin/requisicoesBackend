@@ -10,7 +10,6 @@ class RequisitionFilesService {
       (id_requisicao, arquivo, nome_arquivo) 
       VALUES (?, ?, ?)
     `;
-
     try {
       await fireBaseService.uploadFileToFireBase(filePath);
       const [allFiles] = await fireBaseService.getFilesFromFirebase();
@@ -71,16 +70,18 @@ class RequisitionFilesService {
     }
   }
 
-  static async deleteRequisitionFile(fileID) {
+  static async deleteRequisitionFile(filename, fileID) {
     const query = `
       DELETE FROM dsecombr_controle.anexos_requisicao 
       WHERE id = ?
     `;
-
+    console.log('FILENAME: ', filename)
+    console.log('FILEID: ', fileID);
     try {
       const [result] = await RequisitionFilesService.executeQuery(query, [
         fileID,
       ]);
+      await fireBaseService.deleteFileByName(filename);
       if (result.affectedRows > 0) return result;
       else throw new Error("Something went wrong");
     } catch (e) {

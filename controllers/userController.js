@@ -88,7 +88,7 @@ const userController = {
 
   findOne: async (username, encryptedPassword) => {
     const query =
-      "SELECT CODPESSOA, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
+      "SELECT CODPESSOA, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR, PERM_ADMINISTRADOR, PERM_CADASTRAR_PAT FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
     const [result] = await userController.executeQuery(query, [
       username,
       encryptedPassword,

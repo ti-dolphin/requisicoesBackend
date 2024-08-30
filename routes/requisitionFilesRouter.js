@@ -1,7 +1,5 @@
 var express = require("express");
 var router = express.Router();
-const pool = require("../database");
-const requisitionFilesController = require("../controllers/requisitionFilesController");
 const multerConfig = require("../multer");
 const multer = require("multer");
 const RequisitionFilesController = require("../controllers/requisitionFilesController");
@@ -13,11 +11,12 @@ router.post(
   upload.single("file"),
   RequisitionFilesController.createRequisitionFile
 );
+
 router.post("/link/:requisitionID", RequisitionFilesController.createRequisitionFileFromLink);
 
 router.get("/:requisitionID", RequisitionFilesController.getRequisitionFiles);
 
-router.delete("/:fileID", RequisitionFilesController.deleteRequisitionFile);
+router.delete("/:filename/:fileID", RequisitionFilesController.deleteRequisitionFile);
 
 
 // router.post("/:requisitionID", upload.single("file"), async (req, res, next) => {

@@ -12,7 +12,9 @@ var requisitionFilesRouter = require( './routes/requisitionFilesRouter');
 var productsRouter = require('./routes/productsRouter');
 var personRouter = require('./routes/personRouter');
 var projectRouter = require('./routes/projectRouter');
+var patrimonyRouter = require('./routes/patrimonyRouter');
 var itemFileRouter = require('./routes/itemFileRouter');
+var movementationRouter = require('./routes/movementationRouter');
 const authorize = require('./middleware/authentication');
 var app = express();
 app.disable('etag');
@@ -29,6 +31,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/requisition', authorize,  requisitionRouter);
 app.use('/requisition/requisitionItems', authorize, requisitionItemsRouter);
+app.use('/movementation', authorize, movementationRouter)
+app.use("/patrimony", authorize, patrimonyRouter);
 app.use('/products', authorize, productsRouter);
 app.use('/pessoa', authorize, personRouter);
 app.use('/project', authorize, projectRouter);

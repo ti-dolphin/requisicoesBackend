@@ -14,7 +14,6 @@ class ProductService {
     `;
     try {
       const [rows, fields] = await this.executeQuery(query, [`%${search}%`]);
-      console.log("getProductsBySearch - rows:  ", rows);
       return rows;
     } catch (e) {
       console.log(e);

@@ -7,7 +7,7 @@ const path = require('path');
   },
   filename : (req, file, callback) => { 
     const time = new Date().getTime();
-    callback(null, `${file.originalname}`);
+    callback(null, Buffer.from(file.originalname, "latin1").toString("utf8"));
   }
 });
 module.exports = multerConfig;

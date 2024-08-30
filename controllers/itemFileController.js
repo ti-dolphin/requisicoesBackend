@@ -38,10 +38,10 @@ class ItemFileController {
   }
 
   static async deleteItemFile(req, res) {
-    const { id } = req.params;
+    const { filename, id } = req.params;
 
     try {
-      const result = await ItemFileService.deleteItemFile(id);
+      const result = await ItemFileService.deleteItemFile(filename, id);
       if (result.affectedRows > 0) {
         res.status(200).send("File deleted successfully");
       } else {

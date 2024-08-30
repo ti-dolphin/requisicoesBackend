@@ -28,6 +28,33 @@ admin.initializeApp({
 });
 
 const fireBaseService = {
+
+   getFileByName: async (fileName) => {
+    try {
+      const bucket = admin.storage().bucket();
+      const [files] = await bucket.getFiles({ prefix: fileName });
+      if (files.length > 0) {
+        return files[0]; // Retorna o arquivo se encontrado
+      } else {
+        throw new Error(`File "${fileName}" not found`);
+      }
+    } catch (e) {
+      console.error("Error retrieving file:", e);
+      throw e;
+    }
+  },
+
+  deleteFileByName: async (fileName) => {
+    try {
+      const file = await fireBaseService.getFileByName(fileName);
+      await file.delete(); // Deleta o arquivo
+      return `File "${fileName}" deleted successfully!`;
+    } catch (e) {
+      console.error("Error deleting file:", e);
+      throw e;
+    }
+  },
+  
   uploadFileToFireBase: async (filePath) => {
     try {
       const bucket = admin.storage().bucket();
