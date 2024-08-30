@@ -4,6 +4,7 @@ class RequisitionRepository {
   }
 
   static getManagerRequisitions_monitoring() {
+console.log("getManagerRequisitions_monitoring");
     return `SELECT ID_REQUISICAO,
                             STATUS,
                             OBSERVACAO,
@@ -29,6 +30,7 @@ class RequisitionRepository {
   }
 
   static getNonPurchaser_monitoring() {
+ console.log("getNonPurchaser_monitoring");
     return `SELECT ID_REQUISICAO,
                  STATUS,
                  OBSERVACAO,

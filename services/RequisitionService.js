@@ -11,7 +11,6 @@ class RequisitionService {
     );
     try {
       const rows = await this.executeQuery(query, params);
-      console.log("rows - RequisitionService.getRequisitions -> ", rows);
       return rows;
     } catch (err) {
       console.log(err);
@@ -58,6 +57,7 @@ class RequisitionService {
         const codgerente = await userController.getManagerCode(userID);
         params = ["Em edição", "Concluído", codgerente, userID];
       } else {
+         console.log("not gerente");
         query = RequisitionRepository.getNonPurchaser_monitoring();
         params = ["Em edição", "Concluído", userID];
       }
