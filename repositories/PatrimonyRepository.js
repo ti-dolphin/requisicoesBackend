@@ -4,7 +4,6 @@ class PatrimonyRepository {
       DELETE FROM patrimonio WHERE id_patrimonio = ?
     `;
   }
-
   static getInactivePatrymonyInfoQuery() {
     return `
         SELECT 
@@ -79,11 +78,13 @@ class PatrimonyRepository {
 
     `;
   }
+
   static getSinglePatrimonyInfo() {
     return `
       SELECT * FROM patrimonio WHERE id_patrimonio = ?
     `;
   }
+
   static getPatrimonyInfoQuery() {
     return `    
             SELECT 
@@ -105,6 +106,7 @@ class PatrimonyRepository {
             inner join PESSOA as RESPONSAVEL on RESPONSAVEL.CODPESSOA = movimentacao_patrimonio.id_responsavel WHERE patrimonio.ativo = 1
         `;
   }
+
   static createPatrimonyQuery() {
     return `
           INSERT INTO patrimonio (nome, data_compra, nserie, descricao, pat_legado, tipo)

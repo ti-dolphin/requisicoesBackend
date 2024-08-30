@@ -7,6 +7,7 @@ class ItemFileService {
     if (!file) {
       throw new Error("File not provided");
     }
+    console.log('FILENAME: ', file.filename);
     const filePath = file.path;
     const query = `
       INSERT INTO anexos_item (arquivo, id_item, nome_arquivo)
