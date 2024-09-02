@@ -9,6 +9,8 @@ class RequisitionService {
       userID,
       currentKanbanFilter
     );
+    console.log('QUERY: ', query);
+    console.log('PARAMETROS: ', params);
     try {
       const rows = await this.executeQuery(query, params);
       console.log("rows - RequisitionService.getRequisitions -> ", rows);
@@ -24,6 +26,7 @@ class RequisitionService {
     if (purchaser) {
       return await this.definePurchaser(userID, currentKanbanFilter);
     }
+
     return await this.defineNonPurchaserQuery(userID, currentKanbanFilter);
   }
 
