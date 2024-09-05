@@ -1,4 +1,5 @@
 const PatrimonyService = require("../services/PatrimonyService");
+const utils = require("../utils");
 
 class PatrimonyController {
   static async deletePatrimony(req, res) {
@@ -57,7 +58,6 @@ class PatrimonyController {
       const responsableId = await PatrimonyService.getPatrimonyResponsable(
         patrimonyId
       );
-      console.log(`o responsável é: `, responsableId);
       return res.status(200).send(responsableId);
     } catch (e) {
       console.log("error in getPatrimonyResponsable");
@@ -76,10 +76,11 @@ class PatrimonyController {
   }
 
   static async deletePatrimonyFile(req, res) {
-    const { patrimonyFileId } = req.params;
+    const { patrimonyFileId, filename } = req.params;
     try {
       const affectedRows = await PatrimonyService.deletePatrimonyFile(
-        patrimonyFileId
+        patrimonyFileId,
+        filename
       );
       if (affectedRows)
         console.log({ message: "Deleted Successfully", affectedRows });
@@ -100,9 +101,11 @@ class PatrimonyController {
         patrimonyId,
         file
       );
+      utils.removeFile(file.path);
       return res
         .status(200)
         .send({ message: "Patrimony File inserted Successfuly", insertId });
+       
     } catch (e) {
       console.log("error in createPatrimonyFile : \n", e);
       return res.status(500).send("Internal server Error!");

@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var requisitionRouter = require('./routes/requisitionRouter');
 var requisitionItemsRouter = require('./routes/resquisitionItemsRouter');
 var requisitionFilesRouter = require( './routes/requisitionFilesRouter');
+var patrimonyAccessoryRouter = require('./routes/patrimonyAccessoryRouter');
 var productsRouter = require('./routes/productsRouter');
 var personRouter = require('./routes/personRouter');
 var projectRouter = require('./routes/projectRouter');
@@ -38,6 +39,7 @@ app.use('/pessoa', authorize, personRouter);
 app.use('/project', authorize, projectRouter);
 app.use('/requisitionFiles', authorize, requisitionFilesRouter);
 app.use('/itemFiles', authorize, itemFileRouter);
+app.use("/accessory", patrimonyAccessoryRouter);
 
 
 

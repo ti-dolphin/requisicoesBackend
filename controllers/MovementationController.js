@@ -1,5 +1,5 @@
 const MovementationService = require("../services/MovementationService");
-
+const utils = require("../utils");
 class MovementationController {
   
   static async createMovementation(req, res) {
@@ -68,10 +68,11 @@ class MovementationController {
   }
 
   static async deleteMovementationFile(req, res) {
-    const { movementationFileId } = req.params;
+    const { movementationFileId, filename } = req.params;
     try {
       const affectedRows = await MovementationService.deleteMovementationFile(
-        movementationFileId
+        movementationFileId,
+        filename
       );
       if (affectedRows)
         return res
@@ -97,12 +98,14 @@ class MovementationController {
 
   }
   static async createMovementationFile(req, res) {
+    const  { file } = req;
     try {
       const insertId = await MovementationService.createMovementationFile(
         req.params.movementationId,
         req.file
       );
       if (insertId) {
+        utils.removeFile(file.path);
         return res.status(200).send({
           message: "Successfully created Movementation File",
           insertId,

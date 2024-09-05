@@ -4,7 +4,6 @@ const RequisitionItemController = require("../controllers/requisitionItemControl
 
 // GET /requisitionItems/:requisitionID
 router.get("/:requisitionID",  function (req, res, next) {
-  console.log('req params: ', req.params)
    RequisitionItemController.getRequisitionItemByReqID(req, res);
 });
 

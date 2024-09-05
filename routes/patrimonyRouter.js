@@ -17,12 +17,18 @@ router.get('/inactive', (req, res, next) => {
      PatrimonyController.getInactivePatrymonyInfo(req, res)
 });
 
-router.delete('/:patrimonyId', (req, res, next) => {
-       PatrimonyController.deletePatrimony(req, res);
-});
 router.get('/:patrimonyId', (req, res, next) => { 
      PatrimonyController.getSinglePatrimonyInfo(req, res);
 });
+
+router.get("/files/:patrimonyId", (req, res, next) => {
+  PatrimonyController.getPatrimonyFiles(req, res);
+});
+
+router.get("/responsable/:patrimonyId", (req, res, next) => {
+  PatrimonyController.getPatrimonyResponsable(req, res);
+});
+
 
 router.put("/:patrimonyId",  (req, res, next) => {
    console.log('PUT PATRIMONIO')
@@ -33,24 +39,22 @@ router.put('/', (req, res, next) => {
      PatrimonyController.updatePatrimonies(req, res);
 });
 
-router.get("/responsable/:patrimonyId", (req, res, next) => { 
-     PatrimonyController.getPatrimonyResponsable(req, res);
-});
 
 router.post('', (req, res, next) => {  
      PatrimonyController.createPatrimony(req, res);
 });
 
-router.post("/files/:patrimonyId",upload.single("file"), (req, res, next) => {
+router.post("/files/:patrimonyId", upload.single("file"), (req, res, next) => {
      console.log('post file: ', req.params.patrimonyId)
   PatrimonyController.createPatrimonyFile(req, res);
 });
 
-router.delete("/files/:patrimonyFileId", upload.single("file"), (req, res, next) => {
+router.delete("/files/:filename/:patrimonyFileId", (req, res, next) => {
   PatrimonyController.deletePatrimonyFile(req, res);
 });
 
-router.get('/files/:patrimonyId', (req, res, next) =>  { 
-     PatrimonyController.getPatrimonyFiles(req, res);
+router.delete("/:patrimonyId", (req, res, next) => {
+  PatrimonyController.deletePatrimony(req, res);
 });
+
 module.exports = router;
