@@ -35,28 +35,26 @@ class PatrimonyService {
   }
 
   static async updatePatrimonies(ids, active) {
-    console.log('ids: ', ids);
-    if( !active){ 
-          const affectedRows = await this.executeQuery(
-            PatrimonyRepository.updatePatrimonies(),
-            [0, ids]
-          );
-            return affectedRows;
+    console.log("ids: ", ids);
+    if (!active) {
+      const affectedRows = await this.executeQuery(
+        PatrimonyRepository.updatePatrimonies(),
+        [0, ids]
+      );
+      return affectedRows;
     }
-     const affectedRows = await this.executeQuery(
-       PatrimonyRepository.updatePatrimonies(),
-       [1, ids]
-     );
+    const affectedRows = await this.executeQuery(
+      PatrimonyRepository.updatePatrimonies(),
+      [1, ids]
+    );
     return affectedRows;
   }
 
   static async getPatrimonyResponsable(patrimonyId) {
-    console.log("id patrimonio passado: ", patrimonyId);
     const responsable = await this.executeQuery(
       PatrimonyRepository.getPatrimonyResponsable(),
       [patrimonyId]
     );
-    console.log("result query getPatrimonyResponsable: ", responsable);
     return responsable;
   }
 
@@ -71,11 +69,12 @@ class PatrimonyService {
     }
   }
 
-  static async deletePatrimonyFile(patrimonyFileId) {
+  static async deletePatrimonyFile(patrimonyFileId, filename) {
     const result = await this.executeQuery(
       PatrimonyRepository.deletePatrimonyFileQuery(),
       [patrimonyFileId]
     );
+    await fireBaseService.deleteFileByName(filename);
     return result.affectedRows;
   }
 
@@ -89,6 +88,7 @@ class PatrimonyService {
     );
     return result.insertId;
   }
+
   static async getFileUrl(path, filename) {
     await fireBaseService.uploadFileToFireBase(path);
     const [allFiles] = await fireBaseService.getFilesFromFirebase();
@@ -166,7 +166,6 @@ class PatrimonyService {
       .replace("T", " ")
       .replace(/ .*/, "");
     try {
-      //PARAMS: nome, data_compra, nserie, descricao, pat_legado
       const result = await this.executeQuery(
         PatrimonyRepository.createPatrimonyQuery(),
         [nome, purchaseDate, nserie, descricao, pat_legado, tipo]

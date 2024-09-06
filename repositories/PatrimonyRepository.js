@@ -81,7 +81,10 @@ class PatrimonyRepository {
 
   static getSinglePatrimonyInfo() {
     return `
-      SELECT * FROM patrimonio WHERE id_patrimonio = ?
+      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo
+       FROM patrimonio
+        INNER JOIN tipo_patrimonio ON tipo_patrimonio.id_tipo_patrimonio = patrimonio.tipo
+       WHERE id_patrimonio = ?
     `;
   }
 

@@ -19,7 +19,7 @@ router.post("/files/:movementationId", upload.single("file"), async(req, res, ne
 router.get('/files/:movementationId',  (req, res, next)=> { 
      MovementationController.getMovementationFiles(req, res);
 });
-router.delete("/files/:movementationFileId", (req, res) =>  {
+router.delete("/files/:filename/:movementationFileId", (req, res) =>  {
      MovementationController.deleteMovementationFile(req, res)
 });
 router.post('', (req, res, next) => { 

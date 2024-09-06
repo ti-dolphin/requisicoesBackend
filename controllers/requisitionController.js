@@ -3,6 +3,7 @@ const userController = require("./userController");
 
 class RequisitionController {
   static async getRequisitions(req, res) {
+    
     const { userID, currentKanbanFilter } = req.query;
     const requisitions = await RequisitionService.getRequisitions(
       userID,
@@ -35,8 +36,11 @@ class RequisitionController {
   }
 
   static async updateRequisitionById(req, res) {
-    const {codpessoa, requisition} = req.body;
-    const result = await RequisitionService.updateRequisitionById(codpessoa, requisition);
+    const { codpessoa, requisition } = req.body;
+    const result = await RequisitionService.updateRequisitionById(
+      codpessoa,
+      requisition
+    );
     if (result) {
       return res.status(200).json(result);
     } else {
@@ -45,7 +49,7 @@ class RequisitionController {
   }
 
   static async deleteRequisitionById(req, res) {
-    const { requisitionID} = req.params;
+    const { requisitionID } = req.params;
     const result = await RequisitionService.deleteRequisitionById(
       requisitionID
     );

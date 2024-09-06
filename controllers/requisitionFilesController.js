@@ -70,7 +70,6 @@ class RequisitionFilesController {
 
   static async deleteRequisitionFile(req, res) {
     const { filename, fileID } = req.params;
-
     try {
       const result = await RequisitionFilesService.deleteRequisitionFile(
         filename, fileID
