@@ -40,24 +40,27 @@ class MovementationRepository {
   }
   static getMovementationsByPatrimonyId_Query() {
     return `
-          SELECT 
-          movimentacao_patrimonio.id_movimentacao, 
-           movimentacao_patrimonio.data, 
-           movimentacao_patrimonio.id_patrimonio, 
-           movimentacao_patrimonio.id_projeto, 
-           movimentacao_patrimonio.id_responsavel,
-           movimentacao_patrimonio.id_ultima_movimentacao,
-          NOME as responsavel,
-          PROJETOS.DESCRICAO as projeto,
-          movimentacao_patrimonio.observacao,
-          movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel
-        from 
-          movimentacao_patrimonio 
-          INNER JOIN PESSOA ON PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel 
-          INNER JOIN PROJETOS ON PROJETOS.ID = movimentacao_patrimonio.id_projeto
-          INNER JOIN movimentacao_patrimonio AS movimentacao_patrimonio2 ON movimentacao_patrimonio2.id_movimentacao = movimentacao_patrimonio.id_ultima_movimentacao
+         SELECT 
+            movimentacao_patrimonio.id_movimentacao, 
+            movimentacao_patrimonio.data, 
+            movimentacao_patrimonio.id_patrimonio, 
+            movimentacao_patrimonio.id_projeto, 
+            movimentacao_patrimonio.id_responsavel,
+            movimentacao_patrimonio.id_ultima_movimentacao,
+            PESSOA.NOME as responsavel,
+            PROJETOS.DESCRICAO as projeto,
+            movimentacao_patrimonio.observacao,
+            movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel
+        FROM 
+            movimentacao_patrimonio 
+            INNER JOIN PESSOA ON PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel 
+            INNER JOIN PROJETOS ON PROJETOS.ID = movimentacao_patrimonio.id_projeto
+            INNER JOIN movimentacao_patrimonio AS movimentacao_patrimonio2 ON movimentacao_patrimonio2.id_movimentacao = movimentacao_patrimonio.id_ultima_movimentacao
         WHERE 
-          movimentacao_patrimonio.id_patrimonio = ?
+            movimentacao_patrimonio.id_patrimonio = ?
+        ORDER BY 
+            movimentacao_patrimonio.data DESC;  -- Ordena pela data da movimentação, mais recente primeiro
+
     `;
   }
 
