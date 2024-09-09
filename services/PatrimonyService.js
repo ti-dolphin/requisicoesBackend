@@ -113,7 +113,7 @@ class PatrimonyService {
   }
 
   static async updatePatrimony(patrimony) {
-    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado } =
+    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo } =
       patrimony;
     const result = await this.executeQuery(
       PatrimonyRepository.updatePatrimonyQuery(),
@@ -126,7 +126,9 @@ class PatrimonyService {
         nserie,
         descricao,
         pat_legado,
-        id_patrimonio,
+         ativo,
+        id_patrimonio
+        
       ]
     );
     return result.affectedRows;

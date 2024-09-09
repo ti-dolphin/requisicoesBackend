@@ -67,13 +67,15 @@ class PatrimonyRepository {
   }
 
   static updatePatrimonyQuery() {
+    console.log('updatePatrimonyQuery')
     return `
         UPDATE patrimonio SET
         nome = ? ,
          data_compra = ?,
           nserie = ?,
            descricao = ?,
-            pat_legado = ?
+            pat_legado = ?,
+            ativo = ?
             WHERE id_patrimonio = ?
 
     `;
@@ -81,7 +83,7 @@ class PatrimonyRepository {
 
   static getSinglePatrimonyInfo() {
     return `
-      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo
+      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo
        FROM patrimonio
         INNER JOIN tipo_patrimonio ON tipo_patrimonio.id_tipo_patrimonio = patrimonio.tipo
        WHERE id_patrimonio = ?
