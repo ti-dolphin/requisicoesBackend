@@ -164,6 +164,7 @@ class PatrimonyController {
 
   static async updatePatrimony(req, res) {
     try {
+
       const affectedRows = await PatrimonyService.updatePatrimony(req.body);
       console.log("affectedRows: ", affectedRows);
       if (affectedRows)
