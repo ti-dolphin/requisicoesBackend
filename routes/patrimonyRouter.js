@@ -35,6 +35,7 @@ router.put("/:patrimonyId",  (req, res, next) => {
    PatrimonyController.updatePatrimony(req, res);
 });
 
+
 router.put('/', (req, res, next) => { 
      PatrimonyController.updatePatrimonies(req, res);
 });

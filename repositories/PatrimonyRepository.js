@@ -102,7 +102,8 @@ class PatrimonyRepository {
           patrimonio.nome as nome,
           patrimonio.DESCRICAO as descricao,
           movimentacao_patrimonio.id_movimentacao as numeroMovimentacao,
-          movimentacao_patrimonio.data as dataMovimentacao
+          movimentacao_patrimonio.data as dataMovimentacao,
+          movimentacao_patrimonio.aceito
       FROM dsecombr_controle.movimentacao_patrimonio 
       INNER JOIN PROJETOS ON id_projeto = PROJETOS.ID
       INNER JOIN patrimonio ON patrimonio.id_patrimonio = movimentacao_patrimonio.id_patrimonio 

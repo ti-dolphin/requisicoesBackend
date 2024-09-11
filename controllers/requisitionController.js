@@ -28,6 +28,7 @@ class RequisitionController {
   }
 
   static async getRequisitionByID(req, res) {
+    console.log('getRequisitionByID')
     const { id } = req.params;
     const requisition = await RequisitionService.getRequisitionByID(id);
     if (requisition) {

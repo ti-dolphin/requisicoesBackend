@@ -80,6 +80,7 @@ class RequisitionService {
     const query = RequisitionRepository.getById();
     try {
       const [rows] = await this.executeQuery(query, [id]);
+      console.log('rows: ', rows);
       return rows;
     } catch (err) {
       console.log(err);

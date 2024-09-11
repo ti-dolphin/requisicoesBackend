@@ -1,16 +1,19 @@
 const pool = require("../database");
 
 class ProductService {
-  static async getProductsBySearch(search) {
+  static async getProductsBySearch(search, typeId) {
     const query = `
       SELECT 
         ID, codigo, nome_fantasia 
       FROM 
         produtos 
+      INNER JOIN
+      web_familia_tipo ON web_familia_tipo.familia = produtos.familia
       WHERE 
         nome_fantasia LIKE ? 
         AND inativo = 0 
         AND ultimo_nivel = 0
+       
     `;
     try {
       const [rows, fields] = await this.executeQuery(query, [`%${search}%`]);
