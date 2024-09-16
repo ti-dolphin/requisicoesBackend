@@ -44,6 +44,7 @@ class MovementationRepository {
     `;
   }
   static getMovementationsByPatrimonyId_Query() {
+    console.log("getMovementationsByPatrimonyId_Query");
     return `
          SELECT 
             movimentacao_patrimonio.id_movimentacao, 
@@ -55,7 +56,8 @@ class MovementationRepository {
             PESSOA.NOME as responsavel,
             PROJETOS.DESCRICAO as projeto,
             movimentacao_patrimonio.observacao,
-            movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel
+            movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel,
+            movimentacao_patrimonio.aceito
         FROM 
             movimentacao_patrimonio 
             INNER JOIN PESSOA ON PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel 

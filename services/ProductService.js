@@ -7,20 +7,24 @@ class ProductService {
       typeId,
     });
     const query = `
-      SELECT 
-        ID, codigo, nome_fantasia, produtos.familia
+    SELECT 
+          ID, codigo, nome_fantasia, produtos.familia
       FROM 
-        produtos 
+          produtos 
       INNER JOIN
-      web_familia_tipo 
-        ON web_familia_tipo.familia = produtos.familia
-      INNER JOIN web_tipo_requisicao
-         ON web_tipo_requisicao.id_tipo_requisicao = web_familia_tipo.id_tipo_requisicao
+          web_familia_tipo 
+          ON web_familia_tipo.familia = produtos.familia
+      INNER JOIN 
+          web_tipo_requisicao
+          ON web_tipo_requisicao.id_tipo_requisicao = web_familia_tipo.id_tipo_requisicao
       WHERE 
-        web_tipo_requisicao.id_tipo_requisicao = ? 
-        AND nome_fantasia LIKE ? 
-        AND inativo = 0 
-        AND ultimo_nivel = 0
+          web_tipo_requisicao.id_tipo_requisicao = ? 
+          AND nome_fantasia LIKE ? 
+          AND inativo = 0 
+          AND ultimo_nivel = 0
+      ORDER BY 
+          nome_fantasia ASC;
+
     `;
     try {
       const [rows, fields] = await this.executeQuery(query, [typeId ,`%${search}%`]);
