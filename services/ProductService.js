@@ -23,8 +23,7 @@ class ProductService {
           AND inativo = 0 
           AND ultimo_nivel = 0
       ORDER BY 
-          nome_fantasia ASC;
-
+          nome_fantasia ASC
     `;
     try {
       const [rows, fields] = await this.executeQuery(query, [typeId ,`%${search}%`]);
