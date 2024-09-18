@@ -34,6 +34,7 @@ class RequisitionController {
     if (requisition) {
       return res.status(200).json(requisition);
     } else {
+      
       return res.status(500).json({ error: "Erro ao buscar requisição" });
     }
   }

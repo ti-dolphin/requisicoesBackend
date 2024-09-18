@@ -80,10 +80,12 @@ class RequisitionService {
   }
 
   static async getRequisitionByID(id) {
+    console.log('id: ', id)
+    console.log("getRequisitionByID");
     const query = RequisitionRepository.getById();
     try {
       const [rows] = await this.executeQuery(query, [id]);
-      console.log('rows: ', rows);
+      console.log('rows: ', rows)
       return rows;
     } catch (err) {
       console.log(err);
