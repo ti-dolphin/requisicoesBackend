@@ -2,9 +2,10 @@ const ProductService = require("../services/ProductService");
 
 class ProductsController {
   static async getProductsBySearch(req, res) {
-    const { search } = req.query;
+    const { search, typeId } = req.query;
     try {
-      const products = await ProductService.getProductsBySearch(search);
+      const products = await ProductService.getProductsBySearch(search, typeId);
+      console.log('products', products)
       if (products) {
         res.status(200).send(products);
       } else {

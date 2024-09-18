@@ -4,6 +4,14 @@ const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
 class RequisitionService {
 
+
+  static async getTypes(){ 
+    const types = await this.executeQuery(
+      RequisitionRepository.getTypesQuery()
+    );
+    return types;
+  }
+  
   static async getRequisitions(userID, currentKanbanFilter) {
     const { query, params } = await this.setKanbanQuery(
       userID,
@@ -75,6 +83,7 @@ class RequisitionService {
     const query = RequisitionRepository.getById();
     try {
       const [rows] = await this.executeQuery(query, [id]);
+      console.log('rows: ', rows);
       return rows;
     } catch (err) {
       console.log(err);
@@ -84,6 +93,7 @@ class RequisitionService {
 
   static async insertRequisitions(json) {
     try {
+      console.log(json)
       const query = RequisitionRepository.insertRequisition(json);
       const resultSetHeader = await this.executeQuery(query, []);
       return resultSetHeader;

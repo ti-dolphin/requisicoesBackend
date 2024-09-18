@@ -1,6 +1,20 @@
 const MovementationService = require("../services/MovementationService");
 const utils = require("../utils");
 class MovementationController {
+  static async acceptMovementation(req, res){ 
+    const {movementationId} = req.params;
+    try{ 
+        const affectedRows = await MovementationService.acceptMovementation(
+          movementationId
+        );
+        return res.status(200).send({ 
+          message: "Movementation Accepted Successfully!",
+          affectedRows,
+        })
+    }catch(e){ 
+      return res.status(500).send('Internal Server Error');
+    }
+  }
   
   static async createMovementation(req, res) {
     const movementation = req.body;

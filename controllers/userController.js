@@ -47,12 +47,17 @@ const userController = {
           error: "User not found",
         };
       } else {
+        console.log({user})
         return {
           message: "Login successful",
           user,
         };
       }
     } catch (error) {
+      console.log({
+        message: "An error occurred",
+        error: error.message,
+      });
       return {
         message: "An error occurred",
         error: error.message,
@@ -90,7 +95,7 @@ const userController = {
 
   findOne: async (username, encryptedPassword) => {
     const query =
-      "SELECT CODPESSOA, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR, PERM_ADMINISTRADOR, PERM_CADASTRAR_PAT FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
+      "SELECT CODPESSOA, NOME, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR, PERM_ADMINISTRADOR, PERM_CADASTRAR_PAT FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
     const [result] = await userController.executeQuery(query, [
       username,
       encryptedPassword,

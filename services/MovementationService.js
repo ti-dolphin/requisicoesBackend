@@ -14,6 +14,14 @@ const opcoes = {
 };
 
 class MovementationService {
+
+  static async acceptMovementation(movementationId) {
+      const affectedRows = await this.executeQuery(
+        MovementationRepository.acceptMovementationQuery(),
+        [movementationId]
+      );
+      return affectedRows;
+  } 
   static async getMovementationFiles(movementationId) {
     const result = await this.executeQuery(
       MovementationRepository.getMovementationFilesQuery(),

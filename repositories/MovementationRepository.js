@@ -1,8 +1,13 @@
 
 
 class MovementationRepository {
+  static acceptMovementationQuery(){
+     return `
+      UPDATE movimentacao_patrimonio SET aceito = 1 WHERE id_movimentacao = ?
+     `
+  }
 
-  static  setLastMovementationIdQuery(){
+  static setLastMovementationIdQuery() {
     return `UPDATE movimentacao_patrimonio set id_ultima_movimentacao = ? WHERE id_movimentacao = ?`;
   }
 
@@ -20,10 +25,10 @@ class MovementationRepository {
     `;
   }
 
-  static deleteMovementationQuery(){
-    return `DELETE FROM movimentacao_patrimonio WHERE id_movimentacao = ?`
-  };
-  
+  static deleteMovementationQuery() {
+    return `DELETE FROM movimentacao_patrimonio WHERE id_movimentacao = ?`;
+  }
+
   static updateMovementationQuery() {
     // id_movimentacao, data, id_patrimonio, id_projeto, id_responsavel, id_ultima_movimentacao, observacao ]
     return `
@@ -39,6 +44,7 @@ class MovementationRepository {
     `;
   }
   static getMovementationsByPatrimonyId_Query() {
+    console.log("getMovementationsByPatrimonyId_Query");
     return `
          SELECT 
             movimentacao_patrimonio.id_movimentacao, 
@@ -50,7 +56,8 @@ class MovementationRepository {
             PESSOA.NOME as responsavel,
             PROJETOS.DESCRICAO as projeto,
             movimentacao_patrimonio.observacao,
-            movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel
+            movimentacao_patrimonio2.id_responsavel as id_ultimo_responsavel,
+            movimentacao_patrimonio.aceito
         FROM 
             movimentacao_patrimonio 
             INNER JOIN PESSOA ON PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel 

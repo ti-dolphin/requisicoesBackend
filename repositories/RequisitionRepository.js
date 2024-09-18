@@ -1,10 +1,32 @@
 class RequisitionRepository {
   static getById() {
-    return `SELECT ID_REQUISICAO, STATUS, OBSERVACAO, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, LAST_UPDATE_ON, CREATED_ON, DESCRICAO from WEB_REQUISICAO inner join PROJETOS on ID_PROJETO = PROJETOS.ID WHERE ID_REQUISICAO = ?`;
+    return `SELECT 
+  ID_REQUISICAO, 
+  STATUS, 
+  OBSERVACAO, 
+  DESCRIPTION, 
+  ID_PROJETO, 
+  ID_RESPONSAVEL, 
+  LAST_UPDATE_ON, 
+  CREATED_ON, 
+  DESCRICAO,
+  TIPO, 
+  nome_tipo
+from 
+  WEB_REQUISICAO 
+  inner join PROJETOS on ID_PROJETO = PROJETOS.ID 
+  inner join web_tipo_requisicao on id_tipo_requisicao = TIPO
+WHERE 
+  ID_REQUISICAO = ?
+`;
   }
-
+  static getTypesQuery() {
+    return `
+        SELECT id_tipo_requisicao, nome_tipo from web_tipo_requisicao;
+        `;
+  }
   static getManagerRequisitions_monitoring() {
-console.log("getManagerRequisitions_monitoring");
+    console.log("getManagerRequisitions_monitoring");
     return `SELECT ID_REQUISICAO,
                             STATUS,
                             OBSERVACAO,
@@ -30,7 +52,7 @@ console.log("getManagerRequisitions_monitoring");
   }
 
   static getNonPurchaser_monitoring() {
- console.log("getNonPurchaser_monitoring");
+    console.log("getNonPurchaser_monitoring");
     return `SELECT ID_REQUISICAO,
                  STATUS,
                  OBSERVACAO,
@@ -196,7 +218,9 @@ console.log("getManagerRequisitions_monitoring");
       second: "2-digit",
       hour12: false,
     };
-    const nowDateTimeInBrazil = nowDateTime.toLocaleString("sv-SE", opcoes).replace("T", " ");
+    const nowDateTimeInBrazil = nowDateTime
+      .toLocaleString("sv-SE", opcoes)
+      .replace("T", " ");
     const items = json
       .map(
         (item) =>
@@ -206,11 +230,12 @@ console.log("getManagerRequisitions_monitoring");
               ${item.ID_RESPONSAVEL},
                '${nowDateTimeInBrazil}',
                 '${nowDateTimeInBrazil}',
-                   ${item.ID_RESPONSAVEL})`
+                   ${item.ID_RESPONSAVEL},
+                   ${item.TIPO})`
       )
       .join(", ");
-      return (
-      "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, CREATED_ON, LAST_UPDATE_ON, LAST_MODIFIED_BY ) VALUES " +
+    return (
+      "INSERT INTO WEB_REQUISICAO (STATUS, DESCRIPTION, ID_PROJETO, ID_RESPONSAVEL, CREATED_ON, LAST_UPDATE_ON, LAST_MODIFIED_BY, TIPO) VALUES " +
       items
     );
   }
@@ -227,7 +252,7 @@ console.log("getManagerRequisitions_monitoring");
       second: "2-digit",
       hour12: false,
     };
-    console.log('requisition: ', requisition);
+    console.log("requisition: ", requisition);
     const nowDateTimeInBrazil = nowDateTime
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");

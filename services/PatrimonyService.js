@@ -109,6 +109,7 @@ class PatrimonyService {
       PatrimonyRepository.getSinglePatrimonyInfo(),
       [patrimonyId]
     );
+    console.log(result)
     return result;
   }
 

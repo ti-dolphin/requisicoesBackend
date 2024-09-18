@@ -6,7 +6,7 @@ const multer = require("multer");
 const upload = multer({ storage: multerConfig });
 
 router.get('', (req, res, next ) => { 
-    console.log('get patrimony info');
+    
      PatrimonyController.getPatrimonyInfo(req, res);
 });
 
@@ -34,6 +34,7 @@ router.put("/:patrimonyId",  (req, res, next) => {
    console.log('PUT PATRIMONIO')
    PatrimonyController.updatePatrimony(req, res);
 });
+
 
 router.put('/', (req, res, next) => { 
      PatrimonyController.updatePatrimonies(req, res);

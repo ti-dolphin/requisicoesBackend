@@ -29,9 +29,13 @@ router.post('', (req, res, next) => {
 router.put('/:movementationId' , (req, res, next) => { 
      MovementationController.updateMovementation(req, res)
 } );
+router.put('/accept/:movementationId' , (req, res, next) => {
+     MovementationController.acceptMovementation(req, res);
+});
 router.delete("/:movementationId",  (req, res, next) => {
    MovementationController.deleteMovementation(req, res);
 });
+
 
 
 
