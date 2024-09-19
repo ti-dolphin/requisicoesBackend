@@ -67,7 +67,7 @@ class PatrimonyRepository {
   }
 
   static updatePatrimonyQuery() {
-    console.log('updatePatrimonyQuery')
+    console.log("updatePatrimonyQuery");
     return `
         UPDATE web_patrimonio SET
         nome = ? ,
@@ -100,7 +100,7 @@ class PatrimonyRepository {
           PROJETOS.DESCRICAO AS projeto,
           RESPONSAVEL.NOME AS responsavel,
           web_patrimonio.nome as nome,
-          web_patrimonio.DESCRICAO as descricao,
+          web_patrimonio.descricao as descricao,
           movimentacao_patrimonio.id_movimentacao as numeroMovimentacao,
           movimentacao_patrimonio.data as dataMovimentacao,
           movimentacao_patrimonio.aceito
@@ -116,8 +116,6 @@ class PatrimonyRepository {
       INNER JOIN PESSOA AS RESPONSAVEL ON RESPONSAVEL.CODPESSOA = movimentacao_patrimonio.id_responsavel
       WHERE web_patrimonio.ativo = 1
       ORDER BY movimentacao_patrimonio.data DESC; -- Ordena pela dataMovimentacao em ordem decrescente
-
-
         `;
   }
 
@@ -127,5 +125,11 @@ class PatrimonyRepository {
           VALUES ( ? , ?, ?, ?, ?, ?)
     `;
   }
+  static createPatrimonyQueryNoPurchaseData(){ 
+    return `
+     INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo)
+          VALUES ( ?, ?, ?, ?, ?)
+    `;
+  };
 }
 module.exports = PatrimonyRepository;

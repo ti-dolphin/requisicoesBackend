@@ -138,9 +138,11 @@ class PatrimonyController {
   }
 
   static async getPatrimonyInfo(req, res) {
+    console.log("getPatrimonyInfo");
     try {
       const patrimonyInfo = await PatrimonyService.getPatrimonyInfo();
       if (patrimonyInfo) {
+        console.log('patirmonyInfo: ', patrimonyInfo)
         return res.status(200).send(patrimonyInfo);
       }
       return res.status(404).send({ message: "Patrimony Info not found!" });
