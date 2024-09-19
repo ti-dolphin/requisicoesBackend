@@ -169,11 +169,19 @@ class PatrimonyService {
       .replace("T", " ")
       .replace(/ .*/, "");
     try {
-      const result = await this.executeQuery(
-        PatrimonyRepository.createPatrimonyQuery(),
-        [nome, purchaseDate, nserie, descricao, pat_legado, tipo]
-      );
-      if (result) return result.insertId;
+      if(data_compra !== ''){ 
+        const result = await this.executeQuery(
+                PatrimonyRepository.createPatrimonyQuery(),
+                [nome, purchaseDate, nserie, descricao, pat_legado, tipo]
+              );
+              if (result) return result.insertId;
+      }
+       const result = await this.executeQuery(
+         PatrimonyRepository.createPatrimonyQueryNoPurchaseData(),
+         [nome, nserie, descricao, pat_legado, tipo]
+       );
+       if (result) return result.insertId;
+     
     } catch (e) {
       console.log("error in PatrimonyService.createPatrimony: m", e);
     }
