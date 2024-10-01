@@ -115,7 +115,7 @@ class PatrimonyRepository {
       INNER JOIN PESSOA AS GERENTE ON GERENTE.CODGERENTE = PROJETOS.CODGERENTE
       INNER JOIN PESSOA AS RESPONSAVEL ON RESPONSAVEL.CODPESSOA = movimentacao_patrimonio.id_responsavel
       WHERE web_patrimonio.ativo = 1
-      ORDER BY movimentacao_patrimonio.data DESC; -- Ordena pela dataMovimentacao em ordem decrescente
+      ORDER BY movimentacao_patrimonio.id_patrimonio DESC; -- Ordena pela dataMovimentacao em ordem decrescente
         `;
   }
 
@@ -125,6 +125,7 @@ class PatrimonyRepository {
           VALUES ( ? , ?, ?, ?, ?, ?)
     `;
   }
+  
   static createPatrimonyQueryNoPurchaseData(){ 
     return `
      INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo)
