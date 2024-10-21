@@ -1,6 +1,8 @@
 const MovementationRepository = require("../repositories/MovementationRepository");
+const ChecklistRepository = require('../repositories/CheckListRepository');
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
+const CheckListService = require("./CheckListService");
 
 const opcoes = {
   timeZone: "America/Sao_Paulo",
@@ -14,14 +16,24 @@ const opcoes = {
 };
 
 class MovementationService {
+  static getMovementationsByPatrimonyId =async  (patrimonyId) => { 
+
+      console.log({ patrimonyId });
+      const result = await this.executeQuery(
+        MovementationRepository.getMovementationsByPatrimonyId_Query(),
+        [patrimonyId]
+      );
+      console.log('RESULT', result);
+      if(result.length > 0) return result;
+  };  
 
   static async acceptMovementation(movementationId) {
-      const affectedRows = await this.executeQuery(
-        MovementationRepository.acceptMovementationQuery(),
-        [movementationId]
-      );
-      return affectedRows;
-  } 
+    const affectedRows = await this.executeQuery(
+      MovementationRepository.acceptMovementationQuery(),
+      [movementationId]
+    );
+    return affectedRows;
+  }
   static async getMovementationFiles(movementationId) {
     const result = await this.executeQuery(
       MovementationRepository.getMovementationFilesQuery(),
@@ -99,12 +111,22 @@ class MovementationService {
         id_ultima_movimentacao,
       ]
     );
+
     if (!id_ultima_movimentacao) {
       await this.executeQuery(
         MovementationRepository.setLastMovementationIdQuery(),
         [result.insertId, result.insertId]
       );
     }
+    await CheckListService.createChecklist({
+      id_movimentacao: result.insertId,
+      data_criacao: new Date().toISOString().replace("T", " ").split(".")[0],
+      realizado: 0,
+      data_realizado: null,
+      aprovado: 0,
+      data_aprovado: null,
+      observacao: null,
+    });
     return result.insertId;
   }
 
@@ -113,6 +135,7 @@ class MovementationService {
       MovementationRepository.getMovementationsByPatrimonyId_Query(),
       [patrimonyId]
     );
+    console.log("result getMovementationsByPatrimonyId: ", result);
     return result;
   }
 

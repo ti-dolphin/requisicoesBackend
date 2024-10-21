@@ -1,10 +1,11 @@
 
 
 class MovementationRepository {
-  static acceptMovementationQuery(){
-     return `
+
+  static acceptMovementationQuery() {
+    return `
       UPDATE movimentacao_patrimonio SET aceito = 1 WHERE id_movimentacao = ?
-     `
+     `;
   }
 
   static setLastMovementationIdQuery() {
