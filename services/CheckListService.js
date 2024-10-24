@@ -149,6 +149,7 @@ class CheckListService {
               }
             }
   }
+  
   static dateRenderer = (value) => {
     if (typeof value === "string") {
       const date = value.substring(0, 10).replace(/-/g, "/");
@@ -196,6 +197,7 @@ class CheckListService {
       arquivo,
       problema,
       valido,
+      observacao
     } = JSON.parse(checklistItemFile);
 
     const filePath = file.path;
@@ -212,6 +214,7 @@ class CheckListService {
           fileUrl,
           problema,
           valido,
+          observacao
         ]
       );
       utils.removeFile(filePath);
@@ -278,6 +281,7 @@ class CheckListService {
         id_checklist_movimentacao,
       ]
     );
+    this.sendChecklistEmails();
     return result.affectedRows;
   }
 
@@ -333,11 +337,11 @@ class CheckListService {
     return notifications;
   }
 
-  static async getChecklistsByMovementationID(id_movimentacao) {
-    console.log("id_movimentacao", id_movimentacao);
+  static async getChecklistByPatrimonyId(id_patrimonio) {
+    console.log("getChecklistByPatrimonyId");
     const checklists = await this.executeQuery(
-      CheckListRepository.getChecklistsByMovementationIDQuery(),
-      [id_movimentacao]
+      CheckListRepository.getChecklistByPatrimonyIdQuery(),
+      [id_patrimonio]
     );
 
     return checklists;

@@ -17,13 +17,12 @@ const opcoes = {
 
 class MovementationService {
   static getMovementationsByPatrimonyId =async  (patrimonyId) => { 
-
       console.log({ patrimonyId });
       const result = await this.executeQuery(
         MovementationRepository.getMovementationsByPatrimonyId_Query(),
         [patrimonyId]
       );
-      console.log('RESULT', result);
+
       if(result.length > 0) return result;
   };  
 
@@ -99,7 +98,6 @@ class MovementationService {
     const id_ultima_movimentacao = await this.getLastMovementationByPatrimonyId(
       id_patrimonio
     );
-    console.log("id_ultima_movimentacao: ", id_ultima_movimentacao);
     const result = await this.executeQuery(
       MovementationRepository.createMovementationQuery(),
       [
@@ -111,7 +109,6 @@ class MovementationService {
         id_ultima_movimentacao,
       ]
     );
-
     if (!id_ultima_movimentacao) {
       await this.executeQuery(
         MovementationRepository.setLastMovementationIdQuery(),

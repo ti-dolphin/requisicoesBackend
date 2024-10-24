@@ -3,8 +3,8 @@
 class CheckListRepository {
   static createCheckListItemFileQuery = () => {
     return `
-      INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist, arquivo, problema, valido )
-      VALUES (?,?,?,?,?)
+      INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist, arquivo, problema, valido, observacao )
+      VALUES (?,?,?,?,?, ?)
     `;
   };
 
@@ -67,7 +67,12 @@ class CheckListRepository {
 
     const paramsArray = items.map((item) => [
       query,
-      [item.problema, item.arquivo, item.observacao, item.id_item_checklist_movimentacao],
+      [
+        item.problema,
+        item.arquivo,
+        item.observacao,
+        item.id_item_checklist_movimentacao,
+      ],
     ]);
 
     return { query, paramsArray };
@@ -89,7 +94,7 @@ class CheckListRepository {
     `;
   }
 
-  static getChecklistsByMovementationIDQuery() {
+  static getChecklistByPatrimonyIdQuery() {
     return `
     SELECT 
       id_checklist_movimentacao, 
@@ -108,7 +113,7 @@ class CheckListRepository {
     INNER JOIN  movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao =  web_checklist_movimentacao.id_movimentacao
     INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
     INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
-    WHERE web_checklist_movimentacao.id_movimentacao = ?
+    WHERE web_patrimonio.id_patrimonio = ?
   `;
   }
 
@@ -170,7 +175,7 @@ INNER JOIN (
     `;
   };
 
-  static getUndoneChecklists = ( ) =>  { 
+  static getUndoneChecklists = () => {
     return `
         SELECT 
         id_checklist_movimentacao, 
@@ -196,10 +201,10 @@ INNER JOIN (
         INNER JOIN PESSOA on PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel
       WHERE 
         web_checklist_movimentacao.realizado = 0 
-    `; 
-  }
+    `;
+  };
 
-  static getUnaprovedChecklists = ( ) => { 
+  static getUnaprovedChecklists = () => {
     return `
       SELECT 
         id_checklist_movimentacao, 
@@ -226,7 +231,7 @@ INNER JOIN (
         web_checklist_movimentacao.realizado = 1
         AND web_checklist_movimentacao.aprovado = 0 
     `;
-  }
+  };
 
   static createChecklistQuery = () => {
     return `

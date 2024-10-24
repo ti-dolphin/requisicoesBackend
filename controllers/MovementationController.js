@@ -55,10 +55,11 @@ class MovementationController {
 
   static noUndoneChecklists = async (movementation) => { 
     const unddoneChecklists = await CheckListService.getUndoneChecklistsByMovementation(movementation);
+    console.log("undone checklists: ", unddoneChecklists)
     if(unddoneChecklists){ 
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   static async getMovementationsByPatrimonyId(req, res) {

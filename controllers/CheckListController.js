@@ -107,9 +107,8 @@ class CheckListController {
   }
 
   static async updateChecklistItems(req, res) {
-    console.log("updateChecklistItems");
     const { checklistItems } = req.body;
-
+    console.log('checklistItems', checklistItems);
     try {
       await CheckListService.updateChecklistItems(checklistItems);
       return res.status(200).send("Items created successfully");
@@ -133,11 +132,12 @@ class CheckListController {
     }
   }
 
-  static async getChecklistsByMovementationID(req, res) {
-    const { id_movimentacao } = req.params;
+  static async getChecklistByPatrimonyId(req, res) {
+    console.log("getChecklistByPatrimonyId");
+    const { id_patrimonio } = req.params;
     try {
-      const checklists = await CheckListService.getChecklistsByMovementationID(
-        id_movimentacao
+      const checklists = await CheckListService.getChecklistByPatrimonyId(
+        id_patrimonio
       );
       return res.status(200).send(checklists);
     } catch (error) {

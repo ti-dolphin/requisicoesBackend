@@ -38,8 +38,8 @@ router.post(
   }
 );
 
-router.get('/:id_movimentacao', (req, res) => {
-    CheckListController.getChecklistsByMovementationID(req, res);
+router.get("/:id_patrimonio", (req, res) => {
+  CheckListController.getChecklistByPatrimonyId(req, res);
 });
 
 module.exports = router;
