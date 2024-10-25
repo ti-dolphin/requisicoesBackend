@@ -6,7 +6,7 @@ const multer = require("multer");
 const upload = multer({ storage: multerConfig });
 
 router.get('/:patrimonyId', async(req, res, next) => { 
-
+    
     await MovementationController.getMovementationsByPatrimonyId(req, res);
 });
 
@@ -33,7 +33,7 @@ router.put('/:movementationId' , (req, res, next) => {
 router.put('/accept/:movementationId' , (req, res, next) => {
      MovementationController.acceptMovementation(req, res);
 });
-router.delete("/:movementationId",  (req, res, next) => {
+router.delete("/:patrimonyId/:movementationId",  (req, res, next) => {
    MovementationController.deleteMovementation(req, res);
 });
 

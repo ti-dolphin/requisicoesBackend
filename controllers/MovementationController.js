@@ -54,9 +54,9 @@ class MovementationController {
   }
 
   static noUndoneChecklists = async (movementation) => { 
-    const unddoneChecklists = await CheckListService.getUndoneChecklistsByMovementation(movementation);
-    console.log("undone checklists: ", unddoneChecklists)
+    const unddoneChecklists = await CheckListService.getUndoneChecklistsByPatrimony(movementation);
     if(unddoneChecklists){ 
+      console.log('undone checklists: ', unddoneChecklists)
       return false;
     }
     return true;
@@ -123,14 +123,16 @@ class MovementationController {
 
   static async deleteMovementation(req, res){ 
    try{ 
-      const { movementationId } = req.params;
-      console.log("movementationId: ", movementationId);
+      const { movementationId, patrimonyId } = req.params;
       const affectedRows = await MovementationService.deleteMovementation(
-        movementationId
+        movementationId,
+        patrimonyId
       );
       return res.status(200).send({message: 'Movementation Deleted Successfully', affectedRows});
    }catch(e){ 
-    return res.status(500).send('interal server error');
+    if(e.message === 'Só é possível deletar a ultima movimentação!'){ 
+      return res.status(201).send({ message: e.message });
+    }
    }
 
   }

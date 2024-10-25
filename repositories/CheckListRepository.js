@@ -1,5 +1,4 @@
 
-
 class CheckListRepository {
   static createCheckListItemFileQuery = () => {
     return `
@@ -16,10 +15,12 @@ class CheckListRepository {
     `;
   };
 
-  static getUndoneChecklistsByMovementationQuery = () => {
+  static getUndoneChecklistsByPatrimony = () => {
     return `
-      SELECT * FROM web_checklist_movimentacao WHERE 
-      id_movimentacao = ?
+      SELECT * FROM web_checklist_movimentacao
+      INNER JOIN movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao = web_checklist_movimentacao.id_movimentacao
+      WHERE 
+      id_patrimonio = ? AND web_checklist_movimentacao.realizado = 0
     `;
   };
 

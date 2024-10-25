@@ -16,15 +16,15 @@ const opcoes = {
 };
 
 class MovementationService {
-  static getMovementationsByPatrimonyId =async  (patrimonyId) => { 
-      console.log({ patrimonyId });
-      const result = await this.executeQuery(
-        MovementationRepository.getMovementationsByPatrimonyId_Query(),
-        [patrimonyId]
-      );
+  static getMovementationsByPatrimonyId = async (patrimonyId) => {
+    console.log({ patrimonyId });
+    const result = await this.executeQuery(
+      MovementationRepository.getMovementationsByPatrimonyId_Query(),
+      [patrimonyId]
+    );
 
-      if(result.length > 0) return result;
-  };  
+    if (result.length > 0) return result;
+  };
 
   static async acceptMovementation(movementationId) {
     const affectedRows = await this.executeQuery(
@@ -145,12 +145,23 @@ class MovementationService {
     else return 0;
   }
 
-  static async deleteMovementation(movementationId) {
-    const result = await this.executeQuery(
-      MovementationRepository.deleteMovementationQuery(),
-      [movementationId]
+  static async deleteMovementation(movementationId, patrimonyId) {
+  
+    const [result] = await this.executeQuery(
+      MovementationRepository.getMaxIdQuery(),
+      [patrimonyId]
     );
-    return result.affectedRows;
+    console.log("result.max_id", result.max_id);
+    console.log("movementationId: ", movementationId);
+    if (result.max_id == movementationId){ 
+          const result = await this.executeQuery(
+          MovementationRepository.deleteMovementationQuery(),
+          [movementationId]
+        );
+         console.log("result affectedRows", result.affectedRows);
+         return result.affectedRows;
+    }
+        throw new Error("Só é possível deletar a ultima movimentação!");
   }
 
   static async deleteMovementationFile(movementationFileid, filename) {
