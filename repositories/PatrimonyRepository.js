@@ -49,17 +49,20 @@ class PatrimonyRepository {
             FROM web_tipo_patrimonio
     `;
   }
+
   static deletePatrimonyFileQuery() {
     return `
         DELETE FROM anexo_patrimonio WHERE id_anexo_patrimonio = ?
     `;
   }
+
   static createPatrimonyFileQuery() {
     return `
       INSERT INTO anexo_patrimonio (arquivo, nome_arquivo, id_patrimonio)
       VALUES ( ?, ? , ? )
     `;
   }
+
   static getPatrimonyFilesQuery() {
     return `
         SELECT * FROM anexo_patrimonio WHERE id_patrimonio = ?
@@ -83,7 +86,7 @@ class PatrimonyRepository {
 
   static getSinglePatrimonyInfo() {
     return `
-      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo
+      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo, fabricante
        FROM web_patrimonio
         INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo
        WHERE id_patrimonio = ?
@@ -121,16 +124,17 @@ class PatrimonyRepository {
 
   static createPatrimonyQuery() {
     return `
-          INSERT INTO web_patrimonio (nome, data_compra, nserie, descricao, pat_legado, tipo)
-          VALUES ( ? , ?, ?, ?, ?, ?)
+          INSERT INTO web_patrimonio (nome, data_compra, nserie, descricao, pat_legado, tipo, fabricante)
+          VALUES ( ? , ?, ?, ?, ?, ?, ?)
     `;
   }
   
   static createPatrimonyQueryNoPurchaseData(){ 
     return `
-     INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo)
-          VALUES ( ?, ?, ?, ?, ?)
+     INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo, fabricante)
+          VALUES ( ?, ?, ?, ?, ?, ?)
     `;
   };
+  
 }
 module.exports = PatrimonyRepository;
