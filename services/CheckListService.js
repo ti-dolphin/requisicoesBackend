@@ -203,7 +203,6 @@ class CheckListService {
 
     const filePath = file.path;
     await fireBaseService.uploadFileToFireBase(filePath);
-    const [allFiles] = await fireBaseService.getFilesFromFirebase();
     const createdFile = await fireBaseService.getFileByName(file.filename);
     const fileUrl = createdFile ? createdFile.publicUrl() : null;
     if (fileUrl) {
@@ -218,7 +217,7 @@ class CheckListService {
           observacao,
         ]
       );
-      // utils.removeFile(filePath);
+      utils.removeFile(filePath);
       console.log('fileURL: ', fileUrl);
       return fileUrl;
     }
