@@ -218,7 +218,7 @@ class CheckListService {
           observacao,
         ]
       );
-      utils.removeFile(filePath);
+      // utils.removeFile(filePath);
       console.log('fileURL: ', fileUrl);
       return fileUrl;
     }
