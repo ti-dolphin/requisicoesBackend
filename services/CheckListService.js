@@ -219,6 +219,7 @@ class CheckListService {
         ]
       );
       utils.removeFile(filePath);
+      console.log('fileURL: ', fileUrl);
       return fileUrl;
     }
   };

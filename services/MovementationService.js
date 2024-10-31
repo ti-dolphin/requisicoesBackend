@@ -17,11 +17,13 @@ const opcoes = {
 
 class MovementationService {
   static getMovementationsByPatrimonyId = async (patrimonyId) => {
+    console.log('A PRIMEIRA')
     console.log({ patrimonyId });
     const result = await this.executeQuery(
       MovementationRepository.getMovementationsByPatrimonyId_Query(),
       [patrimonyId]
     );
+    console.log("RESULT getMovementationsByPatrimonyId: ", result);
 
     if (result.length > 0) return result;
   };
@@ -33,6 +35,7 @@ class MovementationService {
     );
     return affectedRows;
   }
+  
   static async getMovementationFiles(movementationId) {
     const result = await this.executeQuery(
       MovementationRepository.getMovementationFilesQuery(),
@@ -98,45 +101,38 @@ class MovementationService {
     const id_ultima_movimentacao = await this.getLastMovementationByPatrimonyId(
       id_patrimonio
     );
-    const result = await this.executeQuery(
-      MovementationRepository.createMovementationQuery(),
-      [
-        localeDate,
-        id_patrimonio,
-        id_projeto,
-        id_responsavel,
-        observacao,
-        id_ultima_movimentacao,
-      ]
-    );
-    if (!id_ultima_movimentacao) {
-      await this.executeQuery(
-        MovementationRepository.setLastMovementationIdQuery(),
-        [result.insertId, result.insertId]
-      );
-    }
-    await CheckListService.createChecklist({
-      id_movimentacao: result.insertId,
-      data_criacao: new Date().toISOString().replace("T", " ").split(".")[0],
-      realizado: 0,
-      data_realizado: null,
-      aprovado: 0,
-      data_aprovado: null,
-      observacao: null,
-    });
+     console.log("LOCALE DATE: ", localeDate);
+     const result = await this.executeQuery(
+       MovementationRepository.createMovementationQuery(),
+       [
+         localeDate,
+         id_patrimonio,
+         id_projeto,
+         id_responsavel,
+         observacao,
+         id_ultima_movimentacao,
+       ]
+     );
+     if (!id_ultima_movimentacao) {
+       await this.executeQuery(
+         MovementationRepository.setLastMovementationIdQuery(),
+         [result.insertId, result.insertId]
+       );
+     }
+     await CheckListService.createChecklist({
+       id_movimentacao: result.insertId,
+       data_criacao: new Date().toISOString().replace("T", " ").split(".")[0],
+       realizado: 0,
+       data_realizado: null,
+       aprovado: 0,
+       data_aprovado: null,
+       observacao: null,
+     });
     return result.insertId;
   }
 
-  static async getMovementationsByPatrimonyId(patrimonyId) {
-    const result = await this.executeQuery(
-      MovementationRepository.getMovementationsByPatrimonyId_Query(),
-      [patrimonyId]
-    );
-    console.log("result getMovementationsByPatrimonyId: ", result);
-    return result;
-  }
-
   static async getLastMovementationByPatrimonyId(patrimonyId) {
+      
     const result = await this.executeQuery(
       MovementationRepository.getLastMovementationQuery(patrimonyId)
     );

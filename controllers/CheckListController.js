@@ -24,7 +24,7 @@ class CheckListController {
     }
   };
 
-  static updateChecklistItemFile = async (req, res) => {
+  static updateChecklistItemFile = async (req, res) => {u
     console.log('UpdateChecklistItemFile');
     const file = req.file;
     if (!file) {
