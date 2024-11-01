@@ -155,9 +155,12 @@ WHERE
     wcm.data_realizado, 
     wcm.aprovado, 
     wcm.data_aprovado, 
-    mp.observacao
+    mp.observacao,
+    periodicidade
 FROM 
     movimentacao_patrimonio AS mp
+INNER JOIN web_patrimonio AS wp ON mp.id_patrimonio = wp.id_patrimonio
+INNER JOIN web_tipo_patrimonio AS wtp ON wtp.id_tipo_patrimonio = wp.tipo
 INNER JOIN web_checklist_movimentacao AS wcm 
     ON wcm.id_movimentacao = mp.id_movimentacao
 INNER JOIN (

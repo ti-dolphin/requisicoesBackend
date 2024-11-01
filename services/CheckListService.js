@@ -6,21 +6,37 @@ const utils = require("../utils");
 const EmailService = require("../services/EmailService");
 class CheckListService {
   static async verifyAndCreateChecklists() {
+    console.log("verifyAndCreateChecklists");
     const checklists = await this.executeQuery(
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
+    // console.log(checklists)
+    console.log("checklists being verified ", checklists.length);    
     const currentDate = new Date();
-    const fifteenDaysInMilliseconds = 15 * 24 * 60 * 60 * 1000;
     for (let checklist of checklists) {
-      const { id_checklist_movimentacao, id_movimentacao, data_realizado } =
-        checklist;
-      if (data_realizado) {
-        const dataRealizadoDate = new Date(data_realizado);
-        if (currentDate - dataRealizadoDate > fifteenDaysInMilliseconds) {
-          console.log("faz mais de 15 dias");
-          // await this.executeQuery(CheckListRepository.createChecklistQuery(), [
-          //   id_movimentacao,
-          // ]);
+  
+      const {
+        id_checklist_movimentacao,
+        id_movimentacao,
+        data_criacao,
+        periodicidade,
+      } = checklist;
+      if (data_criacao) {
+        const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
+        const createdDate = new Date(data_criacao);
+        if (currentDate - createdDate > periodicidadeInMilliseconds) {
+          console.log("NOVO CHECKLIST");
+          await this.executeQuery(CheckListRepository.createChecklistQuery(), [
+            id_movimentacao,
+          ]);
+        }
+        else{ 
+          console.log("checklist em dia: ", {
+            id_checklist_movimentacao,
+            id_movimentacao,
+            data_criacao,
+            periodicidade,
+          });
         }
       }
     }
@@ -218,7 +234,7 @@ class CheckListService {
         ]
       );
       utils.removeFile(filePath);
-      console.log('fileURL: ', fileUrl);
+      console.log("fileURL: ", fileUrl);
       return fileUrl;
     }
   };
