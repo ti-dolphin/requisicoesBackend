@@ -155,6 +155,7 @@ class PatrimonyService {
       descricao,
       pat_legado,
       tipo,
+      fabricante
     } = newPatrimony;
     console.log({
       nome,
@@ -162,6 +163,7 @@ class PatrimonyService {
       nserie,
       descricao,
       pat_legado,
+      fabricante
     });
 
     const purchaseDate = new Date(data_compra)
@@ -172,13 +174,13 @@ class PatrimonyService {
       if(data_compra !== ''){ 
         const result = await this.executeQuery(
                 PatrimonyRepository.createPatrimonyQuery(),
-                [nome, purchaseDate, nserie, descricao, pat_legado, tipo]
+                [nome, purchaseDate, nserie, descricao, pat_legado, tipo, fabricante]
               );
               if (result) return result.insertId;
       }
        const result = await this.executeQuery(
          PatrimonyRepository.createPatrimonyQueryNoPurchaseData(),
-         [nome, nserie, descricao, pat_legado, tipo]
+         [nome, nserie, descricao, pat_legado, tipo, fabricante]
        );
        if (result) return result.insertId;
      

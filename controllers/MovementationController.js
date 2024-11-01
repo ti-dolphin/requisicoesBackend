@@ -1,3 +1,4 @@
+const CheckListService = require("../services/CheckListService");
 const MovementationService = require("../services/MovementationService");
 const utils = require("../utils");
 class MovementationController {
@@ -19,30 +20,52 @@ class MovementationController {
   static async createMovementation(req, res) {
     const movementation = req.body;
     try {
-      const insertId = await MovementationService.createMovementation(
-        movementation
-      );
-      if (insertId) {
-        console.log({
-          message: "Movementation created Successfully",
-          insertId,
-        });
-        return res.status(200).send({
-          message: "Movementation created Successfully",
-          insertId,
-        });
+      const creationPermitted = await this.noUndoneChecklists(movementation);
+      const firstMovementation = await this.isFirstMovementation(movementation);
+      if (creationPermitted || firstMovementation) {
+        const insertId = await MovementationService.createMovementation(
+          movementation
+        );
+        if (insertId) {
+          console.log({
+            message: "Movementation created Successfully",
+            insertId,
+          });
+          return res.status(200).send({
+            message: "Movementation created Successfully",
+            insertId,
+          });
+        }
       }
+      return res.status(201).send({message: 'Não foi possível criar a movimentacção pois há um checklist não realizado! Faça o checklist antes de transferir o patrimônio'});
+
     } catch (e) {
       console.log("error in MovementationController.createMovementation: ", e);
       res.status(500).send("Internal Server Error");
     }
   }
 
+  static isFirstMovementation = async (movementation) => {
+    const movementations = await MovementationService.getMovementationsByPatrimonyId(movementation.id_patrimonio);
+    if (movementations && movementations.length > 0) {
+      return false;
+    }
+    return true;
+  }
+
+  static noUndoneChecklists = async (movementation) => { 
+    const unddoneChecklists = await CheckListService.getUndoneChecklistsByPatrimony(movementation);
+    if(unddoneChecklists){ 
+      console.log('undone checklists: ', unddoneChecklists)
+      return false;
+    }
+    return true;
+  }
+
   static async getMovementationsByPatrimonyId(req, res) {
     const { patrimonyId } = req.params;
     try {
-      const movementations =
-        await MovementationService.getMovementationsByPatrimonyId(patrimonyId);
+      const movementations = await MovementationService.getMovementationsByPatrimonyId(patrimonyId);
       if (movementations) return res.status(200).send(movementations);
       return res.status(404).send({ message: "No Movementations Found!" });
     } catch (e) {
@@ -100,14 +123,16 @@ class MovementationController {
 
   static async deleteMovementation(req, res){ 
    try{ 
-      const { movementationId } = req.params;
-      console.log("movementationId: ", movementationId);
+      const { movementationId, patrimonyId } = req.params;
       const affectedRows = await MovementationService.deleteMovementation(
-        movementationId
+        movementationId,
+        patrimonyId
       );
       return res.status(200).send({message: 'Movementation Deleted Successfully', affectedRows});
    }catch(e){ 
-    return res.status(500).send('interal server error');
+    if(e.message === 'Só é possível deletar a ultima movimentação!'){ 
+      return res.status(201).send({ message: e.message });
+    }
    }
 
   }

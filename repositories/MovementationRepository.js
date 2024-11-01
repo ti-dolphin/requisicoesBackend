@@ -1,10 +1,16 @@
 
 
 class MovementationRepository {
-  static acceptMovementationQuery(){
-     return `
+  static getMaxIdQuery() {
+    return `
+    SELECT MAX(id_movimentacao) as max_id from movimentacao_patrimonio WHERE id_patrimonio = ?
+   `;
+  }
+
+  static acceptMovementationQuery() {
+    return `
       UPDATE movimentacao_patrimonio SET aceito = 1 WHERE id_movimentacao = ?
-     `
+     `;
   }
 
   static setLastMovementationIdQuery() {

@@ -20,7 +20,7 @@ const userController = {
             expiresIn: "1 day",
           }
         );
-        return {user: verification.user[0], token: token}
+        return { user: verification.user[0], token: token };
       } catch (e) {
         console.log("authorization error: ", e);
         return null;
@@ -28,8 +28,8 @@ const userController = {
     }
     return null;
   },
-  getManagerCode  : async  (userID) => { 
-    const query = 'SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?';
+  getManagerCode: async (userID) => {
+    const query = "SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?";
     const [result] = await userController.executeQuery(query, [userID]);
     return result[0].CODGERENTE;
   },
@@ -47,7 +47,7 @@ const userController = {
           error: "User not found",
         };
       } else {
-        console.log({user})
+        console.log({ user });
         return {
           message: "Login successful",
           user,
@@ -64,38 +64,55 @@ const userController = {
       };
     }
   },
-  
-  isPurchaser: async( userID) => { 
-    const query = 'SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND PERM_COMPRADOR = 1'
-    try{ 
+
+  isPurchaser: async (userID) => {
+    const query =
+      "SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND PERM_COMPRADOR = 1";
+    try {
       const [result] = await userController.executeQuery(query, [userID]);
-      if(result.length) { 
+      if (result.length) {
         return true;
       }
       return false;
-    }catch(e){ 
-      console.log('isPurchaser error: ', e)
-      return null
+    } catch (e) {
+      console.log("isPurchaser error: ", e);
+      return null;
     }
   },
-  isManager: async (userID ) => { 
+  isManager: async (userID) => {
     console.log("userID isManager: ", userID);
-      const query =
-        "SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND CODGERENTE != 'null'";
-      try {
-        const [result] = await userController.executeQuery(query, [userID]);
-        console.log('result isManager: ', result)
-        if (result.length) return true;
-        return false;
-      } catch (e) {
-        console.log(e);
-        return null;
-      }
+    const query =
+      "SELECT CODPESSOA, PERM_COMPRADOR FROM PESSOA WHERE CODPESSOA = ? AND CODGERENTE != 'null'";
+    try {
+      const [result] = await userController.executeQuery(query, [userID]);
+      console.log("result isManager: ", result);
+      if (result.length) return true;
+      return false;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   },
 
   findOne: async (username, encryptedPassword) => {
-    const query =
-      "SELECT CODPESSOA, NOME, LOGIN, CODGERENTE, PERM_REQUISITAR, PERM_COMPRADOR, PERM_ADMINISTRADOR, PERM_CADASTRAR_PAT FROM PESSOA WHERE LOGIN = ? AND SENHA = ?";
+    const query = `SELECT 
+  CODPESSOA, 
+  NOME, 
+  LOGIN, 
+  CODGERENTE, 
+  PERM_REQUISITAR, 
+  PERM_COMPRADOR, 
+  PERM_ADMINISTRADOR, 
+  PERM_CADASTRAR_PAT,
+  responsavel_tipo
+FROM 
+  PESSOA 
+  LEFT JOIN web_tipo_patrimonio ON web_tipo_patrimonio.responsavel_tipo = CODPESSOA
+WHERE 
+  LOGIN = ? 
+  AND SENHA = ?
+ 
+`;
     const [result] = await userController.executeQuery(query, [
       username,
       encryptedPassword,

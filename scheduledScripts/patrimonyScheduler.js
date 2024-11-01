@@ -1,0 +1,31 @@
+const EmailService = require("../services/EmailService");
+const ChecklistService = require('../services/CheckListService');
+class PatrimonyScheduler {
+
+  static startchecklistVerification = ( ) =>  { 
+      const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
+      const interval = 5 * oneHourInMilliseconds;
+     setInterval(() => {
+       try {
+         ChecklistService.verifyAndCreateChecklists();
+       } catch (e) {
+         console.error("Error during checklist verification:", e);
+       }
+     }, interval);
+  }
+
+  static startEmailSchedule() {
+    const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
+    const interval = 15 * oneHourInMilliseconds;
+    setInterval(async () => {
+      try {
+        ChecklistService.sendChecklistEmails();
+      } catch (error) {
+        console.error("Error during scheduled email sending:", error);
+      }
+    }, interval); // 10 seconds (10000 milliseconds)
+  }
+  
+}
+
+module.exports = PatrimonyScheduler;

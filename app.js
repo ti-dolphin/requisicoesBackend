@@ -16,8 +16,12 @@ var projectRouter = require('./routes/projectRouter');
 var patrimonyRouter = require('./routes/patrimonyRouter');
 var itemFileRouter = require('./routes/itemFileRouter');
 var movementationRouter = require('./routes/movementationRouter');
+var checklistRouter = require('./routes/checkListRouter');
 const authorize = require('./middleware/authentication');
+const PatrimonyScheduler  = require('./scheduledScripts/patrimonyScheduler');
 var app = express();
+
+
 app.disable('etag');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -39,7 +43,8 @@ app.use('/pessoa', authorize, personRouter);
 app.use('/project', authorize, projectRouter);
 app.use('/requisitionFiles', authorize, requisitionFilesRouter);
 app.use('/itemFiles', authorize, itemFileRouter);
-app.use("/accessory", patrimonyAccessoryRouter);
+app.use("/accessory", authorize,  patrimonyAccessoryRouter);
+app.use('/checklist', authorize, checklistRouter);
 
 
 
@@ -47,7 +52,6 @@ app.use("/accessory", patrimonyAccessoryRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
-
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
@@ -57,5 +61,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+ PatrimonyScheduler.startEmailSchedule();
+ PatrimonyScheduler.startchecklistVerification();
 
 module.exports = app;
