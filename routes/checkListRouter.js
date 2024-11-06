@@ -10,7 +10,7 @@ router.get("/notifications", (req, res ) => {
     CheckListController.getChecklistNotifications(req, res);
 });
 router.get('/checklistItems/:id_patrimonio/:id_movimentacao/:id_checklist_movimentacao', (req, res) => {
-    CheckListController.getChecklistItemsMap(req, res);
+    CheckListController.getChecklistItems(req, res);
 });
 
 router.post('', (req, res) => { 

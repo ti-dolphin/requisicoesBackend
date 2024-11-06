@@ -1,5 +1,17 @@
 
 class CheckListRepository {
+  static createChecklistItemsQuery = () => {
+    return `
+     INSERT INTO web_items_checklist_movimentacao
+     ( id_checklist_movimentacao, nome_item_checklist) 
+     SELECT ?, nome_item_checklist FROM 
+     web_checklist_movimentacao
+    INNER JOIN movimentacao_patrimonio as mp ON mp.id_movimentacao = web_checklist_movimentacao.id_movimentacao
+    INNER JOIN web_patrimonio as p ON p.id_patrimonio = mp.id_patrimonio
+    INNER JOIN web_items_checklist_tipo as ict ON ict.id_tipo_patrimonio = p.tipo
+    
+    `;
+  };
   static createCheckListItemFileQuery = () => {
     return `
       INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist, arquivo, problema, valido, observacao )
@@ -79,19 +91,11 @@ class CheckListRepository {
     return { query, paramsArray };
   }
 
-  static getChecklistItemFilesQuery() {
-    return `
-        SELECT * FROM web_items_checklist_movimentacao
-        WHERE id_checklist_movimentacao = ? 
-    `;
-  }
-
   static getChecklistItemsQuery() {
     return `
-    SELECT * FROM web_patrimonio
-    INNER JOIN web_items_checklist_tipo ON
-    web_items_checklist_tipo.id_tipo_patrimonio = web_patrimonio.tipo
-    WHERE web_patrimonio.id_patrimonio = ?
+        SELECT id_item_checklist_movimentacao, id_checklist_movimentacao, nome_item_checklist, arquivo, problema, observacao
+        FROM web_items_checklist_movimentacao
+        WHERE id_checklist_movimentacao = ? 
     `;
   }
 

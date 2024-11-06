@@ -2,30 +2,29 @@
 var CheckListService = require('../services/CheckListService');
 
 class CheckListController {
-  static createChecklistItemFile = async(req, res ) => { 
-    try{ 
+  static createChecklistItemFile = async (req, res) => {
+    try {
       const file = req.file;
-      console.log('file: ', file);;
+      console.log("file: ", file);
       if (!file) {
         return res.status(400).send("No file uploaded");
       }
-       const fileUrl = await CheckListService.createChecklistItemFile(
-         req.body.checklistItemFile,
-         file
-       );
-       if (fileUrl) {
-         res.status(200).send({ fileUrl });
-       } else {
-         res.status(500).send("Failed to upload file");
-       }
-    }catch(e){ 
-      console.log('Error creating: ', e.message);
+      const fileUrl = await CheckListService.createChecklistItemFile(
+        req.body.checklistItemFile,
+        file
+      );
+      if (fileUrl) {
+        res.status(200).send({ fileUrl });
+      } else {
+        res.status(500).send("Failed to upload file");
+      }
+    } catch (e) {
+      console.log("Error creating: ", e.message);
       res.status(500).send("Internal Server Error");
     }
   };
 
-  static updateChecklistItemFile = async (req, res) => {u
-    console.log('UpdateChecklistItemFile');
+  static updateChecklistItemFile = async (req, res) => {
     const file = req.file;
     if (!file) {
       return res.status(400).send("No file uploaded");
@@ -35,7 +34,7 @@ class CheckListController {
         req.params.id_item_checklist_movimentacao,
         file
       );
-      console.log('file url: ' + fileUrl)
+      console.log("file url: " + fileUrl);
       if (fileUrl) {
         res.status(200).send({ fileUrl });
       } else {
@@ -90,16 +89,17 @@ class CheckListController {
     }
   }
 
-  static async getChecklistItemsMap(req, res) {
+  static async getChecklistItems(req, res) {
     try {
       const { id_patrimonio, id_movimentacao, id_checklist_movimentacao } =
         req.params;
-      const itemsMap = await CheckListService.getChecklistItemsMap(
+      const checklistItems = await CheckListService.getChecklistItems(
         id_patrimonio,
         id_movimentacao,
         id_checklist_movimentacao
       );
-      return res.status(200).send(itemsMap);
+   
+      return res.status(200).send(checklistItems);
     } catch (error) {
       console.error(error);
       res.status(500).send("Server Error");
@@ -108,7 +108,7 @@ class CheckListController {
 
   static async updateChecklistItems(req, res) {
     const { checklistItems } = req.body;
-    console.log('checklistItems', checklistItems);
+    console.log("checklistItems", checklistItems);
     try {
       await CheckListService.updateChecklistItems(checklistItems);
       return res.status(200).send("Items created successfully");
