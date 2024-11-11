@@ -140,7 +140,8 @@ class CheckListService {
                                     `${data_criacao}`
                                   )}.
                                   
-                                  Por favor, verifique e realize o checklist o mais rápido possível.
+                                  Por favor, verifique e realize o checklist o mais rápido possível no sistema de patrimônios.
+                                  link: <a>controle.dse.com.br</a>
                                   
                                   Atenciosamente,
                                   Atenciosamente, Setor de T.I.`;
