@@ -1,5 +1,4 @@
 var CheckListRepository = require("../repositories/CheckListRepository");
-const PersonService = require("../services/PersonService");
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
@@ -11,10 +10,8 @@ class CheckListService {
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
     // console.log(checklists)
-    console.log("checklists being verified ", checklists.length);    
     const currentDate = new Date();
     for (let checklist of checklists) {
-  
       const {
         id_checklist_movimentacao,
         id_movimentacao,
@@ -29,8 +26,7 @@ class CheckListService {
           await this.executeQuery(CheckListRepository.createChecklistQuery(), [
             id_movimentacao,
           ]);
-        }
-        else{ 
+        } else {
           console.log("checklist em dia: ", {
             id_checklist_movimentacao,
             id_movimentacao,
@@ -204,41 +200,6 @@ class CheckListService {
     }
   };
 
-  static createChecklistItemFile = async (checklistItemFile, file) => {
-    if (!file) {
-      throw new Error("File not provided");
-    }
-    const {
-      id_checklist_movimentacao,
-      nome_item_checklist,
-      arquivo,
-      problema,
-      valido,
-      observacao,
-    } = JSON.parse(checklistItemFile);
-
-    const filePath = file.path;
-    await fireBaseService.uploadFileToFireBase(filePath);
-    const createdFile = await fireBaseService.getFileByName(file.filename);
-    const fileUrl = createdFile ? createdFile.publicUrl() : null;
-    if (fileUrl) {
-      await this.executeQuery(
-        CheckListRepository.createCheckListItemFileQuery(),
-        [
-          id_checklist_movimentacao,
-          nome_item_checklist,
-          fileUrl,
-          problema,
-          valido,
-          observacao,
-        ]
-      );
-      utils.removeFile(filePath);
-      console.log("fileURL: ", fileUrl);
-      return fileUrl;
-    }
-  };
-
   static getUndoneChecklistsByPatrimony = async (movementation) => {
     const { id_patrimonio } = movementation;
     const undoneChecklists = await this.executeQuery(
@@ -270,6 +231,12 @@ class CheckListService {
         observacao,
       ]
     );
+
+    const createChecklistItemsResult = await this.executeQuery(
+      CheckListRepository.createChecklistItemsQuery(result.insertId),
+      [result.insertId, result.inserId]
+    );
+    console.log('INSERT ID?: ', result.insertId);
     return result.insertId;
   };
 
@@ -316,35 +283,17 @@ class CheckListService {
     }
   }
 
-  static async getChecklistItemsMap(
+  static async getChecklistItems(
     id_patrimonio,
     id_movimentacao,
     id_checklist_movimentacao
   ) {
     const checklistItems = await this.executeQuery(
       CheckListRepository.getChecklistItemsQuery(),
-      [id_patrimonio]
-    );
-
-    const checklistItemFiles = await this.executeQuery(
-      CheckListRepository.getChecklistItemFilesQuery(),
       [id_checklist_movimentacao]
     );
-    const checklistItemsMap = new Map();
-    const checklistItemsMapArray = [];
-
-    for (let checklistItem of checklistItems) {
-      const checklistItemFile = checklistItemFiles.find(
-        (checklistItemFile) =>
-          checklistItemFile.nome_item_checklist ===
-          checklistItem.nome_item_checklist
-      );
-      checklistItemsMapArray.push({
-        checklistItem,
-        checklistItemFile,
-      });
-    }
-    return checklistItemsMapArray;
+    console.log('checklistItems: ', checklistItems);
+    return checklistItems;
   }
 
   static async getChecklistNotifications(CODPESSOA) {
@@ -370,6 +319,7 @@ class CheckListService {
     try {
       const [result] = await connection.query(query, params);
       connection.release();
+
       return result;
     } catch (queryError) {
       console.log("Error in executeQuery: ", queryError);
