@@ -4,10 +4,11 @@ class PatrimonyScheduler {
 
   static startchecklistVerification = ( ) =>  { 
       const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
-      const interval = 5 * oneHourInMilliseconds;
+      const interval = 24 * oneHourInMilliseconds;
      setInterval(() => {
        try {
          ChecklistService.verifyAndCreateChecklists();
+
        } catch (e) {
          console.error("Error during checklist verification:", e);
        }
@@ -16,7 +17,7 @@ class PatrimonyScheduler {
 
   static startEmailSchedule() {
     const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
-    const interval = 15 * oneHourInMilliseconds;
+    const interval = 24 * oneHourInMilliseconds;
     setInterval(async () => {
       try {
         ChecklistService.sendChecklistEmails();
