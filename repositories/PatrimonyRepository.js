@@ -106,10 +106,12 @@ class PatrimonyRepository {
           web_patrimonio.descricao as descricao,
           movimentacao_patrimonio.id_movimentacao as numeroMovimentacao,
           movimentacao_patrimonio.data as dataMovimentacao,
-          movimentacao_patrimonio.aceito
+          movimentacao_patrimonio.aceito,
+          web_tipo_patrimonio.nome_tipo
       FROM dsecombr_controle.movimentacao_patrimonio 
       INNER JOIN PROJETOS ON id_projeto = PROJETOS.ID
       INNER JOIN web_patrimonio ON web_patrimonio.id_patrimonio = movimentacao_patrimonio.id_patrimonio 
+      INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo
         AND movimentacao_patrimonio.id_movimentacao IN (
             SELECT max(id_movimentacao) as id_movimentacao 
             FROM movimentacao_patrimonio 

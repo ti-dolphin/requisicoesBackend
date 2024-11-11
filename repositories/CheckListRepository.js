@@ -1,17 +1,18 @@
 
 class CheckListRepository {
-  static createChecklistItemsQuery = () => {
+  static createChecklistItemsQuery = (insertID) => {
+    console.log("createChecklistItemsQuery");
     return `
-     INSERT INTO web_items_checklist_movimentacao
-     ( id_checklist_movimentacao, nome_item_checklist) 
-     SELECT ?, nome_item_checklist FROM 
-     web_checklist_movimentacao
-    INNER JOIN movimentacao_patrimonio as mp ON mp.id_movimentacao = web_checklist_movimentacao.id_movimentacao
-    INNER JOIN web_patrimonio as p ON p.id_patrimonio = mp.id_patrimonio
-    INNER JOIN web_items_checklist_tipo as ict ON ict.id_tipo_patrimonio = p.tipo
-    
+     INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist) 
+    SELECT ${insertID}, ict.nome_item_checklist 
+    FROM web_checklist_movimentacao
+    INNER JOIN movimentacao_patrimonio AS mp ON mp.id_movimentacao = web_checklist_movimentacao.id_movimentacao
+    INNER JOIN web_patrimonio AS p ON p.id_patrimonio = mp.id_patrimonio
+    INNER JOIN web_items_checklist_tipo AS ict ON ict.id_tipo_patrimonio = p.tipo
+    WHERE web_checklist_movimentacao.id_checklist_movimentacao = ${insertID};
     `;
   };
+
   static createCheckListItemFileQuery = () => {
     return `
       INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist, arquivo, problema, valido, observacao )
@@ -100,6 +101,7 @@ class CheckListRepository {
   }
 
   static getChecklistByPatrimonyIdQuery() {
+    console.log("getChecklistByPatrimonyIdQuery");
     return `
     SELECT 
       id_checklist_movimentacao, 
@@ -113,40 +115,52 @@ class CheckListRepository {
       web_patrimonio.nome, 
       web_patrimonio.id_patrimonio,
       web_tipo_patrimonio.responsavel_tipo,
-      movimentacao_patrimonio.id_responsavel as responsavel_movimentacao
+      movimentacao_patrimonio.id_responsavel as responsavel_movimentacao,
+      PESSOA.NOME as nome_responsavel,
+      PESSOA.CODPESSOA as responsavel_movimentacao,
+      PROJETOS.DESCRICAO as descricao_projeto,
+      web_patrimonio.nome as nome_patrimonio
      FROM web_checklist_movimentacao
-    INNER JOIN  movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao =  web_checklist_movimentacao.id_movimentacao
-    INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
-    INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
-    WHERE web_patrimonio.id_patrimonio = ?
+      INNER JOIN  movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao =  web_checklist_movimentacao.id_movimentacao
+      INNER JOIN PESSOA ON movimentacao_patrimonio.id_responsavel = PESSOA.CODPESSOA
+      INNER JOIN PROJETOS ON movimentacao_patrimonio.id_projeto = PROJETOS.ID
+      INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
+      INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
+      WHERE web_patrimonio.id_patrimonio = ?
   `;
   }
 
   static getChecklistNotificationsQuery() {
     return `    
-         SELECT 
-  id_checklist_movimentacao, 
-  web_checklist_movimentacao.id_movimentacao, 
-  data_criacao, 
-  realizado, 
-  data_realizado, 
-  aprovado, 
-  data_aprovado, 
-  web_checklist_movimentacao.observacao, 
-  web_patrimonio.nome, 
-  web_patrimonio.id_patrimonio,
-  web_tipo_patrimonio.responsavel_tipo,
-  movimentacao_patrimonio.id_responsavel as responsavel_movimentacao
-FROM 
-  web_checklist_movimentacao 
-  INNER JOIN movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao = web_checklist_movimentacao.id_movimentacao 
-  INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
-  INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
-WHERE 
-  web_checklist_movimentacao.realizado = 0 
-  OR web_checklist_movimentacao.aprovado = 0 
-  AND (movimentacao_patrimonio.id_responsavel = ? 
-  OR web_tipo_patrimonio.responsavel_tipo = ?)`;
+              SELECT 
+        id_checklist_movimentacao, 
+        web_checklist_movimentacao.id_movimentacao, 
+        data_criacao, 
+        realizado, 
+        data_realizado, 
+        aprovado, 
+        data_aprovado, 
+        web_checklist_movimentacao.observacao, 
+        web_patrimonio.nome, 
+        web_patrimonio.id_patrimonio,
+        web_tipo_patrimonio.responsavel_tipo,
+        movimentacao_patrimonio.id_responsavel as responsavel_movimentacao,
+        PESSOA.NOME as nome_responsavel,
+        PESSOA.CODPESSOA as responsavel_movimentacao,
+        PROJETOS.DESCRICAO as descricao_projeto,
+        web_patrimonio.nome as nome_patrimonio
+      FROM 
+        web_checklist_movimentacao 
+        INNER JOIN movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao = web_checklist_movimentacao.id_movimentacao 
+        INNER JOIN PESSOA ON movimentacao_patrimonio.id_responsavel = PESSOA.CODPESSOA
+        INNER JOIN PROJETOS ON movimentacao_patrimonio.id_projeto = PROJETOS.ID
+        INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
+        INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
+      WHERE 
+        web_checklist_movimentacao.realizado = 0 
+        OR web_checklist_movimentacao.aprovado = 0 
+        AND (movimentacao_patrimonio.id_responsavel = ? 
+        OR web_tipo_patrimonio.responsavel_tipo = ?)`;
   }
 
   static getLastChecklistPerMovementationQuery = () => {

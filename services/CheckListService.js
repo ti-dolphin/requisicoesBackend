@@ -1,5 +1,4 @@
 var CheckListRepository = require("../repositories/CheckListRepository");
-const PersonService = require("../services/PersonService");
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
@@ -232,11 +231,12 @@ class CheckListService {
         observacao,
       ]
     );
+
     const createChecklistItemsResult = await this.executeQuery(
-      CheckListRepository.createChecklistItemsQuery(),
+      CheckListRepository.createChecklistItemsQuery(result.insertId),
       [result.insertId, result.inserId]
     );
-    console.log("items: ", createChecklistItemsResult);
+    console.log('INSERT ID?: ', result.insertId);
     return result.insertId;
   };
 
@@ -319,7 +319,7 @@ class CheckListService {
     try {
       const [result] = await connection.query(query, params);
       connection.release();
-      console.log('result: ', result);
+
       return result;
     } catch (queryError) {
       console.log("Error in executeQuery: ", queryError);
