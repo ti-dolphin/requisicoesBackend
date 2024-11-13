@@ -17,8 +17,9 @@ class CheckListService {
         id_movimentacao,
         data_criacao,
         periodicidade,
+        realizado
       } = checklist;
-      if (data_criacao) {
+      if (realizado) {
         const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
         const createdDate = new Date(data_criacao);
         if (currentDate - createdDate > periodicidadeInMilliseconds) {
@@ -80,7 +81,7 @@ class CheckListService {
                           )}.
                           
                           Por favor, verifique o checklist o mais rápido possível.
-                          
+                          link: <a>controle.dse.com.br</a>
                           Atenciosamente,
                           Atenciosamente, Setor de T.I.`;
         try {
@@ -161,6 +162,53 @@ class CheckListService {
           );
         }
       }
+    }
+  }
+
+  static async sendLateUndoneChecklistEmail( ){ 
+    const lateChecklists = await this.executeQuery(
+      CheckListRepository.getLateUndoneChecklists()
+    );
+    if (lateChecklists.length > 0) {
+      for (let checklist of lateChecklists) {
+        const {
+          id_checklist_movimentacao,
+          id_movimentaca,
+          data_criacao,
+          realizado,
+          data_realizado,
+          aprovado,
+          data_aprovado,
+          observacao,
+          nome,
+          id_patrimonio,
+          responsavel_tipo,
+          responsavel_movimentacao,
+          nome_responsavel_movimentacao,
+          email_responsavel_movimentacao,
+          nome_patrimonio,
+          email_responsavel_tipo
+        } = checklist;
+        const subject = `Checklist atrasado! - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
+        const message = `  Olá, ${nome_responsavel_movimentacao},
+                                  A checklist do patrimônio ${id_patrimonio} - ${nome_patrimonio} está atrasado.
+                                  Realize o mais rápido possível!
+                                  link: <a>controle.dse.com.br</a>`
+         try {
+           await EmailService.sendEmail(
+             email_responsavel_movimentacao,
+             subject,
+             message,
+             [email_responsavel_tipo]
+           );
+         } catch (error) {
+           console.error(
+             `Erro ao enviar email para ${email_responsavel_movimentacao}:`,
+             error
+           );
+         }
+      }
+
     }
   }
 
