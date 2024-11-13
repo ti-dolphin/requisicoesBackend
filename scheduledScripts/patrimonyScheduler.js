@@ -8,7 +8,6 @@ class PatrimonyScheduler {
      setInterval(() => {
        try {
          ChecklistService.verifyAndCreateChecklists();
-
        } catch (e) {
          console.error("Error during checklist verification:", e);
        }

@@ -1,5 +1,36 @@
 
 class CheckListRepository {
+  static getLateUndoneChecklists = ( ) => { 
+    return `
+        SELECT 
+        id_checklist_movimentacao, 
+        web_checklist_movimentacao.id_movimentacao, 
+        data_criacao, 
+        realizado, 
+        data_realizado, 
+        aprovado, 
+        data_aprovado, 
+        web_checklist_movimentacao.observacao, 
+        web_patrimonio.nome, 
+        web_patrimonio.id_patrimonio,
+        web_tipo_patrimonio.responsavel_tipo,
+        movimentacao_patrimonio.id_responsavel as responsavel_movimentacao,
+        PESSOA.NOME as nome_responsavel_movimentacao,
+        PESSOA.EMAIL as email_responsavel_movimentacao,
+        web_patrimonio.nome as nome_patrimonio,
+         PESSOA_RESPONSAVEL_TIPO.EMAIL as email_responsavel_tipo
+      FROM 
+        web_checklist_movimentacao 
+        INNER JOIN movimentacao_patrimonio ON movimentacao_patrimonio.id_movimentacao = web_checklist_movimentacao.id_movimentacao 
+        INNER JOIN web_patrimonio ON movimentacao_patrimonio.id_patrimonio = web_patrimonio.id_patrimonio 
+        INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
+        INNER JOIN PESSOA on PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel
+        INNER JOIN PESSOA as PESSOA_RESPONSAVEL_TIPO on  web_tipo_patrimonio.responsavel_tipo = PESSOA_RESPONSAVEL_TIPO.CODPESSOA
+      WHERE 
+        web_checklist_movimentacao.realizado = 0 and data_criacao < DATE_SUB(CURDATE(), INTERVAL 3 DAY);
+    `;
+  };
+
   static createChecklistItemsQuery = (insertID) => {
     console.log("createChecklistItemsQuery");
     return `

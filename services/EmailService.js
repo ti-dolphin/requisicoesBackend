@@ -10,13 +10,14 @@ class EmailService {
     },
   });
 
-  static async sendEmail(recipientEmail, subject, text) {
+  static async sendEmail(recipientEmail, subject, text, ccEmails) {
     try {
       const mailOptions = {
         from: "ti@dse.com.br",
         to: recipientEmail,
         subject: subject,
         text: text,
+        ccEmails: ccEmails
       };
       // Send the email
       const info = await this.transporter.sendMail(mailOptions);
