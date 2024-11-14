@@ -81,8 +81,8 @@ class CheckListService {
                           )}.
                           
                           Por favor, verifique o checklist o mais rápido possível.
-                          link: <a>controle.dse.com.br</a>
-                          Atenciosamente,
+                          link: controle.dse.com.br
+                    
                           Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
@@ -142,9 +142,8 @@ class CheckListService {
                                   )}.
                                   
                                   Por favor, verifique e realize o checklist o mais rápido possível no sistema de patrimônios.
-                                  link: <a>controle.dse.com.br</a>
-                                  
-                                  Atenciosamente,
+                                  link: controle.dse.com.br
+                                
                                   Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
@@ -193,7 +192,7 @@ class CheckListService {
         const message = `  Olá, ${nome_responsavel_movimentacao},
                                   A checklist do patrimônio ${id_patrimonio} - ${nome_patrimonio} está atrasado.
                                   Realize o mais rápido possível!
-                                  link: <a>controle.dse.com.br</a>`
+                                  link: controle.dse.com.br`
          try {
            await EmailService.sendEmail(
              email_responsavel_movimentacao,
