@@ -78,7 +78,8 @@ class PatrimonyRepository {
           nserie = ?,
            descricao = ?,
             pat_legado = ?,
-            ativo = ?
+            ativo = ?,
+            valor_compra = ?
             WHERE id_patrimonio = ?
 
     `;
@@ -86,7 +87,7 @@ class PatrimonyRepository {
 
   static getSinglePatrimonyInfo() {
     return `
-      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo, fabricante
+      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo, fabricante, valor_compra
        FROM web_patrimonio
         INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo
        WHERE id_patrimonio = ?
@@ -104,6 +105,7 @@ class PatrimonyRepository {
           RESPONSAVEL.NOME AS responsavel,
           web_patrimonio.nome as nome,
           web_patrimonio.descricao as descricao,
+           web_patrimonio.valor_compra,
           movimentacao_patrimonio.id_movimentacao as numeroMovimentacao,
           movimentacao_patrimonio.data as dataMovimentacao,
           movimentacao_patrimonio.aceito,
@@ -126,15 +128,15 @@ class PatrimonyRepository {
 
   static createPatrimonyQuery() {
     return `
-          INSERT INTO web_patrimonio (nome, data_compra, nserie, descricao, pat_legado, tipo, fabricante)
-          VALUES ( ? , ?, ?, ?, ?, ?, ?)
+          INSERT INTO web_patrimonio (nome, data_compra, nserie, descricao, pat_legado, tipo, fabricante, valor_compra)
+          VALUES ( ? , ?, ?, ?, ?, ?, ?, ?)
     `;
   }
   
   static createPatrimonyQueryNoPurchaseData(){ 
     return `
-     INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo, fabricante)
-          VALUES ( ?, ?, ?, ?, ?, ?)
+     INSERT INTO web_patrimonio (nome, nserie, descricao, pat_legado, tipo, fabricante, valor_compra)
+          VALUES ( ?, ?, ?, ?, ?, ?, ?)
     `;
   };
   

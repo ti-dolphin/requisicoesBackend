@@ -64,6 +64,7 @@ class PatrimonyController {
       res.status(500).send({ message: "Error getting resopnsable", error: e });
     }
   }
+
   static async getPatrimonyType(req, res) {
     try {
       const patrimonyTypes = await PatrimonyService.getPatrimonyType();
@@ -150,6 +151,7 @@ class PatrimonyController {
       res.status(500).send("Internal Server Error");
     }
   }
+
   static async createPatrimony(req, res) {
     const patrimony = req.body;
     try {
@@ -165,9 +167,7 @@ class PatrimonyController {
 
   static async updatePatrimony(req, res) {
     try {
-
       const affectedRows = await PatrimonyService.updatePatrimony(req.body);
-      console.log("affectedRows: ", affectedRows);
       if (affectedRows)
         return res.status(200).send({
           message: "Movementation Updated Successfully!",
