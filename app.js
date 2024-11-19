@@ -62,7 +62,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
- PatrimonyScheduler.startEmailSchedule();
- PatrimonyScheduler.startchecklistVerification();
+//  PatrimonyScheduler.startEmailSchedule();
+//  PatrimonyScheduler.startchecklistVerification();
 
 module.exports = app;

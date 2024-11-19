@@ -17,7 +17,7 @@ class CheckListService {
         id_movimentacao,
         data_criacao,
         periodicidade,
-        realizado
+        realizado,
       } = checklist;
       if (realizado) {
         const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
@@ -40,11 +40,12 @@ class CheckListService {
   }
 
   static sendChecklistEmails = async () => {
+    await this.sendTobeAprovedChecklistEmails();
     await this.sendUndoneChecklistEmails();
-    await this.sendUnaprovedChecklistEmails();
+    await this.sendLateUndoneChecklistEmail();
   };
 
-  static sendUnaprovedChecklistEmails = async () => {
+  static sendTobeAprovedChecklistEmails = async (id_checklist_movimentacao) => {
     const unaprovedChecklists = await this.executeQuery(
       CheckListRepository.getUnaprovedChecklists()
     );
@@ -67,7 +68,7 @@ class CheckListService {
           email_responsavel_tipo,
           nome_patrimonio,
         } = checklist;
-        const subject = `Checklist não aprovada - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
+        const subject = `Checklist à aprovar - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
         const message = `  Olá, ${nome_responsavel_tipo},
                           
                           Você deve verificar o checklist do patrimônio ${id_patrimonio} - ${nome_patrimonio}.
@@ -82,7 +83,11 @@ class CheckListService {
                           
                           Por favor, verifique o checklist o mais rápido possível.
                           link: controle.dse.com.br
+<<<<<<< HEAD
                     
+=======
+      
+>>>>>>> dev
                           Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
@@ -126,7 +131,7 @@ class CheckListService {
           email_responsavel_movimentacao,
           nome_patrimonio,
         } = checklist;
-        const subject = `Checklist pendente - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
+        const subject = `Checklist à realizar - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
         const message = `
                                   Olá, ${nome_responsavel_movimentacao},
                                   
@@ -143,7 +148,11 @@ class CheckListService {
                                   
                                   Por favor, verifique e realize o checklist o mais rápido possível no sistema de patrimônios.
                                   link: controle.dse.com.br
+<<<<<<< HEAD
                                 
+=======
+                                  
+>>>>>>> dev
                                   Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
@@ -164,7 +173,7 @@ class CheckListService {
     }
   }
 
-  static async sendLateUndoneChecklistEmail( ){ 
+  static async sendLateUndoneChecklistEmail() {
     const lateChecklists = await this.executeQuery(
       CheckListRepository.getLateUndoneChecklists()
     );
@@ -186,28 +195,73 @@ class CheckListService {
           nome_responsavel_movimentacao,
           email_responsavel_movimentacao,
           nome_patrimonio,
-          email_responsavel_tipo
+          email_responsavel_tipo,
         } = checklist;
         const subject = `Checklist atrasado! - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
         const message = `  Olá, ${nome_responsavel_movimentacao},
                                   A checklist do patrimônio ${id_patrimonio} - ${nome_patrimonio} está atrasado.
                                   Realize o mais rápido possível!
-                                  link: controle.dse.com.br`
-         try {
-           await EmailService.sendEmail(
-             email_responsavel_movimentacao,
-             subject,
-             message,
-             [email_responsavel_tipo]
-           );
-         } catch (error) {
-           console.error(
-             `Erro ao enviar email para ${email_responsavel_movimentacao}:`,
-             error
-           );
-         }
+                                  link: controle.dse.com.br`;
+        try {
+          await EmailService.sendEmail(
+            email_responsavel_movimentacao,
+            subject,
+            message,
+            [email_responsavel_tipo]
+          );
+        } catch (error) {
+          console.error(
+            `Erro ao enviar email para ${email_responsavel_movimentacao}:`,
+            error
+          );
+        }
       }
+    }
+  }
 
+  static async sendUnaprovedChecklistEmail(id_checklist_movimentacao) {
+    const unaprovedChecklists = await this.executeQuery(
+      CheckListRepository.getUnaprovedChecklistByIdQuery(),
+      [id_checklist_movimentacao]
+    );
+    for (let checklist of unaprovedChecklists) {
+      const {
+        id_checklist_movimentacao,
+        id_movimentaca,
+        data_criacao,
+        realizado,
+        data_realizado,
+        aprovado,
+        data_aprovado,
+        observacao,
+        nome,
+        id_patrimonio,
+        responsavel_tipo,
+        responsavel_movimentacao,
+        nome_responsavel_movimentacao,
+        email_responsavel_movimentacao,
+        nome_patrimonio,
+        email_responsavel_tipo,
+      } = checklist;
+      const subject = `Checklist reprovado - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
+      const message = `Olá ${nome_responsavel_movimentacao}, seu checklist do patrimônio ${nome_patrimonio} foi reprovado, acesse o sistema e reenvie o checklist o mais rápido possível!
+        link: controle.dse.com.br
+        Atenciosamente, setor de T.I!`;
+      try {
+        await EmailService.sendEmail(
+          email_responsavel_movimentacao,
+          subject,
+          message
+        );
+        console.log(
+          `Email enviado com sucesso para ${nome_responsavel_movimentacao} (${email_responsavel_movimentacao})`
+        );
+      } catch (error) {
+        console.error(
+          `Erro ao enviar email para ${email_responsavel_movimentacao}:`,
+          error
+        );
+      }
     }
   }
 
@@ -284,7 +338,7 @@ class CheckListService {
       CheckListRepository.createChecklistItemsQuery(result.insertId),
       [result.insertId, result.inserId]
     );
-    console.log('INSERT ID?: ', result.insertId);
+    console.log("INSERT ID?: ", result.insertId);
     return result.insertId;
   };
 
@@ -298,6 +352,7 @@ class CheckListService {
       aprovado,
       data_aprovado,
       observacao,
+      reprovado,
     } = checklist;
 
     const result = await this.executeQuery(
@@ -310,10 +365,14 @@ class CheckListService {
         aprovado,
         data_aprovado && data_aprovado.replace("T", " ").split(".")[0],
         observacao,
-        id_checklist_movimentacao,
+        reprovado,
+        id_checklist_movimentacao
       ]
     );
-    this.sendChecklistEmails();
+    if (reprovado) {
+      await this.sendUnaprovedChecklistEmail(id_checklist_movimentacao);
+    }
+    console.log('result', result);
     return result.affectedRows;
   }
 
@@ -340,7 +399,7 @@ class CheckListService {
       CheckListRepository.getChecklistItemsQuery(),
       [id_checklist_movimentacao]
     );
-    console.log('checklistItems: ', checklistItems);
+    console.log("checklistItems: ", checklistItems);
     return checklistItems;
   }
 

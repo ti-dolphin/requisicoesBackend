@@ -58,6 +58,7 @@ class CheckListController {
         aprovado,
         data_aprovado,
         observacao,
+        reprovado
       } = req.body;
       console.log({
         id_checklist_movimentacao,
@@ -68,6 +69,7 @@ class CheckListController {
         aprovado,
         data_aprovado,
         observacao,
+        reprovado
       });
       const result = await CheckListService.updatedChecklist({
         id_checklist_movimentacao,
@@ -78,6 +80,7 @@ class CheckListController {
         aprovado,
         data_aprovado,
         observacao,
+        reprovado
       });
       if (result)
         return res

@@ -114,7 +114,7 @@ class PatrimonyService {
   }
 
   static async updatePatrimony(patrimony) {
-    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo } =
+    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo, valor_compra } =
       patrimony;
     const result = await this.executeQuery(
       PatrimonyRepository.updatePatrimonyQuery(),
@@ -155,16 +155,9 @@ class PatrimonyService {
       descricao,
       pat_legado,
       tipo,
-      fabricante
+      fabricante,
+      valor_compra
     } = newPatrimony;
-    console.log({
-      nome,
-      data_compra, // This should be in ISO date string format, e.g., "2024-08-09"
-      nserie,
-      descricao,
-      pat_legado,
-      fabricante
-    });
 
     const purchaseDate = new Date(data_compra)
       .toLocaleDateString("sv-SE", opcoes)
@@ -174,13 +167,13 @@ class PatrimonyService {
       if(data_compra !== ''){ 
         const result = await this.executeQuery(
                 PatrimonyRepository.createPatrimonyQuery(),
-                [nome, purchaseDate, nserie, descricao, pat_legado, tipo, fabricante]
+                [nome, purchaseDate, nserie, descricao, pat_legado, tipo, fabricante, valor_compra]
               );
               if (result) return result.insertId;
       }
        const result = await this.executeQuery(
          PatrimonyRepository.createPatrimonyQueryNoPurchaseData(),
-         [nome, nserie, descricao, pat_legado, tipo, fabricante]
+         [nome, nserie, descricao, pat_legado, tipo, fabricante, valor_compra]
        );
        if (result) return result.insertId;
      
