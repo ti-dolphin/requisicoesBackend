@@ -70,7 +70,6 @@ class PatrimonyRepository {
   }
 
   static updatePatrimonyQuery() {
-    console.log("updatePatrimonyQuery");
     return `
         UPDATE web_patrimonio SET
         nome = ? ,
