@@ -114,8 +114,17 @@ class PatrimonyService {
   }
 
   static async updatePatrimony(patrimony) {
-    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo, valor_compra } =
-      patrimony;
+    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo, valor_compra } = patrimony;
+    console.log({
+      id_patrimonio,
+      nome,
+      data_compra,
+      nserie,
+      descricao,
+      pat_legado,
+      ativo,
+      valor_compra,
+    });
     const result = await this.executeQuery(
       PatrimonyRepository.updatePatrimonyQuery(),
       [
@@ -128,6 +137,7 @@ class PatrimonyService {
         descricao,
         pat_legado,
          ativo,
+         valor_compra,
         id_patrimonio
         
       ]
@@ -195,4 +205,5 @@ class PatrimonyService {
     }
   }
 }
+
 module.exports = PatrimonyService;

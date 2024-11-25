@@ -31,7 +31,7 @@ router.get("/responsable/:patrimonyId", (req, res, next) => {
 
 
 router.put("/:patrimonyId",  (req, res, next) => {
-   console.log('PUT PATRIMONIO')
+  
    PatrimonyController.updatePatrimony(req, res);
 });
 

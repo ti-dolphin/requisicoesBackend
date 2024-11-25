@@ -39,7 +39,7 @@ class CheckListService {
     }
   }
 
-  static sendChecklistEmails = async () => {
+  static sendChecklistEmails = async () => {''
     await this.sendTobeAprovedChecklistEmails();
     await this.sendUndoneChecklistEmails();
     await this.sendLateUndoneChecklistEmail();

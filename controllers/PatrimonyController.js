@@ -167,6 +167,7 @@ class PatrimonyController {
 
   static async updatePatrimony(req, res) {
     try {
+      console.log("req.body: ", req.body);
       const affectedRows = await PatrimonyService.updatePatrimony(req.body);
       if (affectedRows)
         return res.status(200).send({
