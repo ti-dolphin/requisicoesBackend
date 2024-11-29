@@ -39,7 +39,8 @@ class CheckListService {
     }
   }
 
-  static sendChecklistEmails = async () => {''
+  static sendChecklistEmails = async () => {
+    "";
     await this.sendTobeAprovedChecklistEmails();
     await this.sendUndoneChecklistEmails();
     await this.sendLateUndoneChecklistEmail();
@@ -366,13 +367,13 @@ class CheckListService {
         data_aprovado && data_aprovado.replace("T", " ").split(".")[0],
         observacao,
         reprovado,
-        id_checklist_movimentacao
+        id_checklist_movimentacao,
       ]
     );
     if (reprovado) {
       await this.sendUnaprovedChecklistEmail(id_checklist_movimentacao);
     }
-    console.log('result', result);
+    console.log("result", result);
     return result.affectedRows;
   }
 
@@ -408,8 +409,18 @@ class CheckListService {
       CheckListRepository.getChecklistNotificationsQuery(),
       [CODPESSOA, CODPESSOA]
     );
+    for (let checklist of notifications) {
+      let createdDate = new Date(checklist.data_criacao);
+      const today = new Date();
+      const threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
+      if (createdDate < threeDaysAgo && !checklist.realizado) {
+        checklist.atrasado = 1;
+      }
+     
+    }
     return notifications;
   }
+
 
   static async getChecklistByPatrimonyId(id_patrimonio) {
     console.log("getChecklistByPatrimonyId");

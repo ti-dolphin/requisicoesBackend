@@ -16,6 +16,7 @@ var projectRouter = require('./routes/projectRouter');
 var patrimonyRouter = require('./routes/patrimonyRouter');
 var itemFileRouter = require('./routes/itemFileRouter');
 var movementationRouter = require('./routes/movementationRouter');
+var oppoprtunityRouter = require('./routes/OpportunityRouter'); 
 var checklistRouter = require('./routes/checkListRouter');
 const authorize = require('./middleware/authentication');
 const PatrimonyScheduler  = require('./scheduledScripts/patrimonyScheduler');
@@ -45,7 +46,7 @@ app.use('/requisitionFiles', authorize, requisitionFilesRouter);
 app.use('/itemFiles', authorize, itemFileRouter);
 app.use("/accessory", authorize,  patrimonyAccessoryRouter);
 app.use('/checklist', authorize, checklistRouter);
-
+app.use("/opportunity", authorize, oppoprtunityRouter);
 
 
 
