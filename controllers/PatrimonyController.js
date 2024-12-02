@@ -139,9 +139,13 @@ class PatrimonyController {
   }
 
   static async getPatrimonyInfo(req, res) {
+    const { user, filter: currentFilter } = req.query;
 
     try {
-      const patrimonyInfo = await PatrimonyService.getPatrimonyInfo();
+      const patrimonyInfo = await PatrimonyService.getPatrimonyInfo({
+        user,
+        filter: currentFilter,
+      });
       if (patrimonyInfo) {
         return res.status(200).send(patrimonyInfo);
       }
