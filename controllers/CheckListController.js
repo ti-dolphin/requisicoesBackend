@@ -122,11 +122,15 @@ class CheckListController {
   }
 
   static async getChecklistNotifications(req, res) {
-    console.log("getChecklistNotifications");
-    const { CODPESSOA } = req.query;
+ 
+    const { CODPESSOA, status } = req.query;
+    console.log({
+      CODPESSOA,
+      status,
+    });
     try {
       const notifications = await CheckListService.getChecklistNotifications(
-        CODPESSOA
+        CODPESSOA, status
       );
       res.status(200).send(notifications);
     } catch (error) {

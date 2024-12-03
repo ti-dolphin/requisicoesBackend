@@ -404,7 +404,7 @@ class CheckListService {
     return checklistItems;
   }
 
-  static async getChecklistNotifications(CODPESSOA) {
+  static async getChecklistNotifications(CODPESSOA, status) {
     const notifications = await this.executeQuery(
       CheckListRepository.getChecklistNotificationsQuery(),
       [CODPESSOA, CODPESSOA]
@@ -416,11 +416,18 @@ class CheckListService {
       if (createdDate < threeDaysAgo && !checklist.realizado) {
         checklist.atrasado = 1;
       }
-     
+    }
+    if(status === 'atrasados'){ 
+      return notifications.filter(n => n.atrasado === 1 && !n.realizado);
+    }
+    if(status === 'aprovar'){ 
+      return notifications.filter(n => n.realizado && !n.aprovado);
+    }
+    if(status === 'problemas'){ 
+      return notifications.filter(n => n.problema);
     }
     return notifications;
   }
-
 
   static async getChecklistByPatrimonyId(id_patrimonio) {
     console.log("getChecklistByPatrimonyId");
