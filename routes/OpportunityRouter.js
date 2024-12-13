@@ -8,4 +8,20 @@ router.get('/',  (req, res) => {
     console.log('GET')
     OpportunityController.getOpportunities(req, res);
 });
+
+router.post('/', (req, res) => {
+    console.log('POST');
+    OpportunityController.createOpportunity(req, res);
+});
+
+router.get('/saler', (req, res) => {
+    OpportunityController.getSalers(req, res);
+})
+router.get('/status', (req, res) => {
+    OpportunityController.getStatusList(req, res);
+});
+
+router.get('/client', (req, res) => {
+    OpportunityController.getClients(req, res);
+})
 module.exports = router;
