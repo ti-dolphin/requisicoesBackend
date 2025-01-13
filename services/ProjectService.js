@@ -11,7 +11,6 @@ class ProjectService {
         `,
         [descricao]
       );
-      console.log('projeto craido: ', result)
     return result.insertId;
   }
   static async getAllProjects() {

@@ -1,23 +1,100 @@
 const OpportunityService = require("../services/OpportunityService");
 const PersonService = require("../services/PersonService");
-
 class OpportunityController {
-  static createOpportunity = async (req, res) => {
+  //getOpportunityById
+  static getOpportunityById = async (req, res) => {
     try {
-      const newOpportunityId = await OpportunityService.createOpportunity(
-        req.body
+      const opportunity = await OpportunityService.getOpportunityById(
+        req.params.oppId
       );
-      return res
-        .status(200)
-        .send({
-          message: "Opportunity created successfully",
-          insertId: newOpportunityId,
-        });
+      if (!opportunity) {
+        return res.status(404).send("Opportunity not found");
+      }
+      return res.status(200).send(opportunity);
+    } catch (e) {
+      console.error("Error getting opportunity: ", e.message);
+      return res.status(500).send("Server Error");
+    }
+  };
+
+  static getOpportunityFiles = async (req, res) => {
+    try {
+      const files = await OpportunityService.getOpportunityFiles(
+        req.query.oppId
+      );
+      console.log({
+        files,
+      });
+      return res.status(200).send(files);
+    } catch (e) {
+      console.error("Error getting opportunity files: ", e.message);
+      return res.status(500).send("Server Error");
+    }
+  };
+
+  static uploadFiles = async (req, res) => {
+    try {
+      const { files } = req;
+     
+       await OpportunityService.createOpportunityFiles(
+        req.query.oppId,
+        files
+      );
+      return res.status(200).send({
+        message: "files inserted successfully"
+      });
+    } catch (e) {
+      console.log("Error uploading files: ", e);
+      return res.status(500).send({ message: "Error uploading files" });
+    }
+  };
+
+  static createOpportunity = async (req, res) => {
+    console.log("createOpportunity");
+    try {
+      const response = await OpportunityService.createOpportunity(req.body);
+      return res.status(200).send({
+        message: "Opportunity created successfully",
+        adicional: response.adicional,
+        codOs: response.codOs,
+      });
     } catch (e) {
       console.error("Error creating opportunity: ", e.message);
       return res.status(500).send("Server Error");
     }
   };
+
+  static updateOpportunity = async (req, res) => {
+    console.log("updateOpportunity");
+    const updatedOpportunity = req.body;
+    try {
+      const affectedRows = await OpportunityService.updateOpportunity(
+        updatedOpportunity
+      );
+      return res.status(200).send({ message: "Opportunity updated successfully!" });
+    } catch (e) {
+      console.error("Error updating opportunity: ", e.message);
+      return res.status(500).send("Server Error");
+    }
+  };
+
+  static createOpportuntiyFile = async (req, res) => {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).send("No file uploaded");
+    }
+    try {
+      const insertId = await OpportunityService.createOpportunityFile(
+        req.params.id,
+        file
+      );
+      return res.status(200).send({ message: "File uploaded successfully!" });
+    } catch (e) {
+      console.error("Error uploading file: ", e.message);
+      return res.status(500).send("Server Error");
+    }
+  };
+
   static getClients = async (req, res) => {
     try {
       const clients = await PersonService.getClients();
@@ -28,6 +105,7 @@ class OpportunityController {
       res.status(500).json({ error: err.message });
     }
   };
+
   static getStatusList = async (req, res) => {
     try {
       const statusList = await OpportunityService.getOppStatusList();
@@ -38,6 +116,7 @@ class OpportunityController {
       res.status(500).json({ error: e.message });
     }
   };
+
   static getSalers = async (req, res) => {
     try {
       const salers = await PersonService.getSallers();
@@ -48,6 +127,7 @@ class OpportunityController {
       res.status(500).json({ error: e.message });
     }
   };
+
   static getOpportunities = async (req, res) => {
     try {
       const opps = await OpportunityService.getOpportunities(req.query);

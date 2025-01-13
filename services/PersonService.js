@@ -4,7 +4,7 @@ class PersonService {
 
   static async getClients( ){ 
     const query = `
-      SELECT CODCLIENTE, NOME FROM CLIENTE;
+      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE;
     `;
     try {
       const [rows, fields] = await PersonService.executeQuery(query);
@@ -20,7 +20,7 @@ class PersonService {
     const query = `
       SELECT NOME, CODPESSOA 
       FROM ${personTable}
-      WHERE RESPONSAVEL = 1 and ATIVO = 1
+      WHERE RESPONSAVEL = 1
     `;
     try {
       const [rows, fields] = await PersonService.executeQuery(query);
