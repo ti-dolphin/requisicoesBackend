@@ -84,12 +84,10 @@ class CheckListService {
                           
                           Por favor, verifique o checklist o mais rápido possível.
                           link: controle.dse.com.br
-<<<<<<< HEAD
-                    
-=======
-      
->>>>>>> dev
-                          Atenciosamente, Setor de T.I.`;
+
+                          **Não responda esse email**
+                          **Qualquer dúvida, entre em contato com o setor de T.I**
+                          Atenciosamente, Setor de T.I.`;   
         try {
           await EmailService.sendEmail(
             email_responsavel_tipo,
@@ -149,11 +147,10 @@ class CheckListService {
                                   
                                   Por favor, verifique e realize o checklist o mais rápido possível no sistema de patrimônios.
                                   link: controle.dse.com.br
-<<<<<<< HEAD
-                                
-=======
-                                  
->>>>>>> dev
+
+                                    **Não responda esse email**
+                                    **Qualquer dúvida, entre em contato com o setor de T.I**
+
                                   Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
@@ -202,7 +199,11 @@ class CheckListService {
         const message = `  Olá, ${nome_responsavel_movimentacao},
                                   A checklist do patrimônio ${id_patrimonio} - ${nome_patrimonio} está atrasado.
                                   Realize o mais rápido possível!
-                                  link: controle.dse.com.br`;
+                                  link: controle.dse.com.br
+                                **Não responda esse email**
+                                **Qualquer dúvida, entre em contato com o setor de T.I**
+                                  `;
+                                  
         try {
           await EmailService.sendEmail(
             email_responsavel_movimentacao,
@@ -247,6 +248,9 @@ class CheckListService {
       const subject = `Checklist reprovado - Patrimônio ${id_patrimonio} - ${nome_patrimonio}`;
       const message = `Olá ${nome_responsavel_movimentacao}, seu checklist do patrimônio ${nome_patrimonio} foi reprovado, acesse o sistema e reenvie o checklist o mais rápido possível!
         link: controle.dse.com.br
+
+          **Não responda esse email**
+          **Qualquer dúvida, entre em contato com o setor de T.I**
         Atenciosamente, setor de T.I!`;
       try {
         await EmailService.sendEmail(
