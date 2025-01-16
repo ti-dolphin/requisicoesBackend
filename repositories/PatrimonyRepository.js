@@ -109,7 +109,8 @@ class PatrimonyRepository {
            descricao = ?,
             pat_legado = ?,
             ativo = ?,
-            valor_compra = ?
+            valor_compra = ?,
+            fabricante =?
             WHERE id_patrimonio = ?
 
     `;

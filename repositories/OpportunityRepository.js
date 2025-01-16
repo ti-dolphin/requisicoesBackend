@@ -233,7 +233,7 @@ class OpportunityRepository {
   };
   static getOpportunitiesQuery = (dateFilters) => {
     let baseQuery = `
-                  SELECT 
+                SELECT 
                 os.ID_PROJETO AS numeroProjeto, -- Número do projeto
                 ad.NUMERO AS numeroAdicional, -- Número adicional
                 s.NOME AS nomeStatus, -- Status do projeto
@@ -247,7 +247,7 @@ class OpportunityRepository {
                 gerente.NOME AS nomeGerente, -- Nome do gerente
                 CONCAT('R$ ', FORMAT(os.VALORFATDOLPHIN, 2, 'de_DE')) AS valorFaturamentoDolphin, -- Valor de faturamento Dolphin
                 CONCAT('R$ ', FORMAT(os.VALORFATDIRETO, 2, 'de_DE')) AS valorFaturamentoDireto, -- Valor de faturamento direto
-                CONCAT('R$ ', FORMAT(os.VALORTOTAL, 2, 'de_DE')) AS valorTotal, -- Valor total
+                CONCAT('R$ ', FORMAT((os.VALORFATDOLPHIN + os.VALORFATDIRETO), 2, 'de_DE')) AS valorTotal, -- Valor total
                 os.CODOS AS numeroOs -- Número da ordem de serviço
             FROM 
                 ORDEMSERVICO os
@@ -266,13 +266,14 @@ class OpportunityRepository {
             WHERE 
                 p.ATIVO = 1 AND s.ATIVO = 1 AND s.ACAO = ? AND
                 (
-                os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
-                OR
-                os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
+                    os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
+                    OR
+                    os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
+                    OR 
+                    ? IN (SELECT CODPESSOA FROM PESSOA WHERE PERM_ADMINISTRADOR = 1)
                 )
             ORDER BY 
-                os.CODOS DESC; -- Ordenação pelo número da ordem de serviço, do maior para o menor
-
+                os.CODOS DESC; -- Ordenação pelo número da ordem de serviço, do maior para o menor.
     `;
     for (let dateFilter of dateFilters) {
       if (dateFilter.from !== "") {

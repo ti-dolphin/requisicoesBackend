@@ -109,12 +109,22 @@ class PatrimonyService {
       PatrimonyRepository.getSinglePatrimonyInfo(),
       [patrimonyId]
     );
-    console.log(result)
+    console.log(result);
     return result;
   }
 
   static async updatePatrimony(patrimony) {
-    const { id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, ativo, valor_compra } = patrimony;
+    const {
+      id_patrimonio,
+      nome,
+      data_compra,
+      nserie,
+      descricao,
+      pat_legado,
+      ativo,
+      valor_compra,
+      fabricante,
+    } = patrimony;
     console.log({
       id_patrimonio,
       nome,
@@ -124,6 +134,7 @@ class PatrimonyService {
       pat_legado,
       ativo,
       valor_compra,
+      fabricante,
     });
     const result = await this.executeQuery(
       PatrimonyRepository.updatePatrimonyQuery(),
@@ -136,24 +147,23 @@ class PatrimonyService {
         nserie,
         descricao,
         pat_legado,
-         ativo,
-         valor_compra,
-        id_patrimonio
-        
+        ativo,
+        valor_compra,
+        fabricante,
+        id_patrimonio,
       ]
     );
     return result.affectedRows;
   }
 
   static async getPatrimonyInfo(queryParams) {
-
     try {
-      if(queryParams.filter === 'Meus'){ 
-          const rows = await this.executeQuery(
-            PatrimonyRepository.getPatrimonyInfoQueryByResponsable(), 
-            [queryParams.user.CODPESSOA]
-          );
-          return rows;
+      if (queryParams.filter === "Meus") {
+        const rows = await this.executeQuery(
+          PatrimonyRepository.getPatrimonyInfoQueryByResponsable(),
+          [queryParams.user.CODPESSOA]
+        );
+        return rows;
       }
       const rows = await this.executeQuery(
         PatrimonyRepository.getPatrimonyInfoQuery()
@@ -174,7 +184,7 @@ class PatrimonyService {
       pat_legado,
       tipo,
       fabricante,
-      valor_compra
+      valor_compra,
     } = newPatrimony;
 
     const purchaseDate = new Date(data_compra)
@@ -182,19 +192,27 @@ class PatrimonyService {
       .replace("T", " ")
       .replace(/ .*/, "");
     try {
-      if(data_compra !== ''){ 
+      if (data_compra !== "") {
         const result = await this.executeQuery(
-                PatrimonyRepository.createPatrimonyQuery(),
-                [nome, purchaseDate, nserie, descricao, pat_legado, tipo, fabricante, valor_compra]
-              );
-              if (result) return result.insertId;
+          PatrimonyRepository.createPatrimonyQuery(),
+          [
+            nome,
+            purchaseDate,
+            nserie,
+            descricao,
+            pat_legado,
+            tipo,
+            fabricante,
+            valor_compra
+          ]
+        );
+        if (result) return result.insertId;
       }
-       const result = await this.executeQuery(
-         PatrimonyRepository.createPatrimonyQueryNoPurchaseData(),
-         [nome, nserie, descricao, pat_legado, tipo, fabricante, valor_compra]
-       );
-       if (result) return result.insertId;
-     
+      const result = await this.executeQuery(
+        PatrimonyRepository.createPatrimonyQueryNoPurchaseData(),
+        [nome, nserie, descricao, pat_legado, tipo, fabricante, valor_compra]
+      );
+      if (result) return result.insertId;
     } catch (e) {
       console.log("error in PatrimonyService.createPatrimony: m", e);
     }

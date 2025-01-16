@@ -5,7 +5,6 @@ const utils = require("../utils");
 const EmailService = require("../services/EmailService");
 class CheckListService {
   static async verifyAndCreateChecklists() {
-    console.log("verifyAndCreateChecklists");
     const checklists = await this.executeQuery(
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
