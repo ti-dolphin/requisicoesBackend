@@ -23,10 +23,14 @@ class CheckListService {
         const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
         const createdDate = new Date(data_criacao);
         if (currentDate - createdDate > periodicidadeInMilliseconds) {
-          console.log("NOVO CHECKLIST");
-          await this.executeQuery(CheckListRepository.createChecklistQuery(), [
-            id_movimentacao,
-          ]);
+          const result = await this.executeQuery(
+            CheckListRepository.createChecklistQuery(),
+            [id_movimentacao]
+          );
+          await this.executeQuery(
+            CheckListRepository.createChecklistItemsQuery(result.insertId),
+            [result.insertId, result.inserId]
+          );
         } else {
           console.log("checklist em dia: ", {
             id_checklist_movimentacao,
@@ -87,7 +91,7 @@ class CheckListService {
 
                           **Não responda esse email**
                           **Qualquer dúvida, entre em contato com o setor de T.I**
-                          Atenciosamente, Setor de T.I.`;   
+                          Atenciosamente, Setor de T.I.`;
         try {
           await EmailService.sendEmail(
             email_responsavel_tipo,
@@ -203,7 +207,7 @@ class CheckListService {
                                 **Não responda esse email**
                                 **Qualquer dúvida, entre em contato com o setor de T.I**
                                   `;
-                                  
+
         try {
           await EmailService.sendEmail(
             email_responsavel_movimentacao,
@@ -421,14 +425,14 @@ class CheckListService {
         checklist.atrasado = 1;
       }
     }
-    if(status === 'atrasados'){ 
-      return notifications.filter(n => n.atrasado === 1 && !n.realizado);
+    if (status === "atrasados") {
+      return notifications.filter((n) => n.atrasado === 1 && !n.realizado);
     }
-    if(status === 'aprovar'){ 
-      return notifications.filter(n => n.realizado && !n.aprovado);
+    if (status === "aprovar") {
+      return notifications.filter((n) => n.realizado && !n.aprovado);
     }
-    if(status === 'problemas'){ 
-      return notifications.filter(n => n.problema);
+    if (status === "problemas") {
+      return notifications.filter((n) => n.problema);
     }
     return notifications;
   }
