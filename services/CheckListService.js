@@ -391,7 +391,7 @@ class CheckListService {
       CheckListRepository.getChecklistItemsQuery(),
       [id_checklist_movimentacao]
     );
-    console.log("checklistItems: ", checklistItems);
+    console.log("checklistItems: ", checklistItems.length);
     return checklistItems;
   }
 
