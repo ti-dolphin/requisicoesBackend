@@ -450,8 +450,8 @@ class OpportunityService {
     const { finished, dateFilters, codpessoa } = params;
     const action = finished === "true" ? 1 : 0;
     const opps = await this.executeQuery(
-      OpportunityRepository.getOpportunitiesQuery(dateFilters),
-      [action, codpessoa, codpessoa, codpessoa]
+      OpportunityRepository.getOpportunitiesQuery(dateFilters, action),
+      [ codpessoa, codpessoa, codpessoa]
     );
 
     return opps;

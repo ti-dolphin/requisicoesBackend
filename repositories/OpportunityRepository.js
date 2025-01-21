@@ -231,7 +231,7 @@ class OpportunityRepository {
       SELECT * FROM STATUS as s where ATIVO = 1
     `;
   };
-  static getOpportunitiesQuery = (dateFilters) => {
+  static getOpportunitiesQuery = (dateFilters, action) => {
     let baseQuery = `
                 SELECT 
                 os.ID_PROJETO AS numeroProjeto, -- Número do projeto
@@ -264,7 +264,7 @@ class OpportunityRepository {
             LEFT JOIN
                 ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
             WHERE 
-                p.ATIVO = 1 AND s.ATIVO = 1 AND s.ACAO = ? AND
+                p.ATIVO = 1 AND s.ATIVO = 1  ${action ? 'AND s.ACAO = 1 AND' : 'AND'}
                 (
                     os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
                     OR
