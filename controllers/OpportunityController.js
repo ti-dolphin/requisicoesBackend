@@ -33,9 +33,10 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
+    console.log("uploadFiles");
     try {
       const { files } = req;
-     
+      
        await OpportunityService.createOpportunityFiles(
         req.query.oppId,
         files
@@ -77,6 +78,7 @@ class OpportunityController {
       return res.status(500).send("Server Error");
     }
   };
+
 
   static createOpportuntiyFile = async (req, res) => {
     const file = req.file;

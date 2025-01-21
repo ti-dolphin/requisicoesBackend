@@ -10,7 +10,7 @@ class OpportunityService {
       [oppId]
     );
     const { files } = opp;
-    console.log("files: ", files);
+    console.log("getOpportunityById - files: ", files);
     return opp;
   };
 
@@ -31,6 +31,7 @@ class OpportunityService {
       files.map(async (file) => {
         await fireBaseService.uploadFileToFireBase(file.path);
         const createdFile = await fireBaseService.getFileByName(file.filename);
+        await createdFile.makePublic();
         const fileUrl = createdFile ? createdFile.publicUrl() : null;
         if (fileUrl) {
           const result = await this.executeQuery(
@@ -237,9 +238,12 @@ class OpportunityService {
 
   static handleFollowers = async (seguidores, projectId) => {
     if (seguidores && seguidores.length) {
-      console.log({seguidores});
-      const followersToBeInserted = await this.filterValidUsersTobeInserted(seguidores, projectId)
-     console.log({followersToBeInserted});
+      console.log({ seguidores });
+      const followersToBeInserted = await this.filterValidUsersTobeInserted(
+        seguidores,
+        projectId
+      );
+      console.log({ followersToBeInserted });
 
       if (followersToBeInserted && followersToBeInserted.length) {
         await Promise.all(
@@ -272,23 +276,25 @@ class OpportunityService {
     }
   };
 
-  static filterValidUsersTobeInserted = async (seguidores, projectId) => { 
-  const databaseFollowersList = await this.executeQuery(
-        OpportunityRepository.getAllFollowers()
+  static filterValidUsersTobeInserted = async (seguidores, projectId) => {
+    const databaseFollowersList = await this.executeQuery(
+      OpportunityRepository.getAllFollowers()
+    );
+    return seguidores
+      .map((newFollower) => ({
+        ...newFollower,
+        id_projeto: projectId,
+      }))
+      .filter((newFollower) => newFollower.id_seguidor_projeto === 0)
+      .filter(
+        (newFollower) =>
+          !databaseFollowersList.find(
+            (followerOnDb) =>
+              followerOnDb.id_projeto === newFollower.id_projeto &&
+              followerOnDb.codpessoa === newFollower.codpessoa
+          )
       );
-   return seguidores.map((newFollower) => ({
-          ...newFollower,
-          id_projeto: projectId,
-        }))
-        .filter((newFollower) => newFollower.id_seguidor_projeto === 0).filter(
-          (newFollower) =>
-            !databaseFollowersList.find(
-                (followerOnDb) =>
-                followerOnDb.id_projeto === newFollower.id_projeto &&
-                followerOnDb.codpessoa === newFollower.codpessoa
-            )
-        );
-  }
+  };
 
   static updateOpportunity = async (opp) => {
     const {
@@ -339,6 +345,7 @@ class OpportunityService {
       emailVendaEnviado,
       comentarios,
       seguidores,
+      files,
     } = opp;
     const affectedRows = await this.executeQuery(
       OpportunityRepository.updateOpportunityQuery(),
@@ -390,9 +397,33 @@ class OpportunityService {
         codOs,
       ]
     );
+    await this.handleFiles(files, codOs);
     await this.handleComments(comentarios, codOs);
     await this.handleFollowers(seguidores, idProjeto);
     return { codOs: opp.codOs };
+  };
+
+  static handleFiles = async (filesReceived, oppId) => {
+    console.log("handleFiles: ", filesReceived.length);
+    const oppFiles = await this.executeQuery(
+      OpportunityRepository.getOppFilesQuery(),
+      [oppId]
+    );
+    if (oppFiles.length) {
+      const filesToDelete = oppFiles.filter(
+        (oppFile) =>
+          !filesReceived.find(
+            (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
+          )
+      );
+      const idsToDeleteString = `(${filesToDelete
+        .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
+        .join(",")})`;
+
+      await this.executeQuery(
+        OpportunityRepository.deleteOppFilesQuery(idsToDeleteString)
+      );
+    }
   };
 
   static getOppStatusList = async () => {
@@ -451,7 +482,7 @@ class OpportunityService {
     const action = finished === "true" ? 1 : 0;
     const opps = await this.executeQuery(
       OpportunityRepository.getOpportunitiesQuery(dateFilters, action),
-      [ codpessoa, codpessoa, codpessoa]
+      [codpessoa, codpessoa, codpessoa]
     );
 
     return opps;
@@ -469,4 +500,5 @@ class OpportunityService {
     }
   }
 }
+
 module.exports = OpportunityService;

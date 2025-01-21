@@ -1,5 +1,9 @@
 class OpportunityRepository {
-  static getAllFollowers = ( ) =>  {
+  static deleteOppFilesQuery = (idsToDeleteString) => {
+    return `
+    DELETE FROM web_anexos_os WHERE id_anexo_os in ${idsToDeleteString}`;
+  };
+  static getAllFollowers = () => {
     return `
       SELECT * FROM web_seguidores_projeto WHERE ativo = 1
     `;
@@ -264,7 +268,9 @@ class OpportunityRepository {
             LEFT JOIN
                 ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
             WHERE 
-                p.ATIVO = 1 AND s.ATIVO = 1  ${action ? 'AND s.ACAO = 1 AND' : 'AND'}
+                p.ATIVO = 1 AND s.ATIVO = 1  ${
+                  action ? "AND s.ACAO = 1 AND" : "AND"
+                }
                 (
                     os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
                     OR
@@ -286,4 +292,5 @@ class OpportunityRepository {
     return baseQuery;
   };
 }
+
 module.exports = OpportunityRepository;
