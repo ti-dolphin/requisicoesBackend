@@ -24,25 +24,24 @@ class OpportunityService {
   };
 
   static createOpportunityFiles = async (oppId, files) => {
-    console.log({
-      files,
-    });
-    await Promise.all(
-      files.map(async (file) => {
-        await fireBaseService.uploadFileToFireBase(file.path);
-        const createdFile = await fireBaseService.getFileByName(file.filename);
-        await createdFile.makePublic();
-        const fileUrl = createdFile ? createdFile.publicUrl() : null;
-        if (fileUrl) {
-          const result = await this.executeQuery(
-            OpportunityRepository.createOppFileQuery(),
-            [oppId, file.filename, fileUrl]
-          );
-          utils.removeFile(file.path);
-          return result.insertId;
-        }
-      })
-    );
+    console.log('createOpportunityFiles');
+    console.log({files});
+    // await Promise.all(
+    //   files.map(async (file) => {
+    //     await fireBaseService.uploadFileToFireBase(file.path);
+    //     const createdFile = await fireBaseService.getFileByName(file.filename);
+    //     await createdFile.makePublic();
+    //     const fileUrl = createdFile ? createdFile.publicUrl() : null;
+    //     if (fileUrl) {
+    //       const result = await this.executeQuery(
+    //         OpportunityRepository.createOppFileQuery(),
+    //         [oppId, file.filename, fileUrl]
+    //       );
+    //       utils.removeFile(file.path);
+    //       return result.insertId;
+    //     }
+    //   })
+    // );
   };
 
   static createOpportunity = async (opp) => {
