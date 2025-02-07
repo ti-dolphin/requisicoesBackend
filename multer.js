@@ -7,7 +7,9 @@ const path = require('path');
   },
   filename : (req, file, callback) => { 
     const time = new Date().getTime();
-    callback(null, Buffer.from(file.originalname, "latin1").toString("utf8"));
+    const randomRef = Math.floor(Math.random() * 1000000);
+    const uniqueName = `${randomRef}-${time}`
+    callback(null,uniqueName);
   }
 });
 module.exports = multerConfig;
