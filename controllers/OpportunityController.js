@@ -36,7 +36,6 @@ class OpportunityController {
     console.log("uploadFiles");
     try {
       const { files } = req;
-      
        await OpportunityService.createOpportunityFiles(
         req.query.oppId,
         files

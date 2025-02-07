@@ -11,11 +11,25 @@ class RequisitionRepository {
   CREATED_ON, 
   DESCRICAO,
   TIPO, 
-  nome_tipo
+  nome_tipo,
+  PESSOA.NOME as NOME_RESPONSAVEL,
+  JSON_OBJECT('label', PESSOA.NOME, 'id', PESSOA.CODPESSOA) AS responsableOption,
+  JSON_OBJECT('label', PROJETOS.DESCRICAO, 'id', PROJETOS.ID) AS projectOption,
+  JSON_OBJECT('label', nome_tipo, 'id', TIPO) AS typeOption,
+   (SELECT JSON_ARRAYAGG(JSON_OBJECT('label', web_tipo_requisicao.nome_tipo, 'id',web_tipo_requisicao.id_tipo_requisicao ))
+    FROM web_tipo_requisicao
+  ) AS typeOptions,
+   (SELECT JSON_ARRAYAGG(JSON_OBJECT('label', p.DESCRICAO, 'id', p.ID)) 
+   FROM PROJETOS p 
+   WHERE p.ATIVO = 1
+  ) AS projectOptions,
+  (SELECT JSON_ARRAYAGG(JSON_OBJECT('label', PESSOA.NOME, 'id', PESSOA.CODPESSOA))
+  FROM PESSOA WHERE PERM_REQUISITAR = 1) AS responsableOptions
 from 
   WEB_REQUISICAO 
   inner join PROJETOS on ID_PROJETO = PROJETOS.ID 
   inner join web_tipo_requisicao on id_tipo_requisicao = TIPO
+  inner join PESSOA on WEB_REQUISICAO.ID_RESPONSAVEL = PESSOA.CODPESSOA
 WHERE 
   ID_REQUISICAO = ?
 `;
@@ -257,9 +271,12 @@ WHERE
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");
     return `UPDATE WEB_REQUISICAO
-           SET DESCRIPTION = '${requisition.DESCRIPTION}',
+           SET
+           DESCRIPTION = '${requisition.DESCRIPTION}',
            STATUS = '${requisition.STATUS}',
            ID_PROJETO = ${requisition.ID_PROJETO},
+           ID_RESPONSAVEL = ${requisition.ID_RESPONSAVEL},
+           TIPO = ${requisition.TIPO},
            LAST_UPDATE_ON = '${nowDateTimeInBrazil}',
            LAST_MODIFIED_BY = ${codpessoa},
            OBSERVACAO = '${requisition.OBSERVACAO}'

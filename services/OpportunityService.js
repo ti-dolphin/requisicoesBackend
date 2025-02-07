@@ -404,25 +404,28 @@ class OpportunityService {
   };
 
   static handleFiles = async (filesReceived, oppId) => {
-    console.log("handleFiles: ", filesReceived.length);
+    console.log("filesReceived: ", filesReceived);
     const oppFiles = await this.executeQuery(
       OpportunityRepository.getOppFilesQuery(),
       [oppId]
     );
     if (oppFiles.length) {
+      console.log({filesToUpload: oppFiles})
       const filesToDelete = oppFiles.filter(
         (oppFile) =>
           !filesReceived.find(
             (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
           )
       );
-      const idsToDeleteString = `(${filesToDelete
-        .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
-        .join(",")})`;
+      if(filesToDelete.length) {
+          const idsToDeleteString = `(${filesToDelete
+            .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
+            .join(",")})`;
 
-      await this.executeQuery(
-        OpportunityRepository.deleteOppFilesQuery(idsToDeleteString)
-      );
+          await this.executeQuery(
+            OpportunityRepository.deleteOppFilesQuery(idsToDeleteString)
+          );
+      }
     }
   };
 
@@ -480,13 +483,16 @@ class OpportunityService {
   static getOpportunities = async (params) => {
     const { finished, dateFilters, codpessoa } = params;
     const action = finished === "true" ? 1 : 0;
-    const opps = await this.executeQuery(
+    const [opps] = await this.executeQuery(
       OpportunityRepository.getOpportunitiesQuery(dateFilters, action),
       [codpessoa, codpessoa, codpessoa]
     );
-
+    console.log({ 
+      opps
+    })
     return opps;
   };
+
   static async executeQuery(query, params) {
     const connection = await pool.getConnection();
     try {
