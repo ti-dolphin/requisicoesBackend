@@ -9,7 +9,7 @@ const path = require('path');
     const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
     const time = new Date().getTime();
     const randomRef = Math.floor(Math.random() * 1000000);
-    const uniqueName = `${originalName}-${randomRef}-${time}`
+    const uniqueName = `${randomRef}${originalName}-`
     callback(null,uniqueName);
   }
 });
