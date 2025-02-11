@@ -17,14 +17,10 @@ const opcoes = {
 
 class MovementationService {
   static getMovementationsByPatrimonyId = async (patrimonyId) => {
-    console.log('A PRIMEIRA')
-    console.log({ patrimonyId });
-    const result = await this.executeQuery(
+    const [result] = await this.executeQuery(
       MovementationRepository.getMovementationsByPatrimonyId_Query(),
       [patrimonyId]
     );
-    console.log("RESULT getMovementationsByPatrimonyId: ", result);
-
     if (result.length > 0) return result;
   };
 

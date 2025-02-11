@@ -159,13 +159,13 @@ class PatrimonyService {
   static async getPatrimonyInfo(queryParams) {
     try {
       if (queryParams.filter === "Meus") {
-        const rows = await this.executeQuery(
+        const [rows] = await this.executeQuery(
           PatrimonyRepository.getPatrimonyInfoQueryByResponsable(),
           [queryParams.user.CODPESSOA]
         );
         return rows;
       }
-      const rows = await this.executeQuery(
+      const [rows] = await this.executeQuery(
         PatrimonyRepository.getPatrimonyInfoQuery()
       );
       if (rows) return rows;
