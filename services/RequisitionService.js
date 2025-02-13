@@ -63,12 +63,10 @@ class RequisitionService {
     } else if (currentKanbanFilter.toUpperCase() === "ACOMPANHAMENTO") {
       const gerente = await userController.isManager(userID);
       if (gerente) {
-        console.log('gerente')
         query = RequisitionRepository.getManagerRequisitions_monitoring();
         const codgerente = await userController.getManagerCode(userID);
         params = ["Em edição", "Concluído", codgerente, userID];
       } else {
-         console.log("not gerente");
         query = RequisitionRepository.getNonPurchaser_monitoring();
         params = ["Em edição", "Concluído", userID];
       }

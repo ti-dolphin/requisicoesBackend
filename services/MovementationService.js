@@ -17,14 +17,10 @@ const opcoes = {
 
 class MovementationService {
   static getMovementationsByPatrimonyId = async (patrimonyId) => {
-    console.log('A PRIMEIRA')
-    console.log({ patrimonyId });
-    const result = await this.executeQuery(
+    const [result] = await this.executeQuery(
       MovementationRepository.getMovementationsByPatrimonyId_Query(),
       [patrimonyId]
     );
-    console.log("RESULT getMovementationsByPatrimonyId: ", result);
-
     if (result.length > 0) return result;
   };
 
@@ -72,12 +68,7 @@ class MovementationService {
   static async createMovementationFile(movementationId, file) {
     const { path, filename } = file;
     const fileUrl = await this.getFileUrl(path, filename);
-    console.log("fileInfo: ", {
-      path,
-      filename,
-    });
-    console.log("filerUrl: ", fileUrl);
-    console.log("idMovementation: ", movementationId);
+   
     const result = await this.executeQuery(
       MovementationRepository.createMovementationFileQuery(),
       [fileUrl, filename, movementationId]
@@ -101,7 +92,6 @@ class MovementationService {
     const id_ultima_movimentacao = await this.getLastMovementationByPatrimonyId(
       id_patrimonio
     );
-     console.log("LOCALE DATE: ", localeDate);
      const result = await this.executeQuery(
        MovementationRepository.createMovementationQuery(),
        [
@@ -136,7 +126,6 @@ class MovementationService {
     const result = await this.executeQuery(
       MovementationRepository.getLastMovementationQuery(patrimonyId)
     );
-    console.log("result: ", result);
     if (result && result[0]) return result[0].id_movimentacao;
     else return 0;
   }
@@ -147,14 +136,11 @@ class MovementationService {
       MovementationRepository.getMaxIdQuery(),
       [patrimonyId]
     );
-    console.log("result.max_id", result.max_id);
-    console.log("movementationId: ", movementationId);
     if (result.max_id == movementationId){ 
           const result = await this.executeQuery(
           MovementationRepository.deleteMovementationQuery(),
           [movementationId]
         );
-         console.log("result affectedRows", result.affectedRows);
          return result.affectedRows;
     }
         throw new Error("Só é possível deletar a ultima movimentação!");
@@ -165,8 +151,11 @@ class MovementationService {
       MovementationRepository.deleteMovementationFileQuery(),
       [movementationFileid]
     );
-    await fireBaseService.deleteFileByName(filename);
-    console.log("result deleteMovementationFile \n", result);
+    try{
+      await fireBaseService.deleteFileByName(filename);
+    }catch(e){
+      console.log(e);
+    }
     return result.affectedRows;
   }
 
@@ -177,7 +166,6 @@ class MovementationService {
       connection.release();
       return result;
     } catch (queryError) {
-      console.log("Error in executeQuery: ", queryError);
       connection.release();
       throw queryError;
     }

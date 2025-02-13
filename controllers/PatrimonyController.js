@@ -84,12 +84,10 @@ class PatrimonyController {
         filename
       );
       if (affectedRows)
-        console.log({ message: "Deleted Successfully", affectedRows });
       return res
         .status(200)
         .send({ message: "Deleted Successfully", affectedRows });
     } catch (e) {
-      console.log("error deletePatrimonyFile: ", e);
       return res.status(500).send("Internal server Error");
     }
   }
@@ -171,7 +169,6 @@ class PatrimonyController {
 
   static async updatePatrimony(req, res) {
     try {
-      console.log("req.body: ", req.body);
       const affectedRows = await PatrimonyService.updatePatrimony(req.body);
       if (affectedRows)
         return res.status(200).send({

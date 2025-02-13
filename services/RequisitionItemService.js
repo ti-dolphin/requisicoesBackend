@@ -48,8 +48,12 @@ class RequisitionItemService {
   async updateRequisitionItems(items) {
     const connection = await pool.getConnection();
     try {
-      const result = await connection.query(ItemRepository.update(items));
-      return result.length;
+      const queries = ItemRepository.update(items);
+      const result = await connection.query(ItemRepository.update(items))
+      if(result){ 
+        return result.length
+      }
+     
     } catch (err) {
       console.error("Erro na query", err);
       throw err;

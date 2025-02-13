@@ -27,10 +27,6 @@ class MovementationController {
           movementation
         );
         if (insertId) {
-          console.log({
-            message: "Movementation created Successfully",
-            insertId,
-          });
           return res.status(200).send({
             message: "Movementation created Successfully",
             insertId,
@@ -56,7 +52,6 @@ class MovementationController {
   static noUndoneChecklists = async (movementation) => { 
     const unddoneChecklists = await CheckListService.getUndoneChecklistsByPatrimony(movementation);
     if(unddoneChecklists){ 
-      console.log('undone checklists: ', unddoneChecklists)
       return false;
     }
     return true;

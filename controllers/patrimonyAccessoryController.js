@@ -7,7 +7,6 @@ class PatrimonyAccessoryController {
   static async createAccessory(req, res) {
     try {
       const { nome, id_patrimonio, descricao } = req.body;
-      console.log({ nome, id_patrimonio, descricao });
       const accessoryId = await PatrimonyAccessoryService.createAccessory(
         nome,
         id_patrimonio,

@@ -50,7 +50,6 @@ class MovementationRepository {
     `;
   }
   static getMovementationsByPatrimonyId_Query() {
-    console.log("getMovementationsByPatrimonyId_Query");
     return `
          SELECT 
             movimentacao_patrimonio.id_movimentacao, 

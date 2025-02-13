@@ -1,6 +1,35 @@
 const pool = require("../database");
 
 class PersonService {
+
+  static async getClients( ){ 
+    const query = `
+      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE;
+    `;
+    try {
+      const [rows, fields] = await PersonService.executeQuery(query);
+      return rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  static async getSallers ( ){ 
+    const personTable = "pessoa".toUpperCase();
+    const query = `
+      SELECT NOME, CODPESSOA 
+      FROM ${personTable}
+      WHERE RESPONSAVEL = 1
+    `;
+    try {
+      const [rows, fields] = await PersonService.executeQuery(query);
+      return rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
     
   static async getAllPersons() {
     const personTable = "pessoa".toUpperCase();

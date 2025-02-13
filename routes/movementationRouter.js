@@ -13,7 +13,6 @@ router.get('/:patrimonyId', async(req, res, next) => {
 //MOVEMETATIONFILES ROUTES
 
 router.post("/files/:movementationId", upload.single("file"), async(req, res, next) => { 
-    console.log('router');
      MovementationController.createMovementationFile(req, res);
 });
 router.get('/files/:movementationId',  (req, res, next)=> { 
@@ -24,7 +23,6 @@ router.delete("/files/:filename/:movementationFileId", (req, res) =>  {
      MovementationController.deleteMovementationFile(req, res)
 });
 router.post('', (req, res, next) => { 
-    console.log('post movementation');
      MovementationController.createMovementation(req, res);
 });
 router.put('/:movementationId' , (req, res, next) => { 

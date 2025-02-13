@@ -46,7 +46,6 @@ router.post('', (req, res, next) => {
 });
 
 router.post("/files/:patrimonyId", upload.single("file"), (req, res, next) => {
-     console.log('post file: ', req.params.patrimonyId)
   PatrimonyController.createPatrimonyFile(req, res);
 });
 

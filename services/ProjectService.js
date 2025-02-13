@@ -1,6 +1,18 @@
 const pool = require("../database");
 
 class ProjectService {
+
+  static async createProject(project){ 
+      const {descricao } = project;
+      const [result] = await this.executeQuery(
+        `
+          INSERT INTO PROJETOS (DESCRICAO, ATIVO)
+          VALUES (?,1)
+        `,
+        [descricao]
+      );
+    return result.insertId;
+  }
   static async getAllProjects() {
     const query = `
       SELECT 

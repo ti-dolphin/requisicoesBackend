@@ -5,7 +5,6 @@ class CheckListController {
   static createChecklistItemFile = async (req, res) => {
     try {
       const file = req.file;
-      console.log("file: ", file);
       if (!file) {
         return res.status(400).send("No file uploaded");
       }
@@ -34,7 +33,6 @@ class CheckListController {
         req.params.id_item_checklist_movimentacao,
         file
       );
-      console.log("file url: " + fileUrl);
       if (fileUrl) {
         res.status(200).send({ fileUrl });
       } else {
@@ -47,7 +45,6 @@ class CheckListController {
   };
 
   static async updatetChecklist(req, res) {
-    console.log("updatetChecklist");
     try {
       const {
         id_checklist_movimentacao,
@@ -60,17 +57,7 @@ class CheckListController {
         observacao,
         reprovado
       } = req.body;
-      console.log({
-        id_checklist_movimentacao,
-        id_movimentacao,
-        data_criacao,
-        realizado,
-        data_realizado,
-        aprovado,
-        data_aprovado,
-        observacao,
-        reprovado
-      });
+   
       const result = await CheckListService.updatedChecklist({
         id_checklist_movimentacao,
         id_movimentacao,
@@ -111,7 +98,6 @@ class CheckListController {
 
   static async updateChecklistItems(req, res) {
     const { checklistItems } = req.body;
-    console.log("checklistItems", checklistItems);
     try {
       await CheckListService.updateChecklistItems(checklistItems);
       return res.status(200).send("Items created successfully");
@@ -140,7 +126,6 @@ class CheckListController {
   }
 
   static async getChecklistByPatrimonyId(req, res) {
-    console.log("getChecklistByPatrimonyId");
     const { id_patrimonio } = req.params;
     try {
       const checklists = await CheckListService.getChecklistByPatrimonyId(
