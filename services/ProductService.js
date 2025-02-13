@@ -2,10 +2,6 @@ const pool = require("../database");
 
 class ProductService {
   static async getProductsBySearch(search, typeId) {
-    console.log({
-      search,
-      typeId,
-    });
     const query = `
     SELECT 
           ID, codigo, nome_fantasia, produtos.familia

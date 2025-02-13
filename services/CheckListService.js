@@ -22,7 +22,6 @@ class CheckListService {
         const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
         const createdDate = new Date(data_criacao);
         if (currentDate - createdDate > periodicidadeInMilliseconds) {
-          console.log("NOVO CHECKLIST");
           await this.executeQuery(CheckListRepository.createChecklistQuery(), [
             id_movimentacao,
           ]);
@@ -91,9 +90,6 @@ class CheckListService {
             subject,
             message
           );
-          console.log(
-            `Email enviado com sucesso para ${nome_responsavel_tipo} (${email_responsavel_tipo})`
-          );
         } catch (error) {
           console.error(
             `Erro ao enviar email para ${email_responsavel_tipo}:`,
@@ -151,9 +147,6 @@ class CheckListService {
             email_responsavel_movimentacao,
             subject,
             message
-          );
-          console.log(
-            `Email enviado com sucesso para ${nome_responsavel_movimentacao} (${email_responsavel_movimentacao})`
           );
         } catch (error) {
           console.error(
@@ -245,9 +238,6 @@ class CheckListService {
           subject,
           message
         );
-        console.log(
-          `Email enviado com sucesso para ${nome_responsavel_movimentacao} (${email_responsavel_movimentacao})`
-        );
       } catch (error) {
         console.error(
           `Erro ao enviar email para ${email_responsavel_movimentacao}:`,
@@ -272,10 +262,7 @@ class CheckListService {
     id_item_checklist_movimentacao,
     file
   ) => {
-    console.log(
-      "id_item_checklist_movimentacao: ",
-      id_item_checklist_movimentacao
-    );
+  
     if (!file) {
       throw new Error("File not provided");
     }
@@ -330,7 +317,7 @@ class CheckListService {
       CheckListRepository.createChecklistItemsQuery(result.insertId),
       [result.insertId, result.inserId]
     );
-    console.log("INSERT ID?: ", result.insertId);
+   
     return result.insertId;
   };
 
@@ -364,12 +351,10 @@ class CheckListService {
     if (reprovado) {
       await this.sendUnaprovedChecklistEmail(id_checklist_movimentacao);
     }
-    console.log("result", result);
     return result.affectedRows;
   }
 
   static async updateChecklistItems(checklistItems) {
-    console.log("updateChecklistItems");
     const itemsToUpdate = checklistItems.filter(
       (item) => item.id_item_checklist_movimentacao !== 0
     );
@@ -391,7 +376,6 @@ class CheckListService {
       CheckListRepository.getChecklistItemsQuery(),
       [id_checklist_movimentacao]
     );
-    console.log("checklistItems: ", checklistItems.length);
     return checklistItems;
   }
 
@@ -421,7 +405,6 @@ class CheckListService {
   }
 
   static async getChecklistByPatrimonyId(id_patrimonio) {
-    console.log("getChecklistByPatrimonyId");
     const checklists = await this.executeQuery(
       CheckListRepository.getChecklistByPatrimonyIdQuery(),
       [id_patrimonio]

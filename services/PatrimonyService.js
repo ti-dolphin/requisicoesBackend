@@ -30,12 +30,11 @@ class PatrimonyService {
     const getInactivePatrymonyInfoQuery = await this.executeQuery(
       PatrimonyRepository.getInactivePatrymonyInfoQuery()
     );
-    console.log("inactive: ", getInactivePatrymonyInfoQuery);
+
     return getInactivePatrymonyInfoQuery;
   }
 
   static async updatePatrimonies(ids, active) {
-    console.log("ids: ", ids);
     if (!active) {
       const affectedRows = await this.executeQuery(
         PatrimonyRepository.updatePatrimonies(),
@@ -74,7 +73,11 @@ class PatrimonyService {
       PatrimonyRepository.deletePatrimonyFileQuery(),
       [patrimonyFileId]
     );
-    await fireBaseService.deleteFileByName(filename);
+    try{
+      await fireBaseService.deleteFileByName(filename);
+    }catch(e){
+      console.log(e);
+    }
     return result.affectedRows;
   }
 
@@ -109,7 +112,7 @@ class PatrimonyService {
       PatrimonyRepository.getSinglePatrimonyInfo(),
       [patrimonyId]
     );
-    console.log(result);
+
     return result;
   }
 
@@ -125,17 +128,7 @@ class PatrimonyService {
       valor_compra,
       fabricante,
     } = patrimony;
-    console.log({
-      id_patrimonio,
-      nome,
-      data_compra,
-      nserie,
-      descricao,
-      pat_legado,
-      ativo,
-      valor_compra,
-      fabricante,
-    });
+   
     const result = await this.executeQuery(
       PatrimonyRepository.updatePatrimonyQuery(),
       [
@@ -170,7 +163,7 @@ class PatrimonyService {
       );
       if (rows) return rows;
     } catch (e) {
-      console.log("error in PatrimonyService.getPatrimonyInfo: \n", e);
+      ;
       return null;
     }
   }

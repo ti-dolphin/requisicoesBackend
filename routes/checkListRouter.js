@@ -6,7 +6,6 @@ const multer = require("multer");
 const upload = multer({ storage: multerConfig });
 
 router.get("/notifications", (req, res ) => { 
-    console.log("getChecklistNotifications");
     CheckListController.getChecklistNotifications(req, res);
 });
 router.get('/checklistItems/:id_patrimonio/:id_movimentacao/:id_checklist_movimentacao', (req, res) => {
@@ -33,7 +32,6 @@ router.post(
   "/checklistItems/file",
   upload.single("file"),
   (req, res) => {
-    console.log('POST ITEMFILE')
     CheckListController.createChecklistItemFile(req, res);
   }
 );

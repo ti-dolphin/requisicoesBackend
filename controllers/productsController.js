@@ -5,7 +5,6 @@ class ProductsController {
     const { search, typeId } = req.query;
     try {
       const products = await ProductService.getProductsBySearch(search, typeId);
-      console.log('products', products)
       if (products) {
         res.status(200).send(products);
       } else {

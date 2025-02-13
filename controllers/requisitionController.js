@@ -6,7 +6,6 @@ class RequisitionController {
   static async getTypes(req, res){ 
     const types = await RequisitionService.getTypes();
     if (types) {
-      console.log('types: ', types)
       return res.status(200).json(types);
     } else {
       return res.status(500).json({ error: "Erro ao buscar tipos" });

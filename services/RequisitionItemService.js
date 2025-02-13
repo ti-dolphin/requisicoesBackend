@@ -50,7 +50,9 @@ class RequisitionItemService {
     try {
       const queries = ItemRepository.update(items);
       const result = await connection.query(ItemRepository.update(items))
-      console.log({result});
+      if(result){ 
+        return result.length
+      }
      
     } catch (err) {
       console.error("Erro na query", err);

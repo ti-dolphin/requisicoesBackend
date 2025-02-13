@@ -22,9 +22,6 @@ class OpportunityController {
       const files = await OpportunityService.getOpportunityFiles(
         req.query.oppId
       );
-      console.log({
-        files,
-      });
       return res.status(200).send(files);
     } catch (e) {
       console.error("Error getting opportunity files: ", e.message);
@@ -33,7 +30,6 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
-    console.log("uploadFiles");
     try {
       const { files } = req;
        await OpportunityService.createOpportunityFiles(
@@ -50,7 +46,6 @@ class OpportunityController {
   };
 
   static createOpportunity = async (req, res) => {
-    console.log("createOpportunity");
     try {
       const response = await OpportunityService.createOpportunity(req.body);
       return res.status(200).send({
@@ -65,7 +60,6 @@ class OpportunityController {
   };
 
   static updateOpportunity = async (req, res) => {
-    console.log("updateOpportunity");
     const updatedOpportunity = req.body;
     try {
       const affectedRows = await OpportunityService.updateOpportunity(
@@ -99,7 +93,6 @@ class OpportunityController {
   static getClients = async (req, res) => {
     try {
       const clients = await PersonService.getClients();
-      //   console.log("clients: ", clients);
       return res.status(200).send(clients);
     } catch (err) {
       console.log("error getting clients: ", err.message);
@@ -110,7 +103,6 @@ class OpportunityController {
   static getStatusList = async (req, res) => {
     try {
       const statusList = await OpportunityService.getOppStatusList();
-      //   console.log("statusList: ", statusList);
       return res.status(200).send(statusList);
     } catch (e) {
       console.log("error getting status list: ", e.message);
@@ -121,7 +113,6 @@ class OpportunityController {
   static getSalers = async (req, res) => {
     try {
       const salers = await PersonService.getSallers();
-      //   console.log("salers: ", salers);
       return res.status(200).send(salers);
     } catch (err) {
       console.log("error getting sales: ", err.message);

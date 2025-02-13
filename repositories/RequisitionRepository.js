@@ -40,7 +40,7 @@ WHERE
         `;
   }
   static getManagerRequisitions_monitoring() {
-    console.log("getManagerRequisitions_monitoring");
+
     return `SELECT ID_REQUISICAO,
                             STATUS,
                             OBSERVACAO,
@@ -66,7 +66,6 @@ WHERE
   }
 
   static getNonPurchaser_monitoring() {
-    console.log("getNonPurchaser_monitoring");
     return `SELECT ID_REQUISICAO,
                  STATUS,
                  OBSERVACAO,
@@ -266,7 +265,7 @@ WHERE
       second: "2-digit",
       hour12: false,
     };
-    console.log("requisition: ", requisition);
+
     const nowDateTimeInBrazil = nowDateTime
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");

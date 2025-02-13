@@ -10,7 +10,6 @@ class OpportunityService {
       [oppId]
     );
     const { files } = opp;
-    console.log("getOpportunityById - files: ", files);
     return opp;
   };
 
@@ -24,8 +23,6 @@ class OpportunityService {
   };
 
   static createOpportunityFiles = async (oppId, files) => {
-    console.log('createOpportunityFiles');
-    console.log({files});
     await Promise.all(
       files.map(async (file) => {
         await fireBaseService.uploadFileToFireBase(file.path);
@@ -45,7 +42,6 @@ class OpportunityService {
   };
 
   static createOpportunity = async (opp) => {
-    console.log("createOpportunity");
     const {
       codOs,
       codTipoOs,
@@ -226,7 +222,6 @@ class OpportunityService {
         emailVendaEnviado,
       ]
     );
-    console.log({ newProjectId });
     await this.handleComments(comentarios, result.insertId);
     await this.handleFollowers(seguidores, newProjectId);
     return {
@@ -237,12 +232,10 @@ class OpportunityService {
 
   static handleFollowers = async (seguidores, projectId) => {
     if (seguidores && seguidores.length) {
-      console.log({ seguidores });
       const followersToBeInserted = await this.filterValidUsersTobeInserted(
         seguidores,
         projectId
       );
-      console.log({ followersToBeInserted });
 
       if (followersToBeInserted && followersToBeInserted.length) {
         await Promise.all(
@@ -403,13 +396,11 @@ class OpportunityService {
   };
 
   static handleFiles = async (filesReceived, oppId) => {
-    console.log("filesReceived: ", filesReceived);
     const oppFiles = await this.executeQuery(
       OpportunityRepository.getOppFilesQuery(),
       [oppId]
     );
     if (oppFiles.length) {
-      console.log({filesToUpload: oppFiles})
       const filesToDelete = oppFiles.filter(
         (oppFile) =>
           !filesReceived.find(
@@ -436,9 +427,7 @@ class OpportunityService {
   };
 
   static handleComments = async (comentarios, opportunityId) => {
-    console.log({
-      opportunityId,
-    });
+   
     if (comentarios && comentarios.length) {
       const commentsToInsert = comentarios
         .filter((comment) => !comment.codigoComentario) // Filtra os comentários sem `codigoComentario`
@@ -486,9 +475,6 @@ class OpportunityService {
       OpportunityRepository.getOpportunitiesQuery(dateFilters, action),
       [codpessoa, codpessoa, codpessoa]
     );
-    console.log({ 
-      opps
-    })
     return opps;
   };
 
