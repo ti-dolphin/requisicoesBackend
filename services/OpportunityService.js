@@ -3,12 +3,15 @@ const pool = require("../database");
 const ProjectService = require("./ProjectService");
 const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
+
 class OpportunityService {
+  
   static getOpportunityById = async (oppId) => {
     const [opp] = await this.executeQuery(
       OpportunityRepository.getOppByIdQuery(),
       [oppId]
     );
+    console.log({opp})
     const { files } = opp;
     return opp;
   };
@@ -93,7 +96,7 @@ class OpportunityService {
     } = opp;
     const isAdicional =
       idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
-
+    console.log('criou adicional!');
     if (isAdicional) {
       const adicionalInsertResult = await this.executeQuery(
         OpportunityRepository.createAdicional(),
@@ -289,6 +292,7 @@ class OpportunityService {
   };
 
   static updateOpportunity = async (opp) => {
+    console.log('updateOpportunity')
     const {
       codOs,
       codTipoOs,
@@ -389,6 +393,7 @@ class OpportunityService {
         codOs,
       ]
     );
+    
     await this.handleFiles(files, codOs);
     await this.handleComments(comentarios, codOs);
     await this.handleFollowers(seguidores, idProjeto);
@@ -396,6 +401,7 @@ class OpportunityService {
   };
 
   static handleFiles = async (filesReceived, oppId) => {
+    console.log('handleFiles');
     const oppFiles = await this.executeQuery(
       OpportunityRepository.getOppFilesQuery(),
       [oppId]
@@ -407,6 +413,7 @@ class OpportunityService {
             (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
           )
       );
+      console.log({ filesToDelete_length: filesToDelete.length})
       if(filesToDelete.length) {
           const idsToDeleteString = `(${filesToDelete
             .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
@@ -427,10 +434,11 @@ class OpportunityService {
   };
 
   static handleComments = async (comentarios, opportunityId) => {
-   
+    console.log("handleComments");
+    console.log({comentarios});
     if (comentarios && comentarios.length) {
       const commentsToInsert = comentarios
-        .filter((comment) => !comment.codigoComentario) // Filtra os comentários sem `codigoComentario`
+        .filter((comment) => comment.codigoComentario < 1) // Filtra os comentários sem `codigoComentario`
         .map((comment) => ({
           ...comment,
           codOs: opportunityId,
@@ -438,6 +446,8 @@ class OpportunityService {
       const commentsToUpdate = comentarios.filter(
         (comment) => comment.codigoComentario
       );
+
+      console.log({ commentsToUpdate })
       if (commentsToUpdate.length) {
         await Promise.all(
           commentsToUpdate.map(async (comment) => {

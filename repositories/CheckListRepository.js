@@ -31,7 +31,7 @@ class CheckListRepository {
     `;
   };
 
-  static getProblematicItemsQuery = ( ) => { 
+  static getProblematicItemsQuery = () => {
     return `
       SELECT * FROM web_items_checklist_movimentacao WHERE problema = 1 and id_checklist_movimentacao = ?
     `;
@@ -247,35 +247,44 @@ WHERE
 
   static getLastChecklistPerMovementationQuery = () => {
     return `
-    SELECT 
-    wcm.id_checklist_movimentacao, 
-    mp.id_movimentacao, 
-    wcm.data_criacao, 
-    wcm.realizado, 
-    wcm.data_realizado, 
-    wcm.aprovado, 
-    wcm.data_aprovado, 
+    SELECT
+    wcm.id_checklist_movimentacao,
+    mp.id_movimentacao,
+    wcm.data_criacao,
+    wcm.realizado,
+    wcm.data_realizado,
+    wcm.aprovado,
+    wcm.data_aprovado,
     mp.observacao,
     periodicidade
-FROM 
+FROM
     movimentacao_patrimonio AS mp
 INNER JOIN web_patrimonio AS wp ON mp.id_patrimonio = wp.id_patrimonio
 INNER JOIN web_tipo_patrimonio AS wtp ON wtp.id_tipo_patrimonio = wp.tipo
-INNER JOIN web_checklist_movimentacao AS wcm 
+INNER JOIN web_checklist_movimentacao AS wcm
     ON wcm.id_movimentacao = mp.id_movimentacao
 INNER JOIN (
-    SELECT 
-        id_movimentacao, 
+    SELECT
+        id_movimentacao,
         MAX(id_checklist_movimentacao) AS max_id_checklist_movimentacao
-    FROM 
+    FROM
         web_checklist_movimentacao
-    GROUP BY 
+    GROUP BY
         id_movimentacao
-) AS max_checklist 
+) AS max_checklist
     ON wcm.id_checklist_movimentacao = max_checklist.max_id_checklist_movimentacao
-    AND wcm.id_movimentacao = max_checklist.id_movimentacao;
-
-        
+    AND wcm.id_movimentacao = max_checklist.id_movimentacao
+INNER JOIN (
+    SELECT
+        id_patrimonio,
+        MAX(id_movimentacao) AS max_id_movimentacao
+    FROM
+        movimentacao_patrimonio
+    GROUP BY
+        id_patrimonio
+) AS max_movimentacao
+    ON mp.id_patrimonio = max_movimentacao.id_patrimonio
+    AND mp.id_movimentacao = max_movimentacao.max_id_movimentacao;
     `;
   };
 

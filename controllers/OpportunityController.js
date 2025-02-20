@@ -30,15 +30,22 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
+    console.log('upload files');
+    const {files} = req;
+    console.log({files})
     try {
-      const { files } = req;
-       await OpportunityService.createOpportunityFiles(
-        req.query.oppId,
-        files
-      );
-      return res.status(200).send({
-        message: "files inserted successfully"
-      });
+       if(files.length){ 
+         const { files } = req;
+         await OpportunityService.createOpportunityFiles(
+           req.query.oppId,
+           files
+         );
+         return res.status(200).send({
+           message: "files inserted successfully"
+         });
+       }
+       console.log('sem arquivos')
+       return res.status(200).send({message: 'No files were sent'})
     } catch (e) {
       console.log("Error uploading files: ", e);
       return res.status(500).send({ message: "Error uploading files" });
@@ -74,12 +81,14 @@ class OpportunityController {
 
 
   static createOpportuntiyFile = async (req, res) => {
+    console.log('createOpportuntiyFile')
     const file = req.file;
+    console.log({file})
     if (!file) {
       return res.status(400).send("No file uploaded");
     }
     try {
-      const insertId = await OpportunityService.createOpportunityFile(
+      const insertId = await OpportunityService.createOpportunityFiles(
         req.params.id,
         file
       );

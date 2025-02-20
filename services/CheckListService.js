@@ -5,10 +5,13 @@ const utils = require("../utils");
 const EmailService = require("../services/EmailService");
 class CheckListService {
   static async verifyAndCreateChecklists() {
+    console.log('verifyAndCreateChecklists');
+
     const checklists = await this.executeQuery(
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
-    // console.log(checklists)
+   
+    console.log(checklists)
     const currentDate = new Date();
     for (let checklist of checklists) {
       const {
