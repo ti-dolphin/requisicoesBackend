@@ -23,6 +23,7 @@ class ProductService {
     `;
     try {
       const [rows, fields] = await this.executeQuery(query, [typeId ,`%${search}%`]);
+      console.log({rows})
       return rows;
     } catch (e) {
       console.log(e);

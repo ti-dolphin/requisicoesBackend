@@ -17,28 +17,29 @@ class RequisitionItemController {
   static async createRequisitionItems(req, res) {
     try {
       const { requisitionID } = req.params;
-      const result = await RequisitionItemService.createRequisitionItems(
+      const insertedItems = await RequisitionItemService.createRequisitionItems(
         req.body,
         requisitionID
       );
-      res.status(201).json({ insertId: result.insertId });
+      res.status(201).json({ insertedItems  });
     } catch (err) {
       console.error("Erro no controller", err);
       res.status(500).send("Erro ao criar itens de requisição");
     }
   }
 
-  static async deleteRequisitionItem(req, res) {
+  static async deleteRequisitionItems(req, res) {
     try {
-      const { requisitionID, productID } = req.params;
+       const { ids } = req.query;
+       const idsParam = ids.join(',');
+      const { requisitionID } = req.params;
       const result = await RequisitionItemService.deleteRequisitionItem(
         requisitionID,
-        productID
+        idsParam
       );
       if (result) return res.status(200).send("Item deletado com sucesso");
       else return res.status(404).send("Item não encontrado");
     } catch (err) {
-      console.log("Erro ao deletar item de requisição: ", err);
       return res.status(500).send("Erro ao deletar item de requisição");
     }
   }

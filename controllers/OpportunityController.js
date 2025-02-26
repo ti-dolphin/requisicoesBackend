@@ -100,8 +100,10 @@ class OpportunityController {
   };
 
   static getClients = async (req, res) => {
+    const { projectId } = req.query;
+    console.log({projectId})
     try {
-      const clients = await PersonService.getClients();
+      const clients = await PersonService.getClients(projectId);
       return res.status(200).send(clients);
     } catch (err) {
       console.log("error getting clients: ", err.message);
@@ -120,8 +122,9 @@ class OpportunityController {
   };
 
   static getSalers = async (req, res) => {
+    const { projectId } = req.query;
     try {
-      const salers = await PersonService.getSallers();
+      const salers = await PersonService.getSallers(projectId);
       return res.status(200).send(salers);
     } catch (err) {
       console.log("error getting sales: ", err.message);

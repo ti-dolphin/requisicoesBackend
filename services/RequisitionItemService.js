@@ -20,7 +20,10 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.query(query);
-      return result;
+      const productIds = items.map((item) => item.ID_PRODUTO);
+      const [insertedItems] = await connection.query(`
+        SELECT * FROM WEB_REQUISICAO_ITEMS WHERE ID_PRODUTO IN (${productIds.join(',')})`);
+      return insertedItems;
     } catch (err) {
       console.error("Erro na query", err);
       throw err;
@@ -29,12 +32,11 @@ class RequisitionItemService {
     }
   }
 
-  async deleteRequisitionItem(requisitionID, productID) {
+  async deleteRequisitionItem(requisitionID, idsParam) {
     const connection = await pool.getConnection();
     try {
-      const [result] = await connection.query(ItemRepository.delete(), [
-        requisitionID,
-        productID,
+      const [result] = await connection.query(ItemRepository.delete(idsParam), [
+        requisitionID
       ]);
       return result;
     } catch (err) {

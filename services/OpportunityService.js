@@ -11,7 +11,6 @@ class OpportunityService {
       OpportunityRepository.getOppByIdQuery(),
       [oppId]
     );
-    console.log({opp})
     const { files } = opp;
     return opp;
   };
@@ -94,9 +93,9 @@ class OpportunityService {
       comentarios,
       seguidores,
     } = opp;
-    const isAdicional =
-      idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
+    const isAdicional = idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
     console.log('criou adicional!');
+    console.log({isAdicional, idProjeto})
     if (isAdicional) {
       const adicionalInsertResult = await this.executeQuery(
         OpportunityRepository.createAdicional(),
@@ -162,6 +161,10 @@ class OpportunityService {
         `SELECT * FROM ADICIONAIS WHERE ID = ?`,
         [adicionalInsertResult.insertId]
       );
+      console.log({
+        adicional,
+        codOs: result.insertId,
+      })
       return {
         adicional,
         codOs: result.insertId,

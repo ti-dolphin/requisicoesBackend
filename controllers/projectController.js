@@ -6,7 +6,9 @@ const ProjectService = require("../services/ProjectService");
 class ProjectController {
   static async getAllProjects(req, res) {
     try {
-      const projects = await ProjectService.getAllProjects();
+      console.log('req.query: ', req.query);
+      const {userID} = req.query;
+      const projects = await ProjectService.getAllProjects(userID);
       if (projects) {
         res.status(200).send(projects);
       } else {
