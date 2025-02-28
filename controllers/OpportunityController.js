@@ -30,7 +30,6 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
-    console.log('upload files');
     const {files} = req;
     console.log({files})
     try {
@@ -44,7 +43,6 @@ class OpportunityController {
            message: "files inserted successfully"
          });
        }
-       console.log('sem arquivos')
        return res.status(200).send({message: 'No files were sent'})
     } catch (e) {
       console.log("Error uploading files: ", e);
@@ -68,6 +66,7 @@ class OpportunityController {
 
   static updateOpportunity = async (req, res) => {
     const updatedOpportunity = req.body;
+   
     try {
       const affectedRows = await OpportunityService.updateOpportunity(
         updatedOpportunity
@@ -81,7 +80,6 @@ class OpportunityController {
 
 
   static createOpportuntiyFile = async (req, res) => {
-    console.log('createOpportuntiyFile')
     const file = req.file;
     console.log({file})
     if (!file) {

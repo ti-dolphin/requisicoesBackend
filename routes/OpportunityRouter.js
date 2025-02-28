@@ -10,6 +10,7 @@ router.get('/', (req, res) => {
 });
 
 router.put("/update", async (req, res) => {
+    console.log("PUT")
     await OpportunityController.updateOpportunity(req, res);
 });
 

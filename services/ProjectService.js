@@ -20,7 +20,6 @@ class ProjectService {
       const [data] = await this.executeQuery(`SELECT PERM_ADMINISTRADOR FROM PESSOA where CODPESSOA = ${userID}`);
       isAdm = Number(data[0].PERM_ADMINISTRADOR);
     }
-
     if (userID && !isAdm) {
       console.log(' não adm')
       query = `
