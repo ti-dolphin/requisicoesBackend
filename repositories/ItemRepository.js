@@ -17,9 +17,11 @@ class ItemRepository {
       .join("\n");
     return queries;
   }
-  static delete() {
+  static delete(idsParam) {
+    console.log(`DELETE FROM WEB_REQUISICAO_ITEMS
+      WHERE ID_REQUISICAO = ? AND ID_PRODUTO IN (${idsParam});`)
     return `DELETE FROM WEB_REQUISICAO_ITEMS
-      WHERE ID_REQUISICAO = ? AND ID_PRODUTO = ?`;
+      WHERE ID_REQUISICAO = ? AND ID IN (${idsParam});`;
   }
   static createItems(items, requisitionID) {
     const values = items

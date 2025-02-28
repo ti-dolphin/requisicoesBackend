@@ -14,8 +14,8 @@ router.post("/:requisitionID",  (req, res, next) => {
 });
 
 // DELETE /requisitionItems/:requisitionID/:productID
-router.delete("/:requisitionID/:productID",  (req, res, next) => {
-    RequisitionItemController.deleteRequisitionItem( req, res );
+router.delete("/:requisitionID/",  (req, res, next) => {
+    RequisitionItemController.deleteRequisitionItems( req, res );
   //  next();
 });
 

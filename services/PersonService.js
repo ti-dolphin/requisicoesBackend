@@ -2,10 +2,23 @@ const pool = require("../database");
 
 class PersonService {
 
-  static async getClients( ){ 
-    const query = `
+  static async getClients(projectId ){ 
+    let query;
+
+    if (Number(projectId) !== 0){ 
+      query = `
+        SELECT CODCLIENTE, NOMEFANTASIA FROM ORDEMSERVICO OS
+        INNER JOIN PROJETOS P ON P.ID = OS.ID_PROJETO
+        INNER JOIN ADICIONAIS A ON OS.ID_ADICIONAL = A.ID
+        INNER JOIN CLIENTE C ON C.CODCLIENTE = OS.FK_CODCLIENTE
+        where OS.ID_PROJETO = ${projectId} AND A.NUMERO = 0
+      `
+      console.log('PROJECT ID QUERY: ', query)
+    }else  { 
+      query = `
       SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE;
     `;
+    }
     try {
       const [rows, fields] = await PersonService.executeQuery(query);
       return rows;
@@ -15,13 +28,23 @@ class PersonService {
     }
   }
 
-  static async getSallers ( ){ 
+  static async getSallers ( projectId){ 
     const personTable = "pessoa".toUpperCase();
-    const query = `
+    let query;
+    if (Number(projectId)){ 
+      query = `
+      SELECT  P.NOME, P.CODPESSOA FROM ORDEMSERVICO OS INNER JOIN ADICIONAIS A ON A.ID = OS.ID_ADICIONAL
+      INNER JOIN PESSOA P ON P.CODPESSOA = OS.RESPONSAVEL
+      where OS.ID_PROJETO = ${projectId} and A.NUMERO = 0
+     `
+    }else{ 
+      query = `
       SELECT NOME, CODPESSOA 
       FROM ${personTable}
-      WHERE RESPONSAVEL = 1
+      WHERE PERM_COMERCIAL = 1
     `;
+    }
+    
     try {
       const [rows, fields] = await PersonService.executeQuery(query);
       return rows;

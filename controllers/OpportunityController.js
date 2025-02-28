@@ -30,15 +30,20 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
+    const {files} = req;
+    console.log({files})
     try {
-      const { files } = req;
-       await OpportunityService.createOpportunityFiles(
-        req.query.oppId,
-        files
-      );
-      return res.status(200).send({
-        message: "files inserted successfully"
-      });
+       if(files.length){ 
+         const { files } = req;
+         await OpportunityService.createOpportunityFiles(
+           req.query.oppId,
+           files
+         );
+         return res.status(200).send({
+           message: "files inserted successfully"
+         });
+       }
+       return res.status(200).send({message: 'No files were sent'})
     } catch (e) {
       console.log("Error uploading files: ", e);
       return res.status(500).send({ message: "Error uploading files" });
@@ -61,6 +66,7 @@ class OpportunityController {
 
   static updateOpportunity = async (req, res) => {
     const updatedOpportunity = req.body;
+   
     try {
       const affectedRows = await OpportunityService.updateOpportunity(
         updatedOpportunity
@@ -75,11 +81,12 @@ class OpportunityController {
 
   static createOpportuntiyFile = async (req, res) => {
     const file = req.file;
+    console.log({file})
     if (!file) {
       return res.status(400).send("No file uploaded");
     }
     try {
-      const insertId = await OpportunityService.createOpportunityFile(
+      const insertId = await OpportunityService.createOpportunityFiles(
         req.params.id,
         file
       );
@@ -91,8 +98,10 @@ class OpportunityController {
   };
 
   static getClients = async (req, res) => {
+    const { projectId } = req.query;
+    console.log({projectId})
     try {
-      const clients = await PersonService.getClients();
+      const clients = await PersonService.getClients(projectId);
       return res.status(200).send(clients);
     } catch (err) {
       console.log("error getting clients: ", err.message);
@@ -111,8 +120,9 @@ class OpportunityController {
   };
 
   static getSalers = async (req, res) => {
+    const { projectId } = req.query;
     try {
-      const salers = await PersonService.getSallers();
+      const salers = await PersonService.getSallers(projectId);
       return res.status(200).send(salers);
     } catch (err) {
       console.log("error getting sales: ", err.message);
