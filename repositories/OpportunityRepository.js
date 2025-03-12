@@ -1,4 +1,127 @@
+
+
 class OpportunityRepository {
+
+  static getOppsByManagerQuery = () => {
+    return `SELECT
+    P.CODPESSOA,
+    P.NOME,
+    P.EMAIL,
+    (
+        SELECT
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'ID_PROJETO', OS.ID_PROJETO,
+                    'ADICIONAL', AD.NUMERO,
+                    'NOME', OS.NOME,
+                    'VALORFATDOLPHIN', CONCAT('R$ ', FORMAT(OS.VALORFATDOLPHIN, 2, 'de_DE')),
+                    'VALORFATDIRETO', CONCAT('R$ ', FORMAT(OS.VALORFATDIRETO, 2, 'de_DE')),
+                    'VALORTOTAL', CONCAT('R$ ', FORMAT(IFNULL(OS.VALORFATDIRETO, 0) + IFNULL(OS.VALORFATDOLPHIN, 0), 2, 'de_DE'))
+                )
+            )
+        FROM
+            ORDEMSERVICO OS
+            INNER JOIN PROJETOS PROJ ON PROJ.ID = OS.ID_PROJETO
+            INNER JOIN ADICIONAIS AD ON OS.ID_ADICIONAL = AD.ID
+        WHERE
+            PROJ.CODGERENTE = P.CODGERENTE
+            AND OS.CODSTATUS IN (SELECT CODSTATUS FROM STATUS WHERE ACAO = 0)
+            AND OS.CODTIPOOS = 21
+            AND OS.DATAINTERACAO < CURDATE()
+            AND PROJ.ATIVO = 1
+    ) AS expiredOpportunities,
+    (
+        SELECT
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'ID_PROJETO', OS.ID_PROJETO,
+                    'ADICIONAL', AD.NUMERO,
+                    'NOME', OS.NOME,
+                    'VALORFATDOLPHIN', CONCAT('R$ ', FORMAT(OS.VALORFATDOLPHIN, 2, 'de_DE')),
+                    'VALORFATDIRETO', CONCAT('R$ ', FORMAT(OS.VALORFATDIRETO, 2, 'de_DE')),
+                    'VALORTOTAL',
+                     CONCAT('R$ ', FORMAT(IFNULL(OS.VALORFATDIRETO, 0) + IFNULL(OS.VALORFATDOLPHIN, 0), 2, 'de_DE'))
+                )
+            )
+        FROM
+            ORDEMSERVICO OS
+            INNER JOIN PROJETOS PROJ ON PROJ.ID = OS.ID_PROJETO
+            INNER JOIN ADICIONAIS AD ON OS.ID_ADICIONAL = AD.ID
+        WHERE
+            PROJ.CODGERENTE = P.CODGERENTE
+            AND OS.CODTIPOOS = 21
+            AND OS.CODSTATUS IN (SELECT CODSTATUS FROM STATUS WHERE ACAO = 0)
+            AND OS.DATAINTERACAO >= CURDATE()
+            AND OS.DATAINTERACAO <= DATE_ADD(CURDATE(), INTERVAL 4 DAY)
+            AND PROJ.ATIVO = 1
+    ) AS toExpireOpportunities
+FROM
+    PESSOA P
+WHERE
+    P.CODGERENTE IS NOT NULL;`
+  }
+
+  static getOppsByComercialResponsableQuery = () => {
+    return `
+                SELECT
+    P.CODPESSOA,
+    P.NOME,
+    P.EMAIL,
+    (
+        SELECT
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'ID_PROJETO', OS.ID_PROJETO,
+                    'ADICIONAL', AD.NUMERO,
+                    'NOME', OS.NOME,
+                    'VALORFATDOLPHIN', CONCAT('R$ ', FORMAT(OS.VALORFATDOLPHIN, 2, 'de_DE')),
+                     'VALORFATDIRETO', CONCAT('R$ ', FORMAT(OS.VALORFATDIRETO, 2, 'de_DE')),
+                    'VALORTOTAL', CONCAT('R$ ', FORMAT(IFNULL(OS.VALORFATDIRETO, 0) + IFNULL(OS.VALORFATDOLPHIN, 0), 2, 'de_DE'))
+                )
+            )
+        FROM
+            ORDEMSERVICO OS
+            INNER JOIN PROJETOS PROJ ON PROJ.ID = OS.ID_PROJETO
+            INNER JOIN PESSOA P2 ON PROJ.CODGERENTE = P2.CODGERENTE
+            INNER JOIN ADICIONAIS AD ON OS.ID_ADICIONAL = AD.ID
+        WHERE
+            OS.RESPONSAVEL = P.CODPESSOA
+            AND CODSTATUS IN (SELECT CODSTATUS FROM STATUS WHERE ACAO = 0)
+            AND OS.CODTIPOOS = 21
+            AND OS.DATAINTERACAO < CURDATE()
+            AND PROJ.ATIVO = 1
+    ) AS expiredOpportunities,
+    (
+        SELECT
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'ID_PROJETO', OS.ID_PROJETO,
+                    'ADICIONAL', AD.NUMERO,
+                    'NOME', OS.NOME,
+                    'VALORFATDOLPHIN', CONCAT('R$ ', FORMAT(OS.VALORFATDOLPHIN, 2, 'de_DE')),
+                     'VALORFATDIRETO', CONCAT('R$ ', FORMAT(OS.VALORFATDIRETO, 2, 'de_DE')),
+                    'VALORTOTAL', CONCAT('R$ ', FORMAT(IFNULL(OS.VALORFATDIRETO, 0) + IFNULL(OS.VALORFATDOLPHIN, 0), 2, 'de_DE'))
+                )
+            )
+        FROM
+            ORDEMSERVICO OS
+            INNER JOIN PROJETOS PROJ ON PROJ.ID = OS.ID_PROJETO
+            INNER JOIN PESSOA P2 ON PROJ.CODGERENTE = P2.CODGERENTE
+            INNER JOIN ADICIONAIS AD ON AD.ID_PROJETO = PROJ.ID
+        WHERE
+            OS.RESPONSAVEL = P.CODPESSOA
+            AND OS.CODTIPOOS = 21
+			AND CODSTATUS IN (SELECT CODSTATUS FROM STATUS WHERE ACAO = 0)
+            AND OS.DATAINTERACAO >= CURDATE()
+            AND OS.DATAINTERACAO <= DATE_ADD(CURDATE(), INTERVAL 4 DAY)
+		    AND PROJ.ATIVO = 1
+
+    ) AS toExpireOpportunities
+FROM
+    PESSOA P WHERE P.PERM_COMERCIAL = 1;
+                `
+  }
+
   static deleteOppFilesQuery = (idsToDeleteString) => {
     return `
     DELETE FROM web_anexos_os WHERE id_anexo_os in ${idsToDeleteString}`;
@@ -60,7 +183,7 @@ class OpportunityRepository {
               DATAPREVENTREGA as dataPrevEntrega, 
               DATAENTREGA as dataEntrega, 
               CODSTATUS as codStatus, 
-              NOME as nome, 
+              ORDEMSERVICO.NOME as nome,
               DESCRICAO as descricao, 
               ATIVIDADES as atividades, 
               PRIORIDADE as prioridade, 
@@ -74,6 +197,7 @@ class OpportunityRepository {
               DATALIBERACAO as dataLiberacao, 
               RELACIONAMENTO as relacionamento, 
               FK_CODCLIENTE as fkCodCliente, 
+              NOMEFANTASIA as nomeCliente,
               FK_CODCOLIGADA as fkCodColigada, 
               VALORFATDIRETO as valorFatDireto, 
               VALORSERVICOMO as valorServicoMO, 
@@ -143,6 +267,7 @@ class OpportunityRepository {
               ORDEMSERVICO 
           INNER JOIN 
               ADICIONAIS ON ID = ID_ADICIONAL
+          INNER JOIN CLIENTE ON CLIENTE.CODCLIENTE = ORDEMSERVICO.FK_CODCLIENTE
           WHERE 
               CODOS = ?;
     `;
@@ -268,9 +393,9 @@ class OpportunityRepository {
             LEFT JOIN
                 ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
             WHERE 
-                p.ATIVO = 1 AND s.ATIVO = 1  ${
-                  action ? "AND s.ACAO = 1 AND" : "AND"
-                }
+                p.ATIVO = 1 AND s.ATIVO = 1  
+                ${action ? "AND s.ACAO IN (1, 0) AND" : "AND s.ACAO = 0 AND"
+      }
                 (
                     os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
                     OR
@@ -278,8 +403,7 @@ class OpportunityRepository {
                     OR 
                     ? IN (SELECT CODPESSOA FROM PESSOA WHERE PERM_ADMINISTRADOR = 1)
                 )
-            ORDER BY 
-                os.CODOS DESC; -- Ordenação pelo número da ordem de serviço, do maior para o menor.
+            
     `;
     for (let dateFilter of dateFilters) {
       if (dateFilter.from !== "") {
@@ -289,6 +413,8 @@ class OpportunityRepository {
         baseQuery += ` AND ${dateFilter.dbField} <= '${dateFilter.to}'`;
       }
     }
+    baseQuery += ` ORDER BY 
+                os.CODOS DESC; -- Ordenação pelo número da ordem de serviço, do maior para o menor.`
     return baseQuery;
   };
 }

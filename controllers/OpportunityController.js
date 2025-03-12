@@ -30,20 +30,20 @@ class OpportunityController {
   };
 
   static uploadFiles = async (req, res) => {
-    const {files} = req;
-    console.log({files})
+    const { files } = req;
+    console.log({ files })
     try {
-       if(files.length){ 
-         const { files } = req;
-         await OpportunityService.createOpportunityFiles(
-           req.query.oppId,
-           files
-         );
-         return res.status(200).send({
-           message: "files inserted successfully"
-         });
-       }
-       return res.status(200).send({message: 'No files were sent'})
+      if (files.length) {
+        const { files } = req;
+        await OpportunityService.createOpportunityFiles(
+          req.query.oppId,
+          files
+        );
+        return res.status(200).send({
+          message: "files inserted successfully"
+        });
+      }
+      return res.status(200).send({ message: 'No files were sent' })
     } catch (e) {
       console.log("Error uploading files: ", e);
       return res.status(500).send({ message: "Error uploading files" });
@@ -66,10 +66,12 @@ class OpportunityController {
 
   static updateOpportunity = async (req, res) => {
     const updatedOpportunity = req.body;
-   
+    const { user } = req.query;
+    console.log({ user })
     try {
       const affectedRows = await OpportunityService.updateOpportunity(
-        updatedOpportunity
+        updatedOpportunity,
+        user
       );
       return res.status(200).send({ message: "Opportunity updated successfully!" });
     } catch (e) {
@@ -78,10 +80,32 @@ class OpportunityController {
     }
   };
 
+  static getOppsByComercialResponsable = async (req, res) => {
+    try {
+      const oppsByResponsable = await OpportunityService.getOppsByComercialResponsable();
+      await OpportunityService.sendSalesReportEmail(oppsByResponsable);
+      return res.status(200).send(oppsByResponsable);
+    } catch (e) {
+      console.log(e)
+      res.status(500).send('Server Error')
+    }
+  }
+
+  static getOppsByManager = async (req, res) => {
+    try {
+      const oppsByManager = await OpportunityService.getOppsByManager();
+      await OpportunityService.sendManagerOppExpirationEmail(oppsByManager);
+      return res.status(200).send(oppsByManager);
+    } catch (e) {
+      console.log(e);
+      res.status(500).send('Server Error');
+    }
+  }
+
 
   static createOpportuntiyFile = async (req, res) => {
     const file = req.file;
-    console.log({file})
+    console.log({ file })
     if (!file) {
       return res.status(400).send("No file uploaded");
     }
@@ -99,7 +123,7 @@ class OpportunityController {
 
   static getClients = async (req, res) => {
     const { projectId } = req.query;
-    console.log({projectId})
+    console.log({ projectId })
     try {
       const clients = await PersonService.getClients(projectId);
       return res.status(200).send(clients);

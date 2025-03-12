@@ -16,7 +16,11 @@ class PersonService {
       console.log('PROJECT ID QUERY: ', query)
     }else  { 
       query = `
-      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE;
+      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE WHERE CODCLIENTE IN (
+        SELECT FK_CODCLIENTE FROM dsecombr_controle.ORDEMSERVICO OS INNER JOIN
+          PROJETOS P ON P.ID = OS.ID_PROJETO WHERE
+          P.ATIVO = 1
+      );
     `;
     }
     try {
