@@ -419,10 +419,10 @@ class OpportunityService {
       try {
         const htmlContent = OpportunityView.createSoldOppEmail(newOpportunity, user);
         if (isAdicional) {
-          await EmailService.sendEmail('eduardo017melo@gmail.com', 'Adicional Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+          await EmailService.sendEmail('comuvendas@dse.com.br', 'Adicional Vendido', '', htmlContent, ['ti.dse@gmail.com']);
         }
         if (!isAdicional) {
-          await EmailService.sendEmail('eduardo017melo@gmail.com', 'Projeto Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+          await EmailService.sendEmail('comuvendas@dse.com.br', 'Projeto Vendido', '', htmlContent, ['ti.dse@gmail.com']);
         }
       } catch (e) {
         console.log(e);
