@@ -17,6 +17,16 @@ class OpportunityController {
     }
   };
 
+  static getManagers = async (req, res ) => { 
+    console.log('getManagers')
+        try{ 
+          const managers = await PersonService.getAllManagers();
+          return res.status(200).send(managers);
+        }catch(e){ 
+          return res.status(500).send("Server Error");
+        }
+  } 
+
   static getOpportunityFiles = async (req, res) => {
     try {
       const files = await OpportunityService.getOpportunityFiles(

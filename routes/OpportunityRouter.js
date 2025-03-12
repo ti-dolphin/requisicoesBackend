@@ -20,7 +20,6 @@ router.post('/create', async (req, res) => {
     await OpportunityController.createOpportunity(req, res);
 });
 
-
 router.post('/files', upload.array("files"), (req, res) => {
     OpportunityController.uploadFiles(req, res);
 });
@@ -33,6 +32,11 @@ router.get('/files', (req, res) => {
 router.get('/saler', (req, res) => {
     OpportunityController.getSalers(req, res);
 })
+router.get('/manager', (req, res) => {
+    console.log('MANAGER')
+    OpportunityController.getManagers(req, res);
+});
+
 router.get('/status', (req, res) => {
     OpportunityController.getStatusList(req, res);
 });
