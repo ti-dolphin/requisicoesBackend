@@ -451,7 +451,7 @@ class OpportunityService {
             `Adicional Vendido: ${client.clientName} - ${newOpportunity.idProjeto}.${newOpportunity.numeroAdicional} - ${newOpportunity.nome}`,
             "",
             htmlContent,
-            ["ti.dse@gmail.com"]
+            ["ti.dse01@dse.com.br"]
           );
         }
         if (!isAdicional) {
@@ -460,7 +460,7 @@ class OpportunityService {
             `Projeto Vendido: ${client.clientName} - ${newOpportunity.idProjeto}.${newOpportunity.numeroAdicional} - ${newOpportunity.nome}`,
             "",
             htmlContent,
-            ["ti.dse@gmail.com"]
+            ["ti.dse"]
           );
         }
       } catch (e) {
