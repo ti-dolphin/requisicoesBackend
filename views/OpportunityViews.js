@@ -7,11 +7,11 @@ static createSoldOppEmail = (opportunity, user) => {
         currency: 'BRL'
     });
     const rows = [
-        { label: 'Projeto', data: `${opportunity.idProjeto} - ${opportunity.descricao || opportunity.nome}` },
+        { label: 'Projeto', data: `${opportunity.idProjeto}.${opportunity.numeroAdicional} - ${opportunity.descricao || opportunity.nome}` },
         {
-            label: 'Valor Faturamento direto', data: formatter.format(Number(opportunity.valorFatDireto))},
+            label: 'Valor Faturamento Direto', data: formatter.format(Number(opportunity.valorFatDireto))},
         {
-            label: 'Valor faturamento Dolphin', data: formatter.format(Number(opportunity.valorFatDolphin)) },
+            label: 'Valor Faturamento Dolphin', data: formatter.format(Number(opportunity.valorFatDolphin)) },
         {
             label: 'Valor Total', data: formatter.format(Number(opportunity.valorFatDolphin) + Number(opportunity.valorFatDireto) )}
     ];
