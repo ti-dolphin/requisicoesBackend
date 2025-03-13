@@ -24,36 +24,43 @@ router.post('/files', upload.array("files"), (req, res) => {
     OpportunityController.uploadFiles(req, res);
 });
 
-router.get('/files', (req, res) => {
+
+router.get("/send-sale-email", async (req, res) => {
+    console.log('SEND SALE EMAIL');
+    await OpportunityController.sendSaleEmail(req, res);
+});
+
+router.get('/files', async (req, res) => {
     console.log('files')
-    OpportunityController.getOpportunityFiles(req, res);
+   await  OpportunityController.getOpportunityFiles(req, res);
 });
 
-router.get('/saler', (req, res) => {
-    OpportunityController.getSalers(req, res);
+router.get('/saler', async (req, res) => {
+   await  OpportunityController.getSalers(req, res);
 })
-router.get('/manager', (req, res) => {
+router.get('/manager', async(req, res) => {
     console.log('MANAGER')
-    OpportunityController.getManagers(req, res);
+   await  OpportunityController.getManagers(req, res);
 });
 
-router.get('/status', (req, res) => {
-    OpportunityController.getStatusList(req, res);
+router.get('/status', async (req, res) => {
+   await  OpportunityController.getStatusList(req, res);
 });
 
-router.get('/client', (req, res) => {
-    OpportunityController.getClients(req, res);
+router.get('/client', async (req, res) => {
+   await OpportunityController.getClients(req, res);
 });
-router.get('/sales-report', (req, res) => {
-    OpportunityController.getOppsByComercialResponsable(req, res);
-});
-router.get('/manager-report', (req, res) => {
-    OpportunityController.getOppsByManager(req, res);
+router.get('/sales-report', async (req, res) => {
+   await  OpportunityController.getOppsByComercialResponsable(req, res);
 });
 
-router.get("/:oppId", (req, res) => {
+router.get('/manager-report', async (req, res) => {
+     await   OpportunityController.getOppsByManager(req, res);
+});
+
+router.get("/:oppId", async (req, res) => {
     console.log('getbyid')
-    OpportunityController.getOpportunityById(req, res);
+    await  OpportunityController.getOpportunityById(req, res);
 });
 
 
