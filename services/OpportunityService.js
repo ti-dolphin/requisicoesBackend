@@ -3,9 +3,12 @@ const pool = require("../database");
 const ProjectService = require("./ProjectService");
 const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
+const EmailService = require("./EmailService");
+const OpportunityView = require("../views/OpportunityViews");
 
 class OpportunityService {
-  
+
+
   static getOpportunityById = async (oppId) => {
     const [opp] = await this.executeQuery(
       OpportunityRepository.getOppByIdQuery(),
@@ -95,7 +98,7 @@ class OpportunityService {
     } = opp;
     const isAdicional = idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
     console.log('criou adicional!');
-    console.log({isAdicional, idProjeto})
+    console.log({ isAdicional, idProjeto })
     if (isAdicional) {
       const adicionalInsertResult = await this.executeQuery(
         OpportunityRepository.createAdicional(),
@@ -294,8 +297,7 @@ class OpportunityService {
       );
   };
 
-  static updateOpportunity = async (opp) => {
-    console.log('updateOpportunity')
+  static updateOpportunity = async (opp, user) => {
     const {
       codOs,
       codTipoOs,
@@ -346,6 +348,8 @@ class OpportunityService {
       seguidores,
       files,
     } = opp;
+
+    const oldOpportunity = await this.getOpportunityById(codOs);
     const affectedRows = await this.executeQuery(
       OpportunityRepository.updateOpportunityQuery(),
       [
@@ -396,12 +400,36 @@ class OpportunityService {
         codOs,
       ]
     );
-    
     await this.handleFiles(files, codOs);
     await this.handleComments(comentarios, codOs);
     await this.handleFollowers(seguidores, idProjeto);
+    try {
+      await this.sendSoldOpportunityEmail(codOs, codStatus, oldOpportunity, opp, user);
+    } catch (e) {
+      console.log(e);
+    }
     return { codOs: opp.codOs };
   };
+
+  static sendSoldOpportunityEmail = async (codOs, newCodStatus, oldOpportunity, newOpportunity, user) => {
+    const shouldSendEmail = (newCodStatus !== oldOpportunity.codStatus) && (newOpportunity.codStatus === 11);
+    if (shouldSendEmail) {
+      const adicionals = await this.executeQuery(`SELECT ID FROM ADICIONAIS WHERE ID = ? LIMIT 1`, [oldOpportunity.idAdicional]);
+      const isAdicional = adicionals.length ? true : false;
+      try {
+        const htmlContent = OpportunityView.createSoldOppEmail(newOpportunity, user);
+        if (isAdicional) {
+          await EmailService.sendEmail('comuvendas@dse.com.br', 'Adicional Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+        }
+        if (!isAdicional) {
+          await EmailService.sendEmail('comuvendas@dse.com.br', 'Projeto Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      return;
+    }
+  }
 
   static handleFiles = async (filesReceived, oppId) => {
     console.log('handleFiles');
@@ -416,15 +444,15 @@ class OpportunityService {
             (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
           )
       );
-      console.log({ filesToDelete_length: filesToDelete.length})
-      if(filesToDelete.length) {
-          const idsToDeleteString = `(${filesToDelete
-            .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
-            .join(",")})`;
+      console.log({ filesToDelete_length: filesToDelete.length })
+      if (filesToDelete.length) {
+        const idsToDeleteString = `(${filesToDelete
+          .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
+          .join(",")})`;
 
-          await this.executeQuery(
-            OpportunityRepository.deleteOppFilesQuery(idsToDeleteString)
-          );
+        await this.executeQuery(
+          OpportunityRepository.deleteOppFilesQuery(idsToDeleteString)
+        );
       }
     }
   };
@@ -438,7 +466,7 @@ class OpportunityService {
 
   static handleComments = async (comentarios, opportunityId) => {
     console.log("handleComments");
-    console.log({comentarios});
+    console.log({ comentarios });
     if (comentarios && comentarios.length) {
       const commentsToInsert = comentarios
         .filter((comment) => comment.codigoComentario < 1) // Filtra os comentários sem `codigoComentario`
@@ -501,6 +529,281 @@ class OpportunityService {
       console.log("Error in executeQuery: ", queryError);
       connection.release();
       throw queryError;
+    }
+  }
+
+  static async sendSalesReportEmail(oppsByResponsable) {
+    try {
+      for (let map of oppsByResponsable) {
+        const htmlContent = this.createSalesEmail(map.NOME, map.expiredOpportunities, map.toExpireOpportunities);
+        await EmailService.sendEmail(map.EMAIL, 'Relatório Semanal de Oportunidades', '', htmlContent, ['ti.dse@gmail.com']);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+  static createSalesEmail = (responsableName, expiredOpps, toExpireOpps) => {
+    const columns = [
+      { header: "Projeto", key: "ID_PROJETO" },
+      { header: "Nº Adicional", key: "ADICIONAL" },
+      { header: "Tarefa", key: "NOME" },
+      { header: "Valor Dolphin (R$)", key: "VALORFATDOLPHIN" },
+      { header: "Valor Direto (R$)", key: "VALORFATDIRETO" },
+      { header: "Valor Total (R$)", key: "VALORTOTAL" },
+    ];
+
+    return `
+     <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+          }
+          h2 {
+            color: #2c3e50;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #f2f2f2;
+            color: #333;
+          }
+          tr:nth-child(even) {
+            background-color: #f9f9f9;
+          }
+          .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+          }
+          .no-data {
+            font-style: italic;
+            color: #777;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>Relatório Semanal de Oportunidades</h2>
+        <p>Olá, <strong>${responsableName}</strong>,</p>
+        <p>Segue o relatório semanal das oportunidades vencidas e que estão prestes a vencer:</p>
+
+        <!-- Oportunidades Expiradas -->
+        <h3>Oportunidades Expiradas</h3>
+        ${expiredOpps ? `
+          <table>
+            <thead>
+              <tr>
+                ${columns.map(column => `
+                  <th>${column.header}</th>
+                `).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${expiredOpps.map(opp => `
+                <tr>
+                  ${columns.map(column => `
+                    <td>${opp[column.key]}</td>
+                  `).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : `
+          <p class="no-data">Não há oportunidades expiradas.</p>
+        `}
+
+        <!-- Oportunidades que Expirarão Esta Semana -->
+        <h3>Oportunidades que Expirarão Esta Semana</h3>
+        ${toExpireOpps ? `
+         <table>
+                <thead>
+                  <tr>
+                    ${columns.map(column => `
+                      <th>${column.header}</th>
+                    `).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${expiredOpps.map(opp => `
+                    <tr>
+                      ${columns.map(column => `
+                        <td>${opp[column.key]}</td>
+                      `).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+        </table>
+        ` : `
+          <p class="no-data">Não há oportunidades prestes a expirar.</p>
+        `}
+        <p>Atenciosamente,</p>
+        <p><strong>Setor de TI</strong></p>
+
+        <div class="footer">
+          <p>Por favor, não responder a este e-mail. Em caso de dúvidas, entre em contato com o suporte técnico.</p>
+        </div>
+      </body>
+    </html>
+  `;
+  }
+
+  static sendManagerOppExpirationEmail = async (oppsByManager) => {
+    try {
+      for (let map of oppsByManager) {
+        if (map.expiredOpportunities || map.toExpireOpportunities) {
+          const htmlContent = this.createManagerOppExpirationEmail(map.NOME, map.expiredOpportunities, map.toExpireOpportunities);
+          await EmailService.sendEmail(map.EMAIL, 'Relatório Semanal de Oportunidades', '', htmlContent, ['ti.dse@gmail.com']);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  static createManagerOppExpirationEmail = (managerName, expiredOpps, toExpireOpps) => {
+
+    const columns = [
+      { header: "Projeto", key: "ID_PROJETO" },
+      { header: "Nº Adicional", key: "ADICIONAL" },
+      { header: "Tarefa", key: "NOME" },
+      { header: "Valor Dolphin (R$)", key: "VALORFATDOLPHIN" },
+      { header: "Valor Direto (R$)", key: "VALORFATDIRETO" },
+      { header: "Valor Total (R$)", key: "VALORTOTAL" },
+    ];
+
+    return `
+    <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      h2 {
+        color: #2c3e50;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+        color: #333;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #777;
+      }
+      .no-data {
+        font-style: italic;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Relatório Semanal de Oportunidades</h2>
+    <p>Olá, <strong>${managerName}</strong>,</p>
+    <p>Segue o relatório semanal das oportunidades vencidas e que estão prestes a vencer sob sua gestão:</p>
+
+    <!-- Oportunidades Expiradas -->
+    <h3>Oportunidades Expiradas</h3>
+    ${expiredOpps ? `
+          <table>
+        <thead>
+          <tr>
+            ${columns.map(column => `
+              <th>${column.header}</th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${expiredOpps.map(opp => `
+            <tr>
+              ${columns.map(column => `
+                <td>${opp[column.key]}</td>
+              `).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    ` : `
+      <p class="no-data">Não há oportunidades expiradas.</p>
+    `}
+
+    <!-- Oportunidades que Expirarão Esta Semana -->
+    <h3>Oportunidades que Expirarão Esta Semana</h3>
+    ${toExpireOpps ? `
+    <table>
+            <thead>
+              <tr>
+                ${columns.map(column => `
+                  <th>${column.header}</th>
+                `).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${expiredOpps.map(opp => `
+                <tr>
+                  ${columns.map(column => `
+                    <td>${opp[column.key]}</td>
+                  `).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+      </table>
+    ` : `
+      <p class="no-data">Não há oportunidades prestes a expirar.</p>
+    `}
+
+    <p>Atenciosamente,</p>
+    <p><strong>Setor de TI</strong></p>
+
+    <div class="footer">
+      <p>Por favor, não responder a este e-mail. Em caso de dúvidas, entre em contato com o suporte técnico.</p>
+    </div>
+  </body>
+</html>
+    `;
+  }
+
+  static getOppsByComercialResponsable = async () => {
+    try {
+      const oppsByResponsableMap = await this.executeQuery(OpportunityRepository.getOppsByComercialResponsableQuery());
+      return oppsByResponsableMap;
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  static getOppsByManager = async () => {
+    try {
+      const oppsByManager = await this.executeQuery(OpportunityRepository.getOppsByManagerQuery());
+      return oppsByManager;
+    } catch (e) {
+      throw new Error(e);
     }
   }
 }

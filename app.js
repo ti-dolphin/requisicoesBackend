@@ -20,6 +20,8 @@ var oppoprtunityRouter = require('./routes/OpportunityRouter');
 var checklistRouter = require('./routes/checkListRouter');
 const authorize = require('./middleware/authentication');
 const PatrimonyScheduler  = require('./scheduledScripts/patrimonyScheduler');
+const OpportunityScheduler = require('./scheduledScripts/OpportunityScheduler');
+
 var app = express();
 
 
@@ -46,7 +48,7 @@ app.use('/requisitionFiles', authorize, requisitionFilesRouter);
 app.use('/itemFiles', authorize, itemFileRouter);
 app.use("/accessory", authorize,  patrimonyAccessoryRouter);
 app.use('/checklist', authorize, checklistRouter);
-app.use("/opportunity", authorize, oppoprtunityRouter);
+app.use("/opportunity", oppoprtunityRouter);
 
 
 
@@ -63,6 +65,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+ OpportunityScheduler.startExpiredOppsVerification();
   PatrimonyScheduler.startEmailSchedule();
   PatrimonyScheduler.startchecklistVerification();
 

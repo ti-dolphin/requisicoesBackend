@@ -2,6 +2,20 @@ const pool = require("../database");
 
 class PersonService {
 
+  static getAllManagers = async () => { 
+      try{ 
+        const query = `
+        SELECT * FROM PESSOA 
+          WHERE CODGERENTE IN (SELECT CODGERENTE FROM ORDEMSERVICO OS INNER JOIN PROJETOS P ON OS.ID_PROJETO = P.ID WHERE P.ATIVO = 1)
+        `;
+        const [managers] = await this.executeQuery(query);
+        console.log({managers})
+        return managers
+      }catch(e){ 
+        throw new Error(e);
+      }
+  }
+
   static async getClients(projectId ){ 
     let query;
 
@@ -16,7 +30,11 @@ class PersonService {
       console.log('PROJECT ID QUERY: ', query)
     }else  { 
       query = `
-      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE;
+      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE WHERE CODCLIENTE IN (
+        SELECT FK_CODCLIENTE FROM dsecombr_controle.ORDEMSERVICO OS INNER JOIN
+          PROJETOS P ON P.ID = OS.ID_PROJETO WHERE
+          P.ATIVO = 1
+      );
     `;
     }
     try {

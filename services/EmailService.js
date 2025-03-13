@@ -5,18 +5,19 @@ class EmailService {
     host: "email-ssl.com.br",
     port: 465,
     auth: {
-      user: "ti@dse.com.br",
-      pass: "Dse17@07",
+      user: "comunicacao@dse.com.br",
+      pass: "Comunicacao1707@dse",
     },
   });
 
-  static async sendEmail(recipientEmail, subject, text, ccEmails) {
+  static async sendEmail(recipientEmail, subject, text, html, ccEmails) {
     try {
       const mailOptions = {
-        from: "ti@dse.com.br",
+        from: `'Comunicação - Dolphin Soluções em Engenharia' <comunicacao@dse.com.br>`,
         to: recipientEmail,
         subject: subject,
         text: text,
+        html: html,
         ccEmails: ccEmails
       };
       // Send the email
