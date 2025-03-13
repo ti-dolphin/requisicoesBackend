@@ -7,7 +7,6 @@ const EmailService = require("./EmailService");
 const OpportunityView = require("../views/OpportunityViews");
 
 class OpportunityService {
-
   static getOpportunityById = async (oppId) => {
     const [opp] = await this.executeQuery(
       OpportunityRepository.getOppByIdQuery(),
@@ -94,9 +93,10 @@ class OpportunityService {
       comentarios,
       seguidores,
     } = opp;
-    const isAdicional = idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
-    console.log('criou adicional!');
-    console.log({ isAdicional, idProjeto })
+    const isAdicional =
+      idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
+    console.log("criou adicional!");
+    console.log({ isAdicional, idProjeto });
     if (isAdicional) {
       const adicionalInsertResult = await this.executeQuery(
         OpportunityRepository.createAdicional(),
@@ -165,7 +165,7 @@ class OpportunityService {
       console.log({
         adicional,
         codOs: result.insertId,
-      })
+      });
       return {
         adicional,
         codOs: result.insertId,
@@ -402,35 +402,76 @@ class OpportunityService {
     await this.handleComments(comentarios, codOs);
     await this.handleFollowers(seguidores, idProjeto);
     try {
-      await this.sendSoldOpportunityEmail(codOs, codStatus, oldOpportunity, opp, user, false);
+      await this.sendSoldOpportunityEmail(
+        codOs,
+        codStatus,
+        oldOpportunity,
+        opp,
+        user,
+        false
+      );
     } catch (e) {
       console.log(e);
     }
     return { codOs: opp.codOs };
   };
 
-  static sendSoldOpportunityEmail = async (codOs, newCodStatus, oldOpportunity, newOpportunity, user, manualSending) => {
-    const shouldSendEmail = (newCodStatus !== oldOpportunity.codStatus) && (newOpportunity.codStatus === 11) || manualSending;
+  static sendSoldOpportunityEmail = async (
+    codOs,
+    newCodStatus,
+    oldOpportunity,
+    newOpportunity,
+    user,
+    manualSending
+  ) => {
+    const shouldSendEmail =
+      (newCodStatus !== oldOpportunity.codStatus &&
+        newOpportunity.codStatus === 11) ||
+      manualSending;
+      
     if (shouldSendEmail) {
-      const adicionals = await this.executeQuery(`SELECT ID FROM ADICIONAIS WHERE ID = ? LIMIT 1`, [oldOpportunity.idAdicional]);
-      const isAdicional = adicionals.length ? true : false;
+      const [adicional] = await this.executeQuery(
+        `SELECT ID, NUMERO FROM ADICIONAIS WHERE ID = ? LIMIT 1`,
+        [oldOpportunity.idAdicional]
+      );
+      const [client] = await this.executeQuery(
+        `SELECT NOMEFANTASIA as clientName FROM CLIENTE WHERE CODCLIENTE = ?`,
+        [newOpportunity.fkCodCliente]
+      );
+      const isAdicional = adicional.NUMERO > 0 ? true : false;
+      const htmlContent = OpportunityView.createSoldOppEmail(
+        newOpportunity,
+        user
+      );
       try {
-        const htmlContent = OpportunityView.createSoldOppEmail(newOpportunity, user);
         if (isAdicional) {
-          await EmailService.sendEmail('comuvendas@dse.com.br', 'Adicional Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+          //cliente   //projeto.adicional
+          await EmailService.sendEmail(
+            "comuvendas@dse.com.br",
+            `Adicional Vendido: ${client.clientName} - ${newOpportunity.idProjeto}.${newOpportunity.numeroAdicional} - ${newOpportunity.nome}`,
+            "",
+            htmlContent,
+            ["ti.dse@gmail.com"]
+          );
         }
         if (!isAdicional) {
-          await EmailService.sendEmail('comuvendas@dse.com.br', 'Projeto Vendido', '', htmlContent, ['ti.dse@gmail.com']);
+          await EmailService.sendEmail(
+            "comuvendas@dse.com.br",
+            `Projeto Vendido: ${client.clientName} - ${newOpportunity.idProjeto}.${newOpportunity.numeroAdicional} - ${newOpportunity.nome}`,
+            "",
+            htmlContent,
+            ["ti.dse@gmail.com"]
+          );
         }
       } catch (e) {
-        console.log(e);
+        throw new Error(e);
       }
       return;
     }
-  }
+  };
 
   static handleFiles = async (filesReceived, oppId) => {
-    console.log('handleFiles');
+    console.log("handleFiles");
     const oppFiles = await this.executeQuery(
       OpportunityRepository.getOppFilesQuery(),
       [oppId]
@@ -442,7 +483,7 @@ class OpportunityService {
             (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
           )
       );
-      console.log({ filesToDelete_length: filesToDelete.length })
+      console.log({ filesToDelete_length: filesToDelete.length });
       if (filesToDelete.length) {
         const idsToDeleteString = `(${filesToDelete
           .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
@@ -476,7 +517,7 @@ class OpportunityService {
         (comment) => comment.codigoComentario
       );
 
-      console.log({ commentsToUpdate })
+      console.log({ commentsToUpdate });
       if (commentsToUpdate.length) {
         await Promise.all(
           commentsToUpdate.map(async (comment) => {
@@ -533,14 +574,23 @@ class OpportunityService {
   static async sendSalesReportEmail(oppsByResponsable) {
     try {
       for (let map of oppsByResponsable) {
-        const htmlContent = this.createSalesEmail(map.NOME, map.expiredOpportunities, map.toExpireOpportunities);
-        await EmailService.sendEmail(map.EMAIL, 'Relatório Semanal de Oportunidades', '', htmlContent, ['ti.dse@gmail.com']);
+        const htmlContent = this.createSalesEmail(
+          map.NOME,
+          map.expiredOpportunities,
+          map.toExpireOpportunities
+        );
+        await EmailService.sendEmail(
+          map.EMAIL,
+          "Relatório Semanal de Oportunidades",
+          "",
+          htmlContent,
+          ["ti.dse@gmail.com"]
+        );
       }
     } catch (e) {
       console.log(e);
     }
   }
-
 
   static createSalesEmail = (responsableName, expiredOpps, toExpireOpps) => {
     const columns = [
@@ -599,53 +649,85 @@ class OpportunityService {
 
         <!-- Oportunidades Expiradas -->
         <h3>Oportunidades Expiradas</h3>
-        ${expiredOpps ? `
+        ${
+          expiredOpps
+            ? `
           <table>
             <thead>
               <tr>
-                ${columns.map(column => `
+                ${columns
+                  .map(
+                    (column) => `
                   <th>${column.header}</th>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </tr>
             </thead>
             <tbody>
-              ${expiredOpps.map(opp => `
+              ${expiredOpps
+                .map(
+                  (opp) => `
                 <tr>
-                  ${columns.map(column => `
+                  ${columns
+                    .map(
+                      (column) => `
                     <td>${opp[column.key]}</td>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
-        ` : `
+        `
+            : `
           <p class="no-data">Não há oportunidades expiradas.</p>
-        `}
+        `
+        }
 
         <!-- Oportunidades que Expirarão Esta Semana -->
         <h3>Oportunidades que Expirarão Esta Semana</h3>
-        ${toExpireOpps ? `
+        ${
+          toExpireOpps
+            ? `
          <table>
                 <thead>
                   <tr>
-                    ${columns.map(column => `
+                    ${columns
+                      .map(
+                        (column) => `
                       <th>${column.header}</th>
-                    `).join('')}
+                    `
+                      )
+                      .join("")}
                   </tr>
                 </thead>
                 <tbody>
-                  ${expiredOpps.map(opp => `
+                  ${expiredOpps
+                    .map(
+                      (opp) => `
                     <tr>
-                      ${columns.map(column => `
+                      ${columns
+                        .map(
+                          (column) => `
                         <td>${opp[column.key]}</td>
-                      `).join('')}
+                      `
+                        )
+                        .join("")}
                     </tr>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </tbody>
         </table>
-        ` : `
+        `
+            : `
           <p class="no-data">Não há oportunidades prestes a expirar.</p>
-        `}
+        `
+        }
         <p>Atenciosamente,</p>
         <p><strong>Setor de TI</strong></p>
 
@@ -655,23 +737,36 @@ class OpportunityService {
       </body>
     </html>
   `;
-  }
+  };
 
   static sendManagerOppExpirationEmail = async (oppsByManager) => {
     try {
       for (let map of oppsByManager) {
         if (map.expiredOpportunities || map.toExpireOpportunities) {
-          const htmlContent = this.createManagerOppExpirationEmail(map.NOME, map.expiredOpportunities, map.toExpireOpportunities);
-          await EmailService.sendEmail(map.EMAIL, 'Relatório Semanal de Oportunidades', '', htmlContent, ['ti.dse@gmail.com']);
+          const htmlContent = this.createManagerOppExpirationEmail(
+            map.NOME,
+            map.expiredOpportunities,
+            map.toExpireOpportunities
+          );
+          await EmailService.sendEmail(
+            map.EMAIL,
+            "Relatório Semanal de Oportunidades",
+            "",
+            htmlContent,
+            ["ti.dse@gmail.com"]
+          );
         }
       }
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 
-  static createManagerOppExpirationEmail = (managerName, expiredOpps, toExpireOpps) => {
-
+  static createManagerOppExpirationEmail = (
+    managerName,
+    expiredOpps,
+    toExpireOpps
+  ) => {
     const columns = [
       { header: "Projeto", key: "ID_PROJETO" },
       { header: "Nº Adicional", key: "ADICIONAL" },
@@ -728,53 +823,85 @@ class OpportunityService {
 
     <!-- Oportunidades Expiradas -->
     <h3>Oportunidades Expiradas</h3>
-    ${expiredOpps ? `
+    ${
+      expiredOpps
+        ? `
           <table>
         <thead>
           <tr>
-            ${columns.map(column => `
+            ${columns
+              .map(
+                (column) => `
               <th>${column.header}</th>
-            `).join('')}
+            `
+              )
+              .join("")}
           </tr>
         </thead>
         <tbody>
-          ${expiredOpps.map(opp => `
+          ${expiredOpps
+            .map(
+              (opp) => `
             <tr>
-              ${columns.map(column => `
+              ${columns
+                .map(
+                  (column) => `
                 <td>${opp[column.key]}</td>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tr>
-          `).join('')}
+          `
+            )
+            .join("")}
         </tbody>
       </table>
-    ` : `
+    `
+        : `
       <p class="no-data">Não há oportunidades expiradas.</p>
-    `}
+    `
+    }
 
     <!-- Oportunidades que Expirarão Esta Semana -->
     <h3>Oportunidades que Expirarão Esta Semana</h3>
-    ${toExpireOpps ? `
+    ${
+      toExpireOpps
+        ? `
     <table>
             <thead>
               <tr>
-                ${columns.map(column => `
+                ${columns
+                  .map(
+                    (column) => `
                   <th>${column.header}</th>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </tr>
             </thead>
             <tbody>
-              ${expiredOpps.map(opp => `
+              ${expiredOpps
+                .map(
+                  (opp) => `
                 <tr>
-                  ${columns.map(column => `
+                  ${columns
+                    .map(
+                      (column) => `
                     <td>${opp[column.key]}</td>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
       </table>
-    ` : `
+    `
+        : `
       <p class="no-data">Não há oportunidades prestes a expirar.</p>
-    `}
+    `
+    }
 
     <p>Atenciosamente,</p>
     <p><strong>Setor de TI</strong></p>
@@ -785,25 +912,29 @@ class OpportunityService {
   </body>
 </html>
     `;
-  }
+  };
 
   static getOppsByComercialResponsable = async () => {
     try {
-      const oppsByResponsableMap = await this.executeQuery(OpportunityRepository.getOppsByComercialResponsableQuery());
+      const oppsByResponsableMap = await this.executeQuery(
+        OpportunityRepository.getOppsByComercialResponsableQuery()
+      );
       return oppsByResponsableMap;
     } catch (e) {
       throw new Error(e);
     }
-  }
+  };
 
   static getOppsByManager = async () => {
     try {
-      const oppsByManager = await this.executeQuery(OpportunityRepository.getOppsByManagerQuery());
+      const oppsByManager = await this.executeQuery(
+        OpportunityRepository.getOppsByManagerQuery()
+      );
       return oppsByManager;
     } catch (e) {
       throw new Error(e);
     }
-  }
+  };
 }
 
 module.exports = OpportunityService;

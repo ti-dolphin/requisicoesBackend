@@ -2,19 +2,18 @@ const OpportunityService = require("../services/OpportunityService");
 const PersonService = require("../services/PersonService");
 class OpportunityController {
 
-  static sendSaleEmail = async (req, res ) => { 
-     const {codOs, user} = req.query;
-     
+  static sendSaleEmail = async (req, res) => {
+    const { codOs, user } = req.query;
+
     console.log({ codOs, user })
-      try{
-        const opportunity = await OpportunityService.getOpportunityById(codOs);
-      
-        await OpportunityService.sendSoldOpportunityEmail(codOs, opportunity.codStatus, opportunity, opportunity, user, true)
-        return res.status(200).send({message: 'Email enviado com sucesso!'})
-      }catch(e){ 
-        console.log(e)
-        return res.status(500).send("Server Error");
-      }
+    try {
+      const opportunity = await OpportunityService.getOpportunityById(codOs);
+      await OpportunityService.sendSoldOpportunityEmail(codOs, opportunity.codStatus, opportunity, opportunity, user, true)
+      return res.status(200).send({ message: 'Email enviado com sucesso!' })
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send("Server Error");
+    }
   }
   //getOpportunityById
   static getOpportunityById = async (req, res) => {
@@ -32,15 +31,15 @@ class OpportunityController {
     }
   };
 
-  static getManagers = async (req, res ) => { 
+  static getManagers = async (req, res) => {
     console.log('getManagers')
-        try{ 
-          const managers = await PersonService.getAllManagers();
-          return res.status(200).send(managers);
-        }catch(e){ 
-          return res.status(500).send("Server Error");
-        }
-  } 
+    try {
+      const managers = await PersonService.getAllManagers();
+      return res.status(200).send(managers);
+    } catch (e) {
+      return res.status(500).send("Server Error");
+    }
+  }
 
   static getOpportunityFiles = async (req, res) => {
     try {
