@@ -1,6 +1,21 @@
 const OpportunityService = require("../services/OpportunityService");
 const PersonService = require("../services/PersonService");
 class OpportunityController {
+
+  static sendSaleEmail = async (req, res ) => { 
+     const {codOs, user} = req.query;
+     
+    console.log({ codOs, user })
+      try{
+        const opportunity = await OpportunityService.getOpportunityById(codOs);
+      
+        await OpportunityService.sendSoldOpportunityEmail(codOs, opportunity.codStatus, opportunity, opportunity, user, true)
+        return res.status(200).send({message: 'Email enviado com sucesso!'})
+      }catch(e){ 
+        console.log(e)
+        return res.status(500).send("Server Error");
+      }
+  }
   //getOpportunityById
   static getOpportunityById = async (req, res) => {
     try {

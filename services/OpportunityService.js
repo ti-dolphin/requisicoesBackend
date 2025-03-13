@@ -8,13 +8,11 @@ const OpportunityView = require("../views/OpportunityViews");
 
 class OpportunityService {
 
-
   static getOpportunityById = async (oppId) => {
     const [opp] = await this.executeQuery(
       OpportunityRepository.getOppByIdQuery(),
       [oppId]
     );
-    const { files } = opp;
     return opp;
   };
 
@@ -404,15 +402,15 @@ class OpportunityService {
     await this.handleComments(comentarios, codOs);
     await this.handleFollowers(seguidores, idProjeto);
     try {
-      await this.sendSoldOpportunityEmail(codOs, codStatus, oldOpportunity, opp, user);
+      await this.sendSoldOpportunityEmail(codOs, codStatus, oldOpportunity, opp, user, false);
     } catch (e) {
       console.log(e);
     }
     return { codOs: opp.codOs };
   };
 
-  static sendSoldOpportunityEmail = async (codOs, newCodStatus, oldOpportunity, newOpportunity, user) => {
-    const shouldSendEmail = (newCodStatus !== oldOpportunity.codStatus) && (newOpportunity.codStatus === 11);
+  static sendSoldOpportunityEmail = async (codOs, newCodStatus, oldOpportunity, newOpportunity, user, manualSending) => {
+    const shouldSendEmail = (newCodStatus !== oldOpportunity.codStatus) && (newOpportunity.codStatus === 11) || manualSending;
     if (shouldSendEmail) {
       const adicionals = await this.executeQuery(`SELECT ID FROM ADICIONAIS WHERE ID = ? LIMIT 1`, [oldOpportunity.idAdicional]);
       const isAdicional = adicionals.length ? true : false;
