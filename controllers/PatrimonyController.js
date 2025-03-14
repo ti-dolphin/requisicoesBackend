@@ -126,7 +126,6 @@ class PatrimonyController {
   static async getSinglePatrimonyInfo(req, res) {
     try {
       const { patrimonyId } = req.params;
-      console.log("patrimonyId: ", patrimonyId);
       const patrimonyInfo = await PatrimonyService.getSinglePatrimonyInfo(
         patrimonyId
       );

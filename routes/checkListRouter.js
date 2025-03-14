@@ -8,6 +8,16 @@ const upload = multer({ storage: multerConfig });
 router.get("/notifications", (req, res ) => { 
     CheckListController.getChecklistNotifications(req, res);
 });
+
+router.get('/notRealized', (req, res) => {
+  CheckListController.getNonRealizedChecklistByPatrimonyId(req, res);
+});
+
+router.get('/finish', (req, res) => {
+  console.log('FINISH')
+  CheckListController.finishChecklistByPatrimonyId(req, res);
+});
+
 router.get('/checklistItems/:id_patrimonio/:id_movimentacao/:id_checklist_movimentacao', (req, res) => {
     CheckListController.getChecklistItems(req, res);
 });

@@ -27,7 +27,7 @@ class PersonService {
         INNER JOIN CLIENTE C ON C.CODCLIENTE = OS.FK_CODCLIENTE
         where OS.ID_PROJETO = ${projectId} AND A.NUMERO = 0
       `
-      console.log('PROJECT ID QUERY: ', query)
+
     }else  { 
       query = `
       SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE WHERE CODCLIENTE IN (

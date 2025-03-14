@@ -95,8 +95,6 @@ class OpportunityService {
     } = opp;
     const isAdicional =
       idProjeto !== 0 && idProjeto !== null && idProjeto !== undefined;
-    console.log("criou adicional!");
-    console.log({ isAdicional, idProjeto });
     if (isAdicional) {
       const adicionalInsertResult = await this.executeQuery(
         OpportunityRepository.createAdicional(),
@@ -471,7 +469,6 @@ class OpportunityService {
   };
 
   static handleFiles = async (filesReceived, oppId) => {
-    console.log("handleFiles");
     const oppFiles = await this.executeQuery(
       OpportunityRepository.getOppFilesQuery(),
       [oppId]
@@ -483,7 +480,6 @@ class OpportunityService {
             (fileReceived) => fileReceived.id_anexo_os === oppFile.id_anexo_os
           )
       );
-      console.log({ filesToDelete_length: filesToDelete.length });
       if (filesToDelete.length) {
         const idsToDeleteString = `(${filesToDelete
           .map((file) => file.id_anexo_os) // Extrai o id_anexo_os de cada item
@@ -504,8 +500,6 @@ class OpportunityService {
   };
 
   static handleComments = async (comentarios, opportunityId) => {
-    console.log("handleComments");
-    console.log({ comentarios });
     if (comentarios && comentarios.length) {
       const commentsToInsert = comentarios
         .filter((comment) => comment.codigoComentario < 1) // Filtra os comentários sem `codigoComentario`
@@ -517,7 +511,6 @@ class OpportunityService {
         (comment) => comment.codigoComentario
       );
 
-      console.log({ commentsToUpdate });
       if (commentsToUpdate.length) {
         await Promise.all(
           commentsToUpdate.map(async (comment) => {
@@ -565,7 +558,6 @@ class OpportunityService {
       connection.release();
       return result;
     } catch (queryError) {
-      console.log("Error in executeQuery: ", queryError);
       connection.release();
       throw queryError;
     }

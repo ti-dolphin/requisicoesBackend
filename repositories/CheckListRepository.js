@@ -1,5 +1,32 @@
 
 class CheckListRepository {
+
+  static finishChecklistByPatrimonyId = ( )=> { 
+     return `
+            UPDATE web_checklist_movimentacao WCM
+      SET WCM.realizado = 1,
+          WCM.aprovado = 1
+      WHERE WCM.id_checklist_movimentacao = (
+          SELECT id
+          FROM (
+              SELECT MAX(id_checklist_movimentacao) as id
+              FROM web_checklist_movimentacao WCM2
+              INNER JOIN movimentacao_patrimonio MP ON MP.id_movimentacao = WCM2.id_movimentacao
+              WHERE MP.id_patrimonio = ? AND WCM2.realizado = 0
+          ) AS temp
+      );
+     `
+  }
+
+  static getNonRealizedByPatrimonyId = ( ) => { 
+    return `
+          SELECT MAX(id_checklist_movimentacao) as id  FROM  web_checklist_movimentacao WCM
+          INNER JOIN movimentacao_patrimonio MP ON MP.id_movimentacao = WCM.id_movimentacao
+          WHERE MP.id_patrimonio = ? AND WCM.realizado = 0;
+
+    `
+  }
+
   static getLateUndoneChecklists = () => {
     return `
         SELECT 
