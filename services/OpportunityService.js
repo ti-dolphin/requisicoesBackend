@@ -460,7 +460,7 @@ class OpportunityService {
             `Projeto Vendido: ${client.clientName} - ${newOpportunity.idProjeto}.${newOpportunity.numeroAdicional} - ${newOpportunity.nome}`,
             "",
             htmlContent,
-            ["ti.dse"]
+            ["ti.dse01@dse.com.br"]
           );
         }
       } catch (e) {
