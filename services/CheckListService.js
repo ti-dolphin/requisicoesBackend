@@ -4,14 +4,22 @@ const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
 const EmailService = require("../services/EmailService");
 class CheckListService {
-  static async verifyAndCreateChecklists() {
-    console.log('verifyAndCreateChecklists');
 
+  static finishChecklistByPatrimonyId = async(patrimonyId )=> { 
+    const { affectedRows } = await this.executeQuery(CheckListRepository.finishChecklistByPatrimonyId(), [patrimonyId])
+      return affectedRows;
+  }
+
+  static  getNonRealizedChecklistByPatrimonyId = async (patrimonyId) => {
+    const [nonRealizedChecklist] = await this.executeQuery(CheckListRepository.getNonRealizedByPatrimonyId(), [patrimonyId]);
+    return nonRealizedChecklist;
+  }
+
+  static async verifyAndCreateChecklists() {
     const checklists = await this.executeQuery(
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
-   
-    console.log(checklists)
+
     const currentDate = new Date();
     for (let checklist of checklists) {
       const {

@@ -4,8 +4,6 @@ class OpportunityController {
 
   static sendSaleEmail = async (req, res) => {
     const { codOs, user } = req.query;
-
-    console.log({ codOs, user })
     try {
       const opportunity = await OpportunityService.getOpportunityById(codOs);
       await OpportunityService.sendSoldOpportunityEmail(codOs, opportunity.codStatus, opportunity, opportunity, user, true)
@@ -32,7 +30,6 @@ class OpportunityController {
   };
 
   static getManagers = async (req, res) => {
-    console.log('getManagers')
     try {
       const managers = await PersonService.getAllManagers();
       return res.status(200).send(managers);
@@ -55,7 +52,6 @@ class OpportunityController {
 
   static uploadFiles = async (req, res) => {
     const { files } = req;
-    console.log({ files })
     try {
       if (files.length) {
         const { files } = req;
@@ -91,7 +87,7 @@ class OpportunityController {
   static updateOpportunity = async (req, res) => {
     const updatedOpportunity = req.body;
     const { user } = req.query;
-    console.log({ user })
+
     try {
       const affectedRows = await OpportunityService.updateOpportunity(
         updatedOpportunity,
@@ -129,7 +125,6 @@ class OpportunityController {
 
   static createOpportuntiyFile = async (req, res) => {
     const file = req.file;
-    console.log({ file })
     if (!file) {
       return res.status(400).send("No file uploaded");
     }
@@ -147,7 +142,6 @@ class OpportunityController {
 
   static getClients = async (req, res) => {
     const { projectId } = req.query;
-    console.log({ projectId })
     try {
       const clients = await PersonService.getClients(projectId);
       return res.status(200).send(clients);

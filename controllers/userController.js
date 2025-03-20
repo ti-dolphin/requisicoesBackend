@@ -47,7 +47,6 @@ const userController = {
           error: "User not found",
         };
       } else {
-        console.log({ user });
         return {
           message: "Login successful",
           user,

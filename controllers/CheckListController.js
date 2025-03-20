@@ -2,6 +2,32 @@
 var CheckListService = require('../services/CheckListService');
 
 class CheckListController {
+
+  static finishChecklistByPatrimonyId =async  (req, res) => { 
+    const { patrimonyId } = req.query;
+    try {
+      const affectedRows = await CheckListService.finishChecklistByPatrimonyId(patrimonyId);
+      if(affectedRows){ 
+        return res.status(200).send({ message: 'Checklist foi finalizado com sucesso!' });
+      } 
+      throw new Error('Erro ao finalizar checklist')
+    } catch (e) {
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
+  static getNonRealizedChecklistByPatrimonyId = async (req, res) => { 
+    const {patrimonyId} = req.query;
+    
+    try {
+      const nonRealizedChecklist = await CheckListService.getNonRealizedChecklistByPatrimonyId(patrimonyId)
+      return res.status(200).send(nonRealizedChecklist);
+    } catch (e) {
+      console.log("Error getNonRealizedChecklistByPatrimonyId: ", e.message);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
   static createChecklistItemFile = async (req, res) => {
     try {
       const file = req.file;
