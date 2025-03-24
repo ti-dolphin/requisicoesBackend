@@ -401,6 +401,8 @@ FROM
                     OR
                     os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
                     OR 
+                    os.RESPONSAVEL = ?
+                    OR
                     ? IN (SELECT CODPESSOA FROM PESSOA WHERE PERM_ADMINISTRADOR = 1)
                 )
             

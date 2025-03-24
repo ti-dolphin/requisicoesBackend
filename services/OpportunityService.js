@@ -439,7 +439,8 @@ class OpportunityService {
       const isAdicional = adicional.NUMERO > 0 ? true : false;
       const htmlContent = OpportunityView.createSoldOppEmail(
         newOpportunity,
-        user
+        user,
+        client.clientName
       );
       try {
         if (isAdicional) {
@@ -546,7 +547,7 @@ class OpportunityService {
     const action = finished === "true" ? 1 : 0;
     const [opps] = await this.executeQuery(
       OpportunityRepository.getOpportunitiesQuery(dateFilters, action),
-      [codpessoa, codpessoa, codpessoa]
+      [codpessoa, codpessoa, codpessoa, codpessoa]
     );
     return opps;
   };

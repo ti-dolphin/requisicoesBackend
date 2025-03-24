@@ -23,6 +23,9 @@ class QuoteRepository {
                         'id_item_cotacao', i.id_item_cotacao,
                         'descricao_item', i.descricao_item,
                         'preco_unitario', i.preco_unitario,
+                        'ICMS', i.ICMS,
+                        'IPI', i.IPI,
+                        'ST', i.ST,
                         'quantidade', i.quantidade,
                         'subtotal', i.subtotal,
                         'id_item_requisicao', i.id_item_requisicao
