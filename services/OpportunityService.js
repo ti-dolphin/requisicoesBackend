@@ -577,7 +577,7 @@ class OpportunityService {
           "Relatório Semanal de Oportunidades",
           "",
           htmlContent,
-          ["ti.dse@gmail.com"]
+          ["ti.dse@gmail.com", "rafael.camara@dse.com.br"]
         );
       }
     } catch (e) {
