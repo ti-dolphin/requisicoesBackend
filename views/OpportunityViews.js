@@ -1,7 +1,7 @@
 
 class OpportunityView{ 
   
-static createSoldOppEmail = (opportunity, user) => {
+static createSoldOppEmail = (opportunity, user, clientName) => {
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
@@ -81,7 +81,7 @@ static createSoldOppEmail = (opportunity, user) => {
     </head>
     <body>
       <div class="container">
-        <h2>Cliente: ${opportunity.nomeCliente || 'N/A'}</h2>
+        <h2>Cliente: ${clientName || 'N/A'}</h2>
         <table class="project-details"> 
           ${rows.map(row => `
             <tr>

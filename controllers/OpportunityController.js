@@ -3,6 +3,7 @@ const PersonService = require("../services/PersonService");
 class OpportunityController {
 
   static sendSaleEmail = async (req, res) => {
+
     const { codOs, user } = req.query;
     try {
       const opportunity = await OpportunityService.getOpportunityById(codOs);
