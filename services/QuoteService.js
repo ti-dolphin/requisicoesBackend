@@ -2,13 +2,41 @@ const QuoteRepository = require("../repositories/QuoteRepository");
 const pool = require("../database");
 
 class QuoteService {
+
+    static getShipmentTypes = async (  ) => { 
+        try{ 
+            const data = await this.executeQuery(QuoteRepository.getShipmentTypes());
+            console.log('data: ', data)
+            return data;
+        }catch(e){ 
+            console.log(e.message)
+            throw e;
+        }
+    }
+
+    static getFiscalClassifications = async ( ) => {
+         try{ 
+             const data = await this.executeQuery(QuoteRepository.getFiscalClassifications())
+             return data;
+         }catch(e){ throw e}
+    }
+
+    static getQuotesByRequisitionId = async (requisitionId ) => { 
+        console.log('requisitionId: ', requisitionId)
+        try{ 
+            const quotes = await this.executeQuery(QuoteRepository.getQuotesByRequisitionId(), [requisitionId]);
+            console.log('quotes: ', quotes)
+            return quotes;
+        }catch(e){ 
+            throw e;
+        }
+    }
     // Método para obter uma cotação por ID
     static async getQuoteById(quoteId) {
         const [quote] = await this.executeQuery(
             QuoteRepository.getQuoteByIdQuery(),
             [quoteId]
         );
-        console.log('items: ', quote.items)
         if (!quote) {
             throw new Error("Cotação não encontrada.");
         }
