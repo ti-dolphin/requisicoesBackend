@@ -86,7 +86,7 @@ class QuoteRepository {
 
     static updateQuoteQuery = ( ) => { 
         return `
-            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ? WHERE
+            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?  WHERE
             id_cotacao = ?
         `
     }

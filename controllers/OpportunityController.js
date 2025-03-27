@@ -86,6 +86,7 @@ class OpportunityController {
   };
 
   static updateOpportunity = async (req, res) => {
+    console.log('REQ.BODY UPDATE: ', req.body)
     const updatedOpportunity = req.body;
     const { user } = req.query;
 

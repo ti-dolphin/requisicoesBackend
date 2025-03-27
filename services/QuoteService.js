@@ -78,7 +78,7 @@ class QuoteService {
     // Método para atualizar uma cotação
     static async update(req, res) {
         const {quoteId} = req.params; 
-        const { fornecedor, observacao, descricao,  } = req.body;
+        const { fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal } = req.body;
         if (!fornecedor && !observacao) {
             throw new Error("Pelo menos um campo (fornecedor ou observação) deve ser fornecido para atualização.");
         }
@@ -86,7 +86,7 @@ class QuoteService {
         const result = await this.executeQuery(
             QuoteRepository.updateQuoteQuery(),
             //fornecedor = ?, observacao = ?, descricao = ? 
-            [fornecedor, observacao, descricao, quoteId]
+            [fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal, quoteId]
         );
 
         if (result.affectedRows === 0) {
