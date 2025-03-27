@@ -160,10 +160,7 @@ class OpportunityService {
         `SELECT * FROM ADICIONAIS WHERE ID = ?`,
         [adicionalInsertResult.insertId]
       );
-      console.log({
-        adicional,
-        codOs: result.insertId,
-      });
+   
       return {
         adicional,
         codOs: result.insertId,
