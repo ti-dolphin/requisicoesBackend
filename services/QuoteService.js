@@ -6,7 +6,6 @@ class QuoteService {
     static getShipmentTypes = async (  ) => { 
         try{ 
             const data = await this.executeQuery(QuoteRepository.getShipmentTypes());
-            console.log('data: ', data)
             return data;
         }catch(e){ 
             console.log(e.message)
@@ -22,16 +21,14 @@ class QuoteService {
     }
 
     static getQuotesByRequisitionId = async (requisitionId ) => { 
-        console.log('requisitionId: ', requisitionId)
         try{ 
             const quotes = await this.executeQuery(QuoteRepository.getQuotesByRequisitionId(), [requisitionId]);
-            console.log('quotes: ', quotes)
             return quotes;
         }catch(e){ 
             throw e;
         }
     }
-    // Método para obter uma cotação por ID
+
     static async getQuoteById(quoteId) {
         const [quote] = await this.executeQuery(
             QuoteRepository.getQuoteByIdQuery(),
@@ -75,29 +72,26 @@ class QuoteService {
             throw error;
         }
     }
-    // Método para atualizar uma cotação
+
     static async update(req, res) {
         const {quoteId} = req.params; 
-        const { fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal } = req.body;
+        console.log('req body: ', req.body)
+        const { fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal, valor_frete, cnpj_fornecedor, cnpj_faturamento } = req.body;
         if (!fornecedor && !observacao) {
             throw new Error("Pelo menos um campo (fornecedor ou observação) deve ser fornecido para atualização.");
         }
 
         const result = await this.executeQuery(
             QuoteRepository.updateQuoteQuery(),
-            //fornecedor = ?, observacao = ?, descricao = ? 
-            [fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal, quoteId]
+            [fornecedor, observacao, descricao, id_tipo_frete, id_classificacao_fiscal, valor_frete, cnpj_fornecedor, cnpj_faturamento, quoteId]
         );
-
         if (result.affectedRows === 0) {
             throw new Error("Cotação não encontrada ou não atualizada.");
         }
-
         const [updatedQuote] = await this.executeQuery(
             QuoteRepository.getQuoteByIdQuery(),
             [quoteId]
         );
-        console.log({updatedQuote})
         return updatedQuote;
     }
 
@@ -107,17 +101,15 @@ class QuoteService {
         try{    
             const [result] = await this.executeQuery(QuoteRepository.updateItemsQuery(items),
             );
-            console.log('result: ', result)
             if(result.affectedRows){ 
                 const quote = await this.getQuoteById(quoteId);
-                console.log('updated items: ', quote.items)
                 return quote.items;
             }
         }catch(e){ 
             throw e;
         }
     }
-    // Método para executar queries
+
     static async executeQuery(query, params) {
         const connection = await pool.getConnection();
         try {
