@@ -9,7 +9,6 @@ class PersonService {
           WHERE CODGERENTE IN (SELECT CODGERENTE FROM ORDEMSERVICO OS INNER JOIN PROJETOS P ON OS.ID_PROJETO = P.ID WHERE P.ATIVO = 1)
         `;
         const [managers] = await this.executeQuery(query);
-        console.log({managers})
         return managers
       }catch(e){ 
         throw new Error(e);
