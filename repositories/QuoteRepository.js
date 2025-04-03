@@ -14,7 +14,22 @@ class QuoteRepository {
 
     static getQuotesByRequisitionId = ( ) => { 
         return  `
-            SELECT * FROM web_cotacao WHERE id_requisicao = ?
+            SELECT
+                c.*,
+                TF.nome AS nome_frete,
+                SUM(i.subtotal) + c.valor_frete AS total, -- Soma correta
+                COUNT(i.id_item_cotacao) AS quantidade_itens
+            FROM
+                web_cotacao c
+            LEFT JOIN web_tipo_frete TF ON TF.id_tipo_frete = c.id_tipo_frete
+            LEFT JOIN
+                web_items_cotacao i ON c.id_cotacao = i.id_cotacao
+            WHERE
+                c.id_requisicao = ?
+            GROUP BY
+                c.id_cotacao, c.valor_frete, TF.nome -- Adicionar c.valor_frete e TF.nome ao GROUP BY
+            ORDER BY
+                c.id_cotacao;
         `
     }
 
@@ -38,6 +53,9 @@ class QuoteRepository {
                 c.descricao,
                 c.id_classificacao_fiscal,
                 c.id_tipo_frete,
+                c.valor_frete,
+                c.cnpj_fornecedor,
+                c.cnpj_faturamento,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id_item_cotacao', i.id_item_cotacao,
@@ -86,9 +104,9 @@ class QuoteRepository {
 
     static updateQuoteQuery = ( ) => { 
         return `
-            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?  WHERE
+            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?, valor_frete = ?, cnpj_fornecedor = ?, cnpj_faturamento = ?  WHERE
             id_cotacao = ?
-        `
+        `;
     }
 
     static updateItemsQuery = ( items) =>  {

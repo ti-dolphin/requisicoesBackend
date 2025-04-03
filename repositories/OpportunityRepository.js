@@ -361,52 +361,48 @@ FROM
     `;
   };
   static getOpportunitiesQuery = (dateFilters, action) => {
-    let baseQuery = `
-                SELECT 
-                os.ID_PROJETO AS numeroProjeto, -- Número do projeto
-                ad.NUMERO AS numeroAdicional, -- Número adicional
-                s.NOME AS nomeStatus, -- Status do projeto
-                c.NOMEFANTASIA AS nomeCliente, -- Nome do cliente
-                os.NOME AS nomeDescricaoProposta, -- Descrição da proposta
-                os.DATASOLICITACAO AS dataSolicitacao, -- Data do cadastro
-                os.DATAENTREGA AS dataFechamento, -- Data de fechamento (venda)
-                os.DATAINTERACAO AS dataInteracao, -- Data de interação
-                os.DATAINICIO AS dataInicio, -- Data de início
-                vendedor.NOME AS nomeVendedor, -- Nome do vendedor
-                gerente.NOME AS nomeGerente, -- Nome do gerente
-                CONCAT('R$ ', FORMAT(os.VALORFATDOLPHIN, 2, 'de_DE')) AS valorFaturamentoDolphin, -- Valor de faturamento Dolphin
-                CONCAT('R$ ', FORMAT(os.VALORFATDIRETO, 2, 'de_DE')) AS valorFaturamentoDireto, -- Valor de faturamento direto
-                CONCAT('R$ ', FORMAT((os.VALORFATDOLPHIN + os.VALORFATDIRETO), 2, 'de_DE')) AS valorTotal, -- Valor total
-                os.CODOS AS numeroOs -- Número da ordem de serviço
-            FROM 
-                ORDEMSERVICO os
-            LEFT JOIN 
-                PROJETOS p ON os.ID_PROJETO = p.ID
-            LEFT JOIN 
-                CLIENTE c ON os.FK_CODCLIENTE = c.CODCLIENTE AND os.FK_CODCOLIGADA = c.CODCOLIGADA
-            LEFT JOIN 
-                PESSOA vendedor ON os.RESPONSAVEL = vendedor.CODPESSOA
-            LEFT JOIN 
-                PESSOA gerente ON p.CODGERENTE = gerente.CODGERENTE
-            LEFT JOIN 
-                STATUS s ON os.CODSTATUS = s.CODSTATUS
-            LEFT JOIN
-                ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
-            WHERE 
-                p.ATIVO = 1 AND s.ATIVO = 1  
-                ${action ? "AND s.ACAO IN (1, 0) AND" : "AND s.ACAO = 0 AND"
-      }
-                (
-                    os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
-                    OR
-                    os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
-                    OR 
-                    os.RESPONSAVEL = ?
-                    OR
-                    ? IN (SELECT CODPESSOA FROM PESSOA WHERE PERM_ADMINISTRADOR = 1)
-                )
-            
-    `;
+  let baseQuery = `
+    SELECT 
+        os.ID_PROJETO AS numeroProjeto,
+        ad.NUMERO AS numeroAdicional,
+        s.NOME AS nomeStatus,
+        c.NOMEFANTASIA AS nomeCliente,
+        os.NOME AS nomeDescricaoProposta,
+        os.DATASOLICITACAO AS dataSolicitacao,
+        os.DATAENTREGA AS dataFechamento,
+        os.DATAINTERACAO AS dataInteracao,
+        os.DATAINICIO AS dataInicio,
+        vendedor.NOME AS nomeVendedor,
+        gerente.NOME AS nomeGerente,
+        CONCAT('R$ ', FORMAT(os.VALORFATDOLPHIN, 2, 'de_DE')) AS valorFaturamentoDolphin,
+        CONCAT('R$ ', FORMAT(os.VALORFATDIRETO, 2, 'de_DE')) AS valorFaturamentoDireto,
+        CONCAT('R$ ', FORMAT((os.VALORFATDOLPHIN + os.VALORFATDIRETO), 2, 'de_DE')) AS valorTotal,
+        os.CODOS AS numeroOs,
+        /* Date status indicators */
+        CASE WHEN os.DATAINTERACAO < CURDATE() THEN 1 ELSE 0 END AS dataInteracao_vencida,
+        CASE WHEN os.DATAINTERACAO >= CURDATE() 
+                  AND os.DATAINTERACAO < DATE_ADD(CURDATE(), INTERVAL 5 DAY) 
+             THEN 1 ELSE 0 END AS dataInteracao_a_vencer,
+        CASE WHEN os.DATAINTERACAO >= DATE_ADD(CURDATE(), INTERVAL 5 DAY) 
+             THEN 1 ELSE 0 END AS dataInteracao_em_dia
+    FROM 
+        ORDEMSERVICO os
+    LEFT JOIN PROJETOS p ON os.ID_PROJETO = p.ID
+    LEFT JOIN CLIENTE c ON os.FK_CODCLIENTE = c.CODCLIENTE AND os.FK_CODCOLIGADA = c.CODCOLIGADA
+    LEFT JOIN PESSOA vendedor ON os.RESPONSAVEL = vendedor.CODPESSOA
+    LEFT JOIN PESSOA gerente ON p.CODGERENTE = gerente.CODGERENTE
+    LEFT JOIN STATUS s ON os.CODSTATUS = s.CODSTATUS
+    LEFT JOIN ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
+    WHERE 
+        p.ATIVO = 1 AND s.ATIVO = 1  
+        ${action ? "AND s.ACAO IN (1, 0) AND" : "AND s.ACAO = 0 AND"}
+        (
+            os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
+            OR os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
+            OR os.RESPONSAVEL = ?
+            OR ? IN (SELECT CODPESSOA FROM PESSOA WHERE PERM_ADMINISTRADOR = 1)
+        )
+`;
     for (let dateFilter of dateFilters) {
       if (dateFilter.from !== "") {
         baseQuery += ` AND ${dateFilter.dbField} >= '${dateFilter.from}'`;

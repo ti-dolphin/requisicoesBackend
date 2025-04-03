@@ -4,10 +4,10 @@ class RequisitionItemController {
   static async getRequisitionItemByReqID(req, res) {
     try {
       const { requisitionID } = req.params;
-      const items = await RequisitionItemService.getRequisitionItems(
+      const data = await RequisitionItemService.getRequisitionItems(
         requisitionID
       );
-      res.status(200).json(items);
+      res.status(200).json(data);
     } catch (err) {
       console.error("Erro no controller", err);
       res.status(500).send("Erro ao buscar itens de requisição");

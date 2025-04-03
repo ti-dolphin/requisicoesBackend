@@ -52,6 +52,10 @@ app.use("/accessory", authorize,  patrimonyAccessoryRouter);
 app.use('/checklist', authorize, checklistRouter);
 app.use("/opportunity",authorize,  oppoprtunityRouter);
 
+//rotas publicas
+
+app.use("/supplier/requisition/quote", quoteRouter);
+
 
 
 app.use(function(req, res, next) {
