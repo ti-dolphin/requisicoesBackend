@@ -21,6 +21,7 @@ router.get('/shipment-type', (req, res)=> {
 })
 
 router.get('/:quoteId', (req, res) =>  {
+    console.log('getQuote')
     QuoteController.getQuoteById(req, res);
 });
 
