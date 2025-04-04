@@ -32,7 +32,7 @@ class CheckListRepository {
         SELECT 
         id_checklist_movimentacao, 
         web_checklist_movimentacao.id_movimentacao, 
-        data_criacao, 
+        web_checklist_movimentacao.data_criacao, 
         realizado, 
         data_realizado, 
         aprovado, 
@@ -54,7 +54,7 @@ class CheckListRepository {
         INNER JOIN PESSOA on PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel
         INNER JOIN PESSOA as PESSOA_RESPONSAVEL_TIPO on  web_tipo_patrimonio.responsavel_tipo = PESSOA_RESPONSAVEL_TIPO.CODPESSOA
       WHERE 
-        web_checklist_movimentacao.realizado = 0 and data_criacao < DATE_SUB(CURDATE(), INTERVAL 3 DAY);
+        web_checklist_movimentacao.realizado = 0 and  web_checklist_movimentacao.data_criacao < DATE_SUB(CURDATE(), INTERVAL 3 DAY);
     `;
   };
 
@@ -69,7 +69,7 @@ class CheckListRepository {
     SELECT 
         id_checklist_movimentacao, 
         web_checklist_movimentacao.id_movimentacao, 
-        data_criacao, 
+         web_checklist_movimentacao.data_criacao, 
         realizado, 
         data_realizado, 
         aprovado, 
@@ -200,7 +200,7 @@ class CheckListRepository {
     SELECT 
       id_checklist_movimentacao, 
       web_checklist_movimentacao.id_movimentacao, 
-      data_criacao, 
+       web_checklist_movimentacao.data_criacao, 
       realizado, 
       data_realizado, 
       aprovado, 
@@ -229,7 +229,7 @@ class CheckListRepository {
             SELECT 
     id_checklist_movimentacao, 
     web_checklist_movimentacao.id_movimentacao, 
-    data_criacao, 
+     web_checklist_movimentacao.data_criacao, 
     realizado, 
     data_realizado, 
     aprovado, 
@@ -320,7 +320,7 @@ INNER JOIN (
         SELECT 
         id_checklist_movimentacao, 
         web_checklist_movimentacao.id_movimentacao, 
-        data_criacao, 
+         web_checklist_movimentacao.data_criacao, 
         realizado, 
         data_realizado, 
         aprovado, 
@@ -349,7 +349,7 @@ INNER JOIN (
       SELECT 
         id_checklist_movimentacao, 
         web_checklist_movimentacao.id_movimentacao, 
-        data_criacao, 
+         web_checklist_movimentacao.data_criacao, 
         realizado, 
         data_realizado, 
         aprovado, 
