@@ -5,9 +5,12 @@ const RequisitionController = require("../controllers/requisitionController");
 // GET /requisition/
 router.get("/", RequisitionController.getRequisitions);
 
+router.get("/status", RequisitionController.getStatusList);
+
 router.get('/types', RequisitionController.getTypes);
 
 router.get("/:id", RequisitionController.getRequisitionByID);
+
 
 router.post("/", RequisitionController.insertRequisitions);
 

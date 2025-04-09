@@ -2,8 +2,18 @@ const { json } = require("express");
 const pool = require("../database");
 const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
+
 class RequisitionService {
 
+  static async getStatusList  ( ) { 
+    try{ 
+      const list = await this.executeQuery(RequisitionRepository.getStatusListQuery);
+      return list;
+    }catch(e){ 
+      console.log('erro ao buscar status: ', e.message);
+      throw e;
+    }
+  }
 
   static async getTypes(){ 
     const types = await this.executeQuery(
@@ -13,12 +23,14 @@ class RequisitionService {
   }
   
   static async getRequisitions(userID, currentKanbanFilter) {
+    console.log("getRequisitions");
     const { query, params } = await this.setKanbanQuery(
       userID,
       currentKanbanFilter
     );
     try {
       const rows = await this.executeQuery(query, params);
+      console.log('rows[0] ', rows[0])
       return rows;
     } catch (err) {
       console.log(err);
@@ -77,22 +89,21 @@ class RequisitionService {
   static async getRequisitionByID(id) {
     const query = RequisitionRepository.getById();
     try {
-      const [rows] = await this.executeQuery(query, [id]);
-      return rows;
+      const [requisition] = await this.executeQuery(query, [id]);
+      return requisition;
     } catch (err) {
-      console.log(err);
-      return null;
+      throw err;
     }
   }
 
-  static async insertRequisitions(json) {
+  static async insertRequisitions(body) {
     try {
-      console.log(json)
-      const query = RequisitionRepository.insertRequisition(json);
+      console.log(body)
+      const query = RequisitionRepository.insertRequisition(body);
       const resultSetHeader = await this.executeQuery(query, []);
       return resultSetHeader;
     } catch (err) {
-      return null;
+      throw err;
     }
   }
 
