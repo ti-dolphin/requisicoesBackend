@@ -2,8 +2,18 @@ const { json } = require("express");
 const pool = require("../database");
 const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
+
 class RequisitionService {
 
+  static async getStatusList  ( ) { 
+    try{ 
+      const list = await this.executeQuery(RequisitionRepository.getStatusListQuery);
+      return list;
+    }catch(e){ 
+      console.log('erro ao buscar status: ', e.message);
+      throw e;
+    }
+  }
 
   static async getTypes(){ 
     const types = await this.executeQuery(
@@ -12,77 +22,10 @@ class RequisitionService {
     return types;
   }
   
-  static async getRequisitions(userID, currentKanbanFilter) {
-    const { query, params } = await this.setKanbanQuery(
-      userID,
-      currentKanbanFilter
-    );
-    console.log('QUERY: ', query);
-    console.log('PARAMETROS: ', params);
+  static async getRequisitions(){
+     
     try {
-      const rows = await this.executeQuery(query, params);
-      return rows;
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-  }
-
-  static async setKanbanQuery(userID, currentKanbanFilter) {
-    const purchaser = await userController.isPurchaser(userID);
-    if (purchaser) {
-      return await this.definePurchaser(userID, currentKanbanFilter);
-    }
-
-    return await this.defineNonPurchaserQuery(userID, currentKanbanFilter);
-  }
-
-  static async definePurchaser(userID, currentKanbanFilter) {
-    let query, params;
-    if (currentKanbanFilter.toUpperCase() === "A FAZER") {
-      query = RequisitionRepository.getPurchaser_toDo();
-      params = ["Requisitado"];
-    } else if (currentKanbanFilter.toUpperCase() === "FAZENDO") {
-      query = RequisitionRepository.getPurchaser_doing();
-      params = ["Em cotação", "Cotado"];
-    } else if (currentKanbanFilter.toUpperCase() === "CONCLUÍDO") {
-      query = RequisitionRepository.getPurchaser_done();
-      params = ["Concluído"];
-    } else if (currentKanbanFilter.toUpperCase() === "TUDO") {
-      query = RequisitionRepository.getPurchaser_all();
-      params = [];
-    }
-    return { query, params };
-  }
-
-  static async defineNonPurchaserQuery(userID, currentKanbanFilter) {
-    let query, params;
-    if (currentKanbanFilter.toUpperCase() === "BACKLOG") {
-      query = RequisitionRepository.getNonPurchaser_backlog();
-      params = ["Em edição", userID];
-    } else if (currentKanbanFilter.toUpperCase() === "ACOMPANHAMENTO") {
-      const gerente = await userController.isManager(userID);
-      if (gerente) {
-        query = RequisitionRepository.getManagerRequisitions_monitoring();
-        const codgerente = await userController.getManagerCode(userID);
-        params = ["Em edição", "Concluído", codgerente, userID];
-      } else {
-        query = RequisitionRepository.getNonPurchaser_monitoring();
-        params = ["Em edição", "Concluído", userID];
-      }
-    } else if (currentKanbanFilter.toUpperCase() === "TUDO") {
-      query = RequisitionRepository.getNonPurchaser_all();
-      params = [];
-    }
-    return { query, params };
-  }
-
-  static async getRequisitionByID(id) {
-    console.log('id: ', id)
-    console.log("getRequisitionByID");
-    const query = RequisitionRepository.getById();
-    try {
-      const [rows] = await this.executeQuery(query, [id]);
+      const rows = await this.executeQuery(RequisitionRepository.getAll());
       console.log('rows: ', rows)
       return rows;
     } catch (err) {
@@ -91,14 +34,27 @@ class RequisitionService {
     }
   }
 
-  static async insertRequisitions(json) {
+
+  static async getRequisitionByID(id) {
+    console.log('id: ', id)
+    console.log("getRequisitionByID");
+    const query = RequisitionRepository.getById();
     try {
-      console.log(json)
-      const query = RequisitionRepository.insertRequisition(json);
+      const [requisition] = await this.executeQuery(query, [id]);
+      return requisition;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async insertRequisitions(body) {
+    try {
+      console.log(body)
+      const query = RequisitionRepository.insertRequisition(body);
       const resultSetHeader = await this.executeQuery(query, []);
       return resultSetHeader;
     } catch (err) {
-      return null;
+      throw err;
     }
   }
 
