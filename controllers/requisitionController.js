@@ -23,11 +23,8 @@ class RequisitionController {
   }
 
   static async getRequisitions(req, res) {
-    const { userID, currentKanbanFilter } = req.query;
-    const requisitions = await RequisitionService.getRequisitions(
-      userID,
-      currentKanbanFilter
-    );
+    const { user, currentKanbanFilter } = req.query;
+    const requisitions = await RequisitionService.getRequisitions();
     if (requisitions) {
       return res.status(200).json(requisitions);
     } else {

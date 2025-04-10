@@ -39,7 +39,11 @@ class RequisitionRepository {
           'NOME', P3.NOME,
           'CODPESSOA', P3.CODPESSOA
         )
-      ) AS projeto,
+      ) AS projeto_gerente,
+        JSON_OBJECT(
+        'ID_PROJETO', PR.ID,
+        'DESCRICAO', PR.DESCRICAO
+      ) AS projeto_descricao,
       JSON_OBJECT('label', P1.NOME, 'id', P1.CODPESSOA) AS responsableOption,
       JSON_OBJECT('label', PR.DESCRICAO, 'id', PR.ID) AS projectOption,
       JSON_OBJECT('label', T.nome_tipo, 'id', T.id_tipo_requisicao) AS typeOption,
@@ -55,7 +59,7 @@ class RequisitionRepository {
     INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
     LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
     INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
+    LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
     INNER JOIN web_tipo_requisicao T ON T.id_tipo_requisicao = R.TIPO
     WHERE R.ID_REQUISICAO = ?`;
   }
@@ -66,98 +70,7 @@ class RequisitionRepository {
     `;
   }
 
-  static getManagerRequisitions_monitoring() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome != ? AND S.nome != ?
-      AND (PR.CODGERENTE = ? OR R.ID_RESPONSAVEL = ?)`;
-  }
-
-  static getNonPurchaser_monitoring() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome != ? AND S.nome != ? AND R.ID_RESPONSAVEL = ?`;
-  }
-
-  static getNonPurchaser_all() {
+  static getAll() {
     console.log("getNonPurchaser_all");
     return `SELECT 
       R.ID_REQUISICAO,
@@ -193,237 +106,17 @@ class RequisitionRepository {
           'NOME', P3.NOME,
           'CODPESSOA', P3.CODPESSOA
         )
-      ) AS projeto
+      ) AS projeto_gerente,
+        JSON_OBJECT(
+        'ID_PROJETO', PR.ID,
+        'DESCRICAO', PR.DESCRICAO
+      ) AS projeto_descricao
     FROM WEB_REQUISICAO R
     INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
     INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
     LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
+    LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
     INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao`;
-  }
-
-  static getPurchaser_toDo() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome = ?`;
-  }
-
-  static getPurchaser_doing() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome = ? OR S.nome = ?`;
-  }
-
-  static getPurchaser_done() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome = ?`;
-  }
-
-  static getPurchaser_all() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao`;
-  }
-
-  static getNonPurchaser_backlog() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODPESSOA = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
-    WHERE S.nome = ? AND R.ID_RESPONSAVEL = ?`;
   }
 
   static insertRequisition(requisition) {
