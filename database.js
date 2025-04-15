@@ -16,8 +16,6 @@ const pool = mysql.createPool({
   keepAliveInitialDelay: 30000, // Atrasar keep-alive para reduzir overhead
   multipleStatements: true,
   connectTimeout: 20000, // 20 segundos para estabelecer conexão
-  acquireTimeout: 20000, // 20 segundos para adquirir conexão do pool
-  timeout: 120000, // 120 segundos para queries pesadas
 });
 
 module.exports = pool;

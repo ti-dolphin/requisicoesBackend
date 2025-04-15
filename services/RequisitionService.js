@@ -37,7 +37,6 @@ class RequisitionService {
      
     try {
       const rows = await this.executeQuery(RequisitionRepository.getAll());
-      console.log('rows: ', rows)
       return rows;
     } catch (err) {
       console.log(err);

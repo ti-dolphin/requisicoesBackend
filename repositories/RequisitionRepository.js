@@ -3,6 +3,7 @@ class RequisitionRepository {
   static getStatusChangesByRequisition() {
     return `
       SELECT 
+      A.id_alteracao,
       A.id_requisicao,
       A.id_status_requisicao,
       S.nome AS status_nome,
@@ -107,7 +108,6 @@ class RequisitionRepository {
   }
 
   static getAll() {
-    console.log("getNonPurchaser_all");
     return `SELECT 
       R.ID_REQUISICAO,
       R.DESCRIPTION,
