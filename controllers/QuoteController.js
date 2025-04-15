@@ -3,8 +3,6 @@ const QuoteService = require("../services/QuoteService");
 
 class QuoteController {
 
-  
-
     static async deleteQuoteFileById(req, res) {
         try {
           const { fileId } = req.params;
