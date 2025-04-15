@@ -2,8 +2,19 @@ const { json } = require("express");
 const pool = require("../database");
 const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
-
+const utiils = require('../utils');
 class RequisitionService {
+
+  static async getStatusChangesByRequisition(requisitionID) {
+    try {
+      const query = RequisitionRepository.getStatusChangesByRequisition();
+      const statusChanges = await this.executeQuery(query, [requisitionID]);
+      return statusChanges;
+    } catch (err) {
+      console.log("Error fetching status changes: ", err);
+      throw err;
+    }
+  }
 
   static async getStatusList  ( ) { 
     try{ 
@@ -57,8 +68,19 @@ class RequisitionService {
 
   static async updateRequisitionById(codpessoa, requisition) {
     try {
+      const reqBeforeUpdate = await this.getRequisitionByID(requisition.ID_REQUISICAO)
       const query = await RequisitionRepository.update(codpessoa, requisition);
       const result = await this.executeQuery(query);
+      const reqAfterUpdate = await this.getRequisitionByID(requisition.ID_REQUISICAO);
+      const statusChanged = reqBeforeUpdate.id_status_requisicao !== reqAfterUpdate.id_status_requisicao;
+      if (statusChanged) {
+          await this.executeQuery(RequisitionRepository.insertStatusChange(), [
+            requisition.ID_REQUISICAO,
+            requisition.id_status_requisicao,
+            codpessoa,
+            utiils.getCurrentDateTime(),
+          ]);
+      }
       return result;
     } catch (err) {
       console.log("erro no execute / setquery: ", err);

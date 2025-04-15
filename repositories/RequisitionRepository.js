@@ -1,4 +1,40 @@
 class RequisitionRepository {
+
+  static getStatusChangesByRequisition() {
+    return `
+      SELECT 
+      A.id_requisicao,
+      A.id_status_requisicao,
+      S.nome AS status_nome,
+      A.alterado_por,
+      JSON_OBJECT(
+        'NOME', P.NOME,
+        'CODPESSOA', P.CODPESSOA
+      ) AS alterado_por_pessoa,
+      A.data_alteracao
+      FROM web_alteracao_req_status A
+      INNER JOIN web_status_requisicao S ON S.id_status_requisicao = A.id_status_requisicao
+      LEFT JOIN PESSOA P ON P.CODPESSOA = A.alterado_por
+      WHERE A.id_requisicao = ?
+      ORDER BY A.data_alteracao DESC
+    `;
+  }
+
+  static insertStatusChange = ( ) => { 
+    return `
+      INSERT INTO web_alteracao_req_status (
+        id_requisicao,
+        id_status_requisicao,
+        alterado_por,
+        data_alteracao
+      ) VALUES (
+        ?,
+        ?,
+        ?,
+        ?
+      )
+    `
+  };
   static getStatusListQuery = `
     SELECT * FROM dsecombr_controle.web_status_requisicao
   `;

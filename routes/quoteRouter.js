@@ -29,12 +29,6 @@ router.post(
   upload.single("file"),
   QuoteController.createQuoteFile
 );
-
-router.post(
-  "/file/:quoteId",
-  upload.single("file"),
-  QuoteController.createQuoteFile
-);
 router.delete("/file/:quoteId/:fileId", QuoteController.deleteQuoteFileById);
 
 router.get("/:quoteId", (req, res) => {
