@@ -1,6 +1,7 @@
 const QuoteRepository = require("../repositories/QuoteRepository");
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
+const utils = require("../utils");
 
 class QuoteService {
 
@@ -58,6 +59,7 @@ static async deleteQuoteFileById(fileId) {
           QuoteRepository.getQuoteFileById(),
           [result.insertId]
         );
+        utils.removeFile(req.file.path);
         return newFile;
       } else {
         throw new Error("Erro ao inserir anexo na cotação");
