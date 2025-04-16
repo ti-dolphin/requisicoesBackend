@@ -4,7 +4,6 @@ const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
 const utiils = require('../utils');
 class RequisitionService {
-
   static async getStatusChangesByRequisition(requisitionID) {
     try {
       const query = RequisitionRepository.getStatusChangesByRequisition();
@@ -16,25 +15,26 @@ class RequisitionService {
     }
   }
 
-  static async getStatusList  ( ) { 
-    try{ 
-      const list = await this.executeQuery(RequisitionRepository.getStatusListQuery);
+  static async getStatusList() {
+    try {
+      const list = await this.executeQuery(
+        RequisitionRepository.getStatusListQuery
+      );
       return list;
-    }catch(e){ 
-      console.log('erro ao buscar status: ', e.message);
+    } catch (e) {
+      console.log("erro ao buscar status: ", e.message);
       throw e;
     }
   }
 
-  static async getTypes(){ 
+  static async getTypes() {
     const types = await this.executeQuery(
       RequisitionRepository.getTypesQuery()
     );
     return types;
   }
-  
-  static async getRequisitions(){
-     
+
+  static async getRequisitions() {
     try {
       const rows = await this.executeQuery(RequisitionRepository.getAll());
       return rows;
@@ -56,7 +56,7 @@ class RequisitionService {
 
   static async insertRequisitions(body) {
     try {
-      console.log(body)
+      console.log(body);
       const query = RequisitionRepository.insertRequisition(body);
       const resultSetHeader = await this.executeQuery(query, []);
       return resultSetHeader;
@@ -65,20 +65,33 @@ class RequisitionService {
     }
   }
 
-  static async updateRequisitionById(codpessoa, requisition) {
+  static async updateRequisitionById(
+    codpessoa,
+    requisition,
+    justification,
+    id_status_anterior
+  ) {
     try {
-      const reqBeforeUpdate = await this.getRequisitionByID(requisition.ID_REQUISICAO)
+      const reqBeforeUpdate = await this.getRequisitionByID(
+        requisition.ID_REQUISICAO
+      );
       const query = await RequisitionRepository.update(codpessoa, requisition);
       const result = await this.executeQuery(query);
-      const reqAfterUpdate = await this.getRequisitionByID(requisition.ID_REQUISICAO);
-      const statusChanged = reqBeforeUpdate.id_status_requisicao !== reqAfterUpdate.id_status_requisicao;
+      const reqAfterUpdate = await this.getRequisitionByID(
+        requisition.ID_REQUISICAO
+      );
+      const statusChanged =
+        reqBeforeUpdate.id_status_requisicao !==
+        reqAfterUpdate.id_status_requisicao;
       if (statusChanged) {
-          await this.executeQuery(RequisitionRepository.insertStatusChange(), [
-            requisition.ID_REQUISICAO,
-            requisition.id_status_requisicao,
-            codpessoa,
-            utiils.getCurrentDateTime(),
-          ]);
+        await this.executeQuery(RequisitionRepository.insertStatusChange(), [
+          requisition.ID_REQUISICAO,
+          requisition.id_status_requisicao,
+          id_status_anterior,
+          codpessoa,
+          justification,
+          utiils.getCurrentDateTime(),
+        ]);
       }
       return result;
     } catch (err) {
