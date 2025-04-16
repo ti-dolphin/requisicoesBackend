@@ -2,6 +2,23 @@ const RequisitionService = require("../services/RequisitionService");
 const userController = require("./userController");
 
 class RequisitionController {
+
+
+  static async getStatusChangesByRequisition(req, res) {
+    try {
+      const { requisitionID } = req.params;
+      const statusChanges = await RequisitionService.getStatusChangesByRequisition(requisitionID);
+      if (statusChanges) {
+      return res.status(200).json(statusChanges);
+      } else {
+      return res.status(404).json({ error: "Status changes not found" });
+      }
+    } catch (e) {
+      console.log("Erro ao buscar alterações de status da requisição", e);
+      return res.status(500).json({ error: "Erro ao buscar alterações de status da requisição" });
+    }
+    }
+
   static async getStatusList(req, res) {
     console.log("getStatusList");
     try {
@@ -57,10 +74,12 @@ class RequisitionController {
   }
 
   static async updateRequisitionById(req, res) {
-    const { codpessoa, requisition } = req.body;
+    const { codpessoa, requisition, justification, id_status_anterior } = req.body;
     const result = await RequisitionService.updateRequisitionById(
       codpessoa,
-      requisition
+      requisition,
+      justification,
+      id_status_anterior
     );
     if (result) {
       return res.status(200).json(result);

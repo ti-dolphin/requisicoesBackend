@@ -1,19 +1,58 @@
-class QuoteRepository { 
+class QuoteRepository {
 
-    static getShipmentTypes = ( ) => { 
-        return `
+static deleteQuoteFileByIdQuery = () => {
+    return `
+                DELETE FROM web_anexo_cotacao
+                WHERE id_anexo_cotacao = ?;
+        `;
+};
+
+  static getFilesByQuoteIdQuery = ( ) => { 
+    return `
+        SELECT
+            id_anexo_cotacao,
+            id_cotacao,
+            nome_arquivo,
+            url
+        FROM
+            web_anexo_cotacao
+        WHERE
+            id_cotacao = ?;
+    `;
+  };
+
+  static getQuoteFileById = () => {
+    return `
+            SELECT
+                id_anexo_cotacao,
+                id_cotacao,
+                nome_arquivo,
+                url
+            FROM
+                web_anexo_cotacao
+            WHERE
+                id_anexo_cotacao = ?;
+        `;
+  };
+
+  static createQuoteFile = () => {
+    return `INSERT INTO web_anexo_cotacao (id_cotacao, nome_arquivo, url) VALUES (?, ?, ?)`;
+  };
+
+  static getShipmentTypes = () => {
+    return `
             SELECT * FROM dsecombr_controle.web_tipo_frete;
-        `
-    }
+        `;
+  };
 
-    static getFiscalClassifications = ( ) => { 
-        return `
+  static getFiscalClassifications = () => {
+    return `
             SELECT * FROM dsecombr_controle.web_classificacao_fiscal;
-        `
-    }
+        `;
+  };
 
-    static getQuotesByRequisitionId = ( ) => { 
-        return  `
+  static getQuotesByRequisitionId = () => {
+    return `
             SELECT
                 c.*,
                 TF.nome AS nome_frete,
@@ -30,20 +69,20 @@ class QuoteRepository {
                 c.id_cotacao, c.valor_frete, TF.nome -- Adicionar c.valor_frete e TF.nome ao GROUP BY
             ORDER BY
                 c.id_cotacao;
-        `
-    }
+        `;
+  };
 
-    static createQuoteQuery = ( ) => { 
-        return `
+  static createQuoteQuery = () => {
+    return `
             INSERT INTO web_cotacao (id_requisicao,
                     descricao,
                     fornecedor)
             VALUES (?, ?, ?)
-        `
-    }
+        `;
+  };
 
-    static getQuoteByIdQuery = ( ) => { 
-        return `
+  static getQuoteByIdQuery = () => {
+    return `
                     SELECT
                 c.id_cotacao,
                 c.id_requisicao,
@@ -78,44 +117,46 @@ class QuoteRepository {
             GROUP BY
                 c.id_cotacao, c.id_requisicao, c.fornecedor, c.data_cotacao, c.observacao;
     
-        `
-    }
+        `;
+  };
 
-    static getQuotes = ( ) => { 
-        return `
+  static getQuotes = () => {
+    return `
             SELECT * FROM web_cotacao;
-        `
-    }
+        `;
+  };
 
-    static createQuoteItems = (items, quoteId) => { 
-        let query = `INSERT INTO web_items_cotacao (id_cotacao ,id_item_requisicao, quantidade_solicitada, quantidade_cotada,  descricao_item) VALUES`;
-        const values = [];
-        for (let item of items) {   
-            const {
-                ID, //id_item_requisicao
-                QUANTIDADE, //quantidade
-                nome_fantasia, //descricao_item
-            } = item;
-            values.push(`(${quoteId}, ${ID}, ${QUANTIDADE}, ${QUANTIDADE}, '${nome_fantasia}')`);
-        }
-        query += values.join(', ');
-        return query;
+  static createQuoteItems = (items, quoteId) => {
+    let query = `INSERT INTO web_items_cotacao (id_cotacao ,id_item_requisicao, quantidade_solicitada, quantidade_cotada,  descricao_item) VALUES`;
+    const values = [];
+    for (let item of items) {
+      const {
+        ID, //id_item_requisicao
+        QUANTIDADE, //quantidade
+        nome_fantasia, //descricao_item
+      } = item;
+      values.push(
+        `(${quoteId}, ${ID}, ${QUANTIDADE}, ${QUANTIDADE}, '${nome_fantasia}')`
+      );
     }
+    query += values.join(", ");
+    return query;
+  };
 
-    static updateQuoteQuery = ( ) => { 
-        return `
+  static updateQuoteQuery = () => {
+    return `
             UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?, valor_frete = ?, cnpj_fornecedor = ?, cnpj_faturamento = ?  WHERE
             id_cotacao = ?
         `;
-    }
+  };
 
-    static updateItemsQuery = ( items) =>  {
-        // Inicia a construção da query
-        let query = '';
-        // Itera sobre cada item do array
-        items.forEach(item => {
-            // Calcula o subtotal (preco_unitario * quantidade)
-            query += `
+  static updateItemsQuery = (items) => {
+    // Inicia a construção da query
+    let query = "";
+    // Itera sobre cada item do array
+    items.forEach((item) => {
+      // Calcula o subtotal (preco_unitario * quantidade)
+      query += `
             UPDATE web_items_cotacao
             SET
                 descricao_item = '${item.descricao_item.trim()}', -- Remove espaços em branco extras
@@ -126,13 +167,15 @@ class QuoteRepository {
                 IPI = ${item.IPI},
                 ST = ${item.ST},
                 subtotal = ${item.subtotal},
-                observacao = '${item.observacao || 'Sem observação'}' -- Observação padrão se não for fornecida
+                observacao = '${
+                  item.observacao || "Sem observação"
+                }' -- Observação padrão se não for fornecida
             WHERE id_item_cotacao = ${item.id_item_cotacao};
 
         `;
-        });
-        // Retorna a query completa
-        return query.trim(); // Remove espaços em branco extras no início e no final
-    }
+    });
+    // Retorna a query completa
+    return query.trim(); // Remove espaços em branco extras no início e no final
+  };
 }
 module.exports = QuoteRepository

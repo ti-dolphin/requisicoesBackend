@@ -8,13 +8,14 @@ const pool = mysql.createPool({
   port: 3306,
   waitForConnections: true,
   timezone: "Z",
-  connectionLimit: 10,
-  maxIdle: 10, 
-  idleTimeout: 60000,
-  queueLimit: 0,
+  connectionLimit: 20, // Aumentar para suportar mais conexões simultâneas
+  maxIdle: 10,
+  idleTimeout: 30000, // Reduzir para liberar conexões ociosas mais rápido
+  queueLimit: 50, // Limitar a fila para evitar espera indefinida
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-  multipleStatements: true
+  keepAliveInitialDelay: 30000, // Atrasar keep-alive para reduzir overhead
+  multipleStatements: true,
+  connectTimeout: 20000, // 20 segundos para estabelecer conexão
 });
-  
+
 module.exports = pool;

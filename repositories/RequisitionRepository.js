@@ -1,4 +1,60 @@
 class RequisitionRepository {
+
+  static getStatusChangesByRequisition() {
+    return `
+      SELECT 
+      A.id_alteracao,
+      A.id_requisicao,
+      A.id_status_requisicao,
+      JSON_OBJECT( 
+      'id_status_requisicao', S.id_status_requisicao,
+      'nome', S.nome,
+      'acao_posterior', S.acao_posterior,
+      'etapa', S.etapa,
+      'acao_anterior', S.acao_anterior
+      ) AS status,
+      JSON_OBJECT(
+        'id_status_requisicao', SA.id_status_requisicao,
+        'nome', SA.nome,
+        'acao_posterior', SA.acao_posterior,
+        'etapa', SA.etapa,
+        'acao_anterior', SA.acao_anterior
+      ) AS status_anterior,
+      A.alterado_por,
+      A.justificativa,
+      JSON_OBJECT(
+        'NOME', P.NOME,
+        'CODPESSOA', P.CODPESSOA
+      ) AS alterado_por_pessoa,
+      A.data_alteracao
+      FROM web_alteracao_req_status A
+      INNER JOIN web_status_requisicao S ON S.id_status_requisicao = A.id_status_requisicao
+      LEFT JOIN PESSOA P ON P.CODPESSOA = A.alterado_por
+      LEFT JOIN web_status_requisicao SA ON SA.id_status_requisicao = A.id_status_anterior
+      WHERE A.id_requisicao = ?
+      ORDER BY A.data_alteracao DESC
+    `;
+  }
+
+  static insertStatusChange = ( ) => { 
+    return `
+      INSERT INTO web_alteracao_req_status (
+        id_requisicao,
+        id_status_requisicao,
+        id_status_anterior,
+        alterado_por,
+        justificativa,
+        data_alteracao
+      ) VALUES (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+      )
+    `;
+  };
   static getStatusListQuery = `
     SELECT * FROM dsecombr_controle.web_status_requisicao
   `;
@@ -71,7 +127,6 @@ class RequisitionRepository {
   }
 
   static getAll() {
-    console.log("getNonPurchaser_all");
     return `SELECT 
       R.ID_REQUISICAO,
       R.DESCRIPTION,

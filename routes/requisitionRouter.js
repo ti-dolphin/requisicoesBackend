@@ -9,6 +9,11 @@ router.get("/status", RequisitionController.getStatusList);
 
 router.get('/types', RequisitionController.getTypes);
 
+router.get(
+  "/statusChanges/:requisitionID",
+  RequisitionController.getStatusChangesByRequisition
+);
+
 router.get("/:id", RequisitionController.getRequisitionByID);
 
 
