@@ -4,6 +4,7 @@ const utils = require("../utils");
 
 class RequisitionFilesService {
   static async createRequisitionFile(requisitionID, file) {
+    console.log("createRequisitionFile SERVICE");
     const filePath = file.path;
     const query = `
       INSERT INTO dsecombr_controle.anexos_requisicao 
