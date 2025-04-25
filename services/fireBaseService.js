@@ -35,12 +35,10 @@ const fireBaseService = {
       const [files] = await bucket.getFiles({ prefix: fileName });
       if (files.length > 0) {
         return files[0]; // Retorna o arquivo se encontrado
-      } else {
-        throw new Error(`File "${fileName}" not found`);
-      }
+      } 
+      return null;
     } catch (e) {
-      console.error("Error retrieving file:", e);
-      throw e;
+      throw new Error('Erro ao buscar arquivo do firabase: ', e);
     }
   },
 

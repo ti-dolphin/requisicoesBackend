@@ -1,6 +1,7 @@
 const pool = require("../database");
 const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
+const { firebase } = require("googleapis/build/src/apis/firebase");
 
 class RequisitionFilesService {
   static async createRequisitionFile(requisitionID, file) {
@@ -41,10 +42,11 @@ class RequisitionFilesService {
     `;
 
     try {
+      const sanitizedLink = link.replace(/https?:\/\/|\/.*/g, '');
       const [result] = await RequisitionFilesService.executeQuery(query, [
         id,
         link,
-        link,
+        sanitizedLink,
       ]);
       return result;
     } catch (e) {
@@ -72,22 +74,24 @@ class RequisitionFilesService {
   }
 
   static async deleteRequisitionFile(filename, fileID) {
+    console.log("deleteRequisitionFile SERVICE", filename, fileID);
     const query = `
       DELETE FROM dsecombr_controle.anexos_requisicao 
       WHERE id = ?
     `;
-    console.log('FILENAME: ', filename)
-    console.log('FILEID: ', fileID);
     try {
+      const fireBasefile = await fireBaseService.getFileByName(filename);
+      if(fireBasefile) {
+        await fireBasefile.delete();
+        console.log("Arquivo deletado do Firebase: ", filename);
+      }
       const [result] = await RequisitionFilesService.executeQuery(query, [
         fileID,
       ]);
-      await fireBaseService.deleteFileByName(filename);
-      if (result.affectedRows > 0) return result;
-      else throw new Error("Something went wrong");
+      return result;
     } catch (e) {
-      console.log("Error in deleteRequisitionFile:", e);
-      return null;
+      console.log("Erro ao deletar anexo: ", e);
+      throw new Error("Erro ao deletar anexo: ", e);
     }
   }
 
