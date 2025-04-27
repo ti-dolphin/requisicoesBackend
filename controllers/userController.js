@@ -101,6 +101,7 @@ const userController = {
   PERM_COMPRADOR, 
   PERM_ADMINISTRADOR, 
   PERM_CADASTRAR_PAT,
+  PERM_DIRETOR,
   responsavel_tipo
 FROM 
   PESSOA 
