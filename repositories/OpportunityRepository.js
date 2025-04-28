@@ -394,7 +394,7 @@ FROM
     LEFT JOIN STATUS s ON os.CODSTATUS = s.CODSTATUS
     LEFT JOIN ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
     WHERE 
-      p.ATIVO = 1 AND s.ATIVO = 1  
+       s.ATIVO = 1  
       ${action ? "AND s.ACAO IN (1, 0) AND" : "AND s.ACAO = 0 AND"}
       (
         os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
