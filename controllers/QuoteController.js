@@ -27,11 +27,12 @@ class QuoteController {
   };
 
   static createQuoteFile = async (req, res) => {
+    console.log("createQuoteFile");
     try {
       const quoteFile = await QuoteService.createQuoteFile(req);
       return res.status(200).send(quoteFile);
     } catch (e) {
-      console.log("Error creating quote file:", e.message);
+      console.log("Erro ao criar arquivo de cotação:", e.message);
       return res.status(500).json({ error: e.message });
     }
   };
