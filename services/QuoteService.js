@@ -186,14 +186,11 @@ static async deleteQuoteFileById(fileId) {
     const items = req.body;
     const { quoteId } = req.params;
     try {
-      const [result] = await this.executeQuery(
+      await this.executeQuery(
         QuoteRepository.updateItemsQuery(items)
       );
-      console.log('result', result);
-      if (result.affectedRows) {
-        const quote = await this.getQuoteById(quoteId);
-        return quote.items;
-      }
+      const quote = await this.getQuoteById(quoteId);
+      return quote.items;
     } catch (e) {
       console.log("Erro ao atualizar itens da cotação", e.message);
       throw e;
