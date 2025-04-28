@@ -185,7 +185,7 @@ static async deleteQuoteFileById(fileId) {
     const items = req.body;
     const { quoteId } = req.params;
     try {
-      const [result] = await this.executeQuery(
+      const result = await this.executeQuery(
         QuoteRepository.updateItemsQuery(items)
       );
       if (result.affectedRows) {
