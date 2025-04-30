@@ -4,6 +4,7 @@ class RequisitionFilesController {
 
   static async createRequisitionFile(req, res) {
     const { requisitionID } = req.params;
+    const {codpessoa } = req.query;
     const file = req.file;
 
     if (!file) {
@@ -13,7 +14,8 @@ class RequisitionFilesController {
     try {
       const fileUrl = await RequisitionFilesService.createRequisitionFile(
         requisitionID,
-        file
+        file,
+        codpessoa
       );
       if (fileUrl) {
         res.status(200).send(fileUrl);
@@ -28,7 +30,7 @@ class RequisitionFilesController {
 
   static async createRequisitionFileFromLink(req, res) {
     const { requisitionID } = req.params;
-    const { link } = req.body;
+    const { link, codpessoa } = req.body;
 
     if (!link) {
       return res.status(400).send("Link is required.");
@@ -37,7 +39,8 @@ class RequisitionFilesController {
       const result =
         await RequisitionFilesService.createRequisitionFileFromLink(
           requisitionID,
-          link
+          link,
+          codpessoa
         );
       if (result) {
         res.status(200).send(result);

@@ -1,13 +1,16 @@
 class QuoteRepository {
+  static getPaymentMethods = () => {
+    return `SELECT * FROM web_condicao_pagamento`;
+  };
 
-static deleteQuoteFileByIdQuery = () => {
+  static deleteQuoteFileByIdQuery = () => {
     return `
-                DELETE FROM web_anexo_cotacao
-                WHERE id_anexo_cotacao = ?;
+          DELETE FROM web_anexo_cotacao
+         WHERE id_anexo_cotacao = ?;
         `;
-};
+  };
 
-  static getFilesByQuoteIdQuery = ( ) => { 
+  static getFilesByQuoteIdQuery = () => {
     return `
         SELECT
             id_anexo_cotacao,
@@ -95,6 +98,7 @@ static deleteQuoteFileByIdQuery = () => {
                 c.valor_frete,
                 c.cnpj_fornecedor,
                 c.cnpj_faturamento,
+                c.id_condicao_pagamento,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id_item_cotacao', i.id_item_cotacao,
@@ -145,9 +149,20 @@ static deleteQuoteFileByIdQuery = () => {
 
   static updateQuoteQuery = () => {
     return `
-            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?, valor_frete = ?, cnpj_fornecedor = ?, cnpj_faturamento = ?  WHERE
-            id_cotacao = ?
-        `;
+      UPDATE web_cotacao
+      SET
+        fornecedor = ?,
+        observacao = ?,
+        descricao = ?,
+        id_tipo_frete = ?,
+        id_classificacao_fiscal = ?,
+        valor_frete = ?,
+        cnpj_fornecedor = ?,
+        cnpj_faturamento = ?,
+        id_condicao_pagamento = ?
+      WHERE
+        id_cotacao = ?;
+    `;
   };
 
   static updateItemsQuery = (items) => {

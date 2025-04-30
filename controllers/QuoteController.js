@@ -3,6 +3,18 @@ const QuoteService = require("../services/QuoteService");
 
 class QuoteController {
 
+  static async getPaymentMethods(req, res) {
+    try {
+      const paymentMethods = await QuoteService.getPaymentMethods();
+      return res.status(200).send(paymentMethods);
+    } catch (error) {
+      console.log("erro ao buscar condições de pagamento", error.message);
+      return res
+        .status(500)
+        .send(`Erro ao buscar condições de pagamento: ${error.message}`);
+    }
+    }
+
     static async deleteQuoteFileById(req, res) {
         try {
           const { fileId } = req.params;
@@ -33,7 +45,7 @@ class QuoteController {
       return res.status(200).send(quoteFile);
     } catch (e) {
       console.log("Erro ao criar arquivo de cotação:", e.message);
-      return res.status(500).json({ error: e.message });
+      return res.status(500).send(`Erro ao criar arquivo de cotação: ${e.message}`);
     }
   };
 

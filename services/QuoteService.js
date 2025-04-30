@@ -5,39 +5,50 @@ const utils = require("../utils");
 
 class QuoteService {
 
-static async deleteQuoteFileById(fileId) {
+  static async getPaymentMethods() {
     try {
-        const [file] = await this.executeQuery(
-            QuoteRepository.getQuoteFileById(),
-            [fileId]
-        );
-        if (!file) {
-            throw new Error("Arquivo não encontrado.");
-        }
-        await fireBaseService.deleteFileByName(file.filename);
-        const result = await this.executeQuery(
-            QuoteRepository.deleteQuoteFileByIdQuery(),
-            [fileId]
-        );
-        if (result.affectedRows === 0) {
-            throw new Error("Erro ao deletar o arquivo.");
-        }
-        return { message: "Arquivo deletado com sucesso." };
+      const paymentMethods = await this.executeQuery(QuoteRepository.getPaymentMethods());
+      return paymentMethods;
     } catch (error) {
-        throw error;
+      console.error("Erro ao buscar métodos de pagamento", error.message);
+      throw error;
     }
-}
+    }
 
-  static getFilesByQuoteId = async (quoteId ) => { 
+
+  static async deleteQuoteFileById(fileId) {
     try {
-        const files = await this.executeQuery(
-          QuoteRepository.getFilesByQuoteIdQuery(),
-          [quoteId]
-        );
-        return files;
+      const [file] = await this.executeQuery(
+        QuoteRepository.getQuoteFileById(),
+        [fileId]
+      );
+      if (!file) {
+        throw new Error("Arquivo não encontrado.");
+      }
+      await fireBaseService.deleteFileByName(file.filename);
+      const result = await this.executeQuery(
+        QuoteRepository.deleteQuoteFileByIdQuery(),
+        [fileId]
+      );
+      if (result.affectedRows === 0) {
+        throw new Error("Erro ao deletar o arquivo.");
+      }
+      return { message: "Arquivo deletado com sucesso." };
     } catch (error) {
-        console.error("Erro ao buscar arquivos por ID da cotação", error.message);
-        throw error;
+      throw error;
+    }
+  }
+
+  static getFilesByQuoteId = async (quoteId) => {
+    try {
+      const files = await this.executeQuery(
+        QuoteRepository.getFilesByQuoteIdQuery(),
+        [quoteId]
+      );
+      return files;
+    } catch (error) {
+      console.error("Erro ao buscar arquivos por ID da cotação", error.message);
+      throw error;
     }
   };
 
@@ -143,7 +154,6 @@ static async deleteQuoteFileById(fileId) {
 
   static async update(req, res) {
     const { quoteId } = req.params;
-    console.log("req body: ", req.body);
     const {
       fornecedor,
       observacao,
@@ -153,14 +163,14 @@ static async deleteQuoteFileById(fileId) {
       valor_frete,
       cnpj_fornecedor,
       cnpj_faturamento,
+      id_condicao_pagamento
     } = req.body;
     if (!fornecedor && !observacao) {
       throw new Error(
         "Pelo menos um campo (fornecedor ou observação) deve ser fornecido para atualização."
       );
     }
-
-    const result = await this.executeQuery(QuoteRepository.updateQuoteQuery(), [
+      await this.executeQuery(QuoteRepository.updateQuoteQuery(), [
       fornecedor,
       observacao,
       descricao,
@@ -169,11 +179,9 @@ static async deleteQuoteFileById(fileId) {
       valor_frete,
       cnpj_fornecedor,
       cnpj_faturamento,
+      id_condicao_pagamento,
       quoteId,
     ]);
-    if (result.affectedRows === 0) {
-      throw new Error("Cotação não encontrada ou não atualizada.");
-    }
     const [updatedQuote] = await this.executeQuery(
       QuoteRepository.getQuoteByIdQuery(),
       [quoteId]
@@ -186,9 +194,7 @@ static async deleteQuoteFileById(fileId) {
     const items = req.body;
     const { quoteId } = req.params;
     try {
-      await this.executeQuery(
-        QuoteRepository.updateItemsQuery(items)
-      );
+      await this.executeQuery(QuoteRepository.updateItemsQuery(items));
       const quote = await this.getQuoteById(quoteId);
       return quote.items;
     } catch (e) {

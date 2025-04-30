@@ -22,6 +22,10 @@ router.get("/shipment-type", (req, res) => {
   QuoteController.getShipmentTypes(req, res);
 });
 
+router.get("/payment-method", (req, res) => {
+  QuoteController.getPaymentMethods(req, res);
+});
+
 router.get("/file/:quoteId", QuoteController.getFilesByQuoteId);
 
 router.post(

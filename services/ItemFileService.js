@@ -3,15 +3,17 @@ const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
 
 class ItemFileService {
-  static async createItemFile(itemID, file) {
+  static async createItemFile(itemID, file, codpessoa) {
     if (!file) {
       throw new Error("File not provided");
     }
 
+
+
     const filePath = file.path;
     const query = `
-      INSERT INTO anexos_item (arquivo, id_item, nome_arquivo)
-      VALUES (?, ?, ?)
+      INSERT INTO anexos_item (arquivo, id_item, nome_arquivo, criado_por, criado_em)
+      VALUES (?, ?, ?, ?, ?)
     `;
 
     try {
@@ -21,7 +23,8 @@ class ItemFileService {
       const fileUrl = createdFile ? createdFile.publicUrl() : null;
 
       if (fileUrl) {
-        await this.executeQuery(query, [fileUrl, itemID, file.filename]);
+        const now = new Date();
+        await this.executeQuery(query, [fileUrl, itemID, file.filename, codpessoa, utils.getCurrentDateTime()]);
         utils.removeFile(filePath);
       }
 
