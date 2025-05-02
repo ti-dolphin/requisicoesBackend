@@ -118,13 +118,17 @@ class RequisitionItemService {
           itemIdRows.push(r);
         }
       });
+    
       itemIdRows.forEach((itemIdRow) => {
         const columnToInsertPrice = Object.keys(quoteIdRow).filter(
           (key) => key === itemIdRow.fornecedor
         );
+         let columnToInsertQuotedQuantity = 'quantidade_cotada';
+         columnToInsertQuotedQuantity = `${columnToInsertQuotedQuantity}_${itemIdRow.fornecedor}`;
         quoteIdRow = {
           ...quoteIdRow,
           [columnToInsertPrice]: itemIdRow.preco_unitario,
+          [columnToInsertQuotedQuantity]: itemIdRow.quantidade_cotada,
         };
       });
       if (notInComposedRows) {
