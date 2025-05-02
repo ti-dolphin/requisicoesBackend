@@ -165,11 +165,9 @@ class QuoteService {
       cnpj_faturamento,
       id_condicao_pagamento
     } = req.body;
-    if (!fornecedor && !observacao) {
-      throw new Error(
-        "Pelo menos um campo (fornecedor ou observação) deve ser fornecido para atualização."
-      );
-    }
+
+     
+
       await this.executeQuery(QuoteRepository.updateQuoteQuery(), [
       fornecedor,
       observacao,

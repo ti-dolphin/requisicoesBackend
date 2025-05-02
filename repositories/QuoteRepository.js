@@ -85,8 +85,8 @@ class QuoteRepository {
   };
 
   static getQuoteByIdQuery = () => {
-    return `
-                    SELECT
+    return `  
+        SELECT
                 c.id_cotacao,
                 c.id_requisicao,
                 c.fornecedor,
@@ -99,6 +99,8 @@ class QuoteRepository {
                 c.cnpj_fornecedor,
                 c.cnpj_faturamento,
                 c.id_condicao_pagamento,
+                fornecedor.NOME as nome_fornecedor,
+                faturamento.NOME as nome_faturamento,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id_item_cotacao', i.id_item_cotacao,
@@ -117,10 +119,11 @@ class QuoteRepository {
             FROM
                 web_cotacao c
                 LEFT JOIN web_items_cotacao i ON c.id_cotacao = i.id_cotacao
+                LEFT JOIN CLIENTE fornecedor on fornecedor.CNPJ = c.cnpj_fornecedor
+                LEFT JOIN CLIENTE faturamento on faturamento.CNPJ = c.cnpj_faturamento
             WHERE c.id_cotacao = ?
-            GROUP BY
-                c.id_cotacao, c.id_requisicao, c.fornecedor, c.data_cotacao, c.observacao;
-    
+             GROUP BY
+                c.id_cotacao, c.id_requisicao, c.fornecedor, c.data_cotacao, c.observacao, fornecedor.NOME, faturamento.NOME;
         `;
   };
 
