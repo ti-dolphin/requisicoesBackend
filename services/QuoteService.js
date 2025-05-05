@@ -108,6 +108,7 @@ class QuoteService {
         QuoteRepository.getQuotesByRequisitionId(),
         [requisitionId]
       );
+      console.log('quotes: ', quotes );
       return quotes;
     } catch (e) {
       throw e;
