@@ -195,7 +195,7 @@ class QuoteService {
     try {
       await this.executeQuery(QuoteRepository.updateItemsQuery(items));
       const quote = await this.getQuoteById(quoteId);
-      return quote.items;
+      return quote.itens;
     } catch (e) {
       console.log("Erro ao atualizar itens da cotação", e.message);
       throw e;
