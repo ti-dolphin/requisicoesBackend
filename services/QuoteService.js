@@ -53,7 +53,6 @@ class QuoteService {
   };
 
   static createQuoteFile = async (req) => {
-    console.log("createQuoteFile");
     try {
       await fireBaseService.uploadFileToFireBase(req.file.path);
       const createdFile = await fireBaseService.getFileByName(
@@ -108,7 +107,6 @@ class QuoteService {
         QuoteRepository.getQuotesByRequisitionId(),
         [requisitionId]
       );
-      console.log('quotes: ', quotes );
       return quotes;
     } catch (e) {
       throw e;
@@ -145,7 +143,6 @@ class QuoteService {
         );
       }
       const newQuote = await this.getQuoteById(insertId);
-      console.log({ newQuote });
       return newQuote;
     } catch (error) {
       console.log(error);
@@ -189,7 +186,6 @@ class QuoteService {
   }
 
   static async updateItems(req, res) {
-    console.log("updateItems");
     const items = req.body;
     const { quoteId } = req.params;
     try {

@@ -6,8 +6,9 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       let [originalRows] = await connection.query(query, [requisitionID]);
+      console.log('originalRows: ', originalRows);
       const responseObject = this.getItemsComparedByPrices(originalRows);
-      console.log("rows: ", responseObject.rows);
+      console.log("req items: ", responseObject.rows);
       return responseObject;
     } catch (err) {
       console.error("Erro na query", err);
@@ -68,7 +69,6 @@ class RequisitionItemService {
          where IR.ID in (${itemIds.join(",")})
         `
     );
-    console.log("updatedMap: ", updatedMap);
 
     return updatedMap;
   }
@@ -179,7 +179,6 @@ class RequisitionItemService {
   async updateRequisitionItems(items) {
     const connection = await pool.getConnection();
     try {
-      console.log("items: ", items);
       const queries = ItemRepository.update(items);
       const result = await connection.query(ItemRepository.update(items));
       if (result) {
@@ -192,6 +191,7 @@ class RequisitionItemService {
       connection.release();
     }
   }
+
   async executeQuery(query, params) {
     const connection = await pool.getConnection();
     try {

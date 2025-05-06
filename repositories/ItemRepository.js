@@ -75,9 +75,8 @@ class ItemRepository {
     LEFT JOIN web_items_cotacao IC on IR.ID = IC.id_item_requisicao
     LEFT JOIN  web_items_cotacao IC_SELECIONADO ON IC_SELECIONADO.id_item_cotacao = IR.id_item_cotacao_selecionado
     LEFT JOIN web_cotacao C_SELECIONADO on C_SELECIONADO.id_cotacao = IC_SELECIONADO.id_cotacao
-    INNER JOIN web_cotacao C on C.id_cotacao = IC.id_cotacao
+    LEFT JOIN web_cotacao C on C.id_cotacao = IC.id_cotacao
     INNER JOIN produtos P on P.ID = IR.ID_PRODUTO
-   
     WHERE IR.ID_REQUISICAO = ?
     `;
   }

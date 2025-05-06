@@ -187,11 +187,9 @@ class QuoteRepository {
   };
 
   static updateItemsQuery = (items) => {
-    // Inicia a construção da query
+ 
     let query = "";
-    // Itera sobre cada item do array
     items.forEach((item) => {
-      // Calcula o subtotal (preco_unitario * quantidade)
       query += `
             UPDATE web_items_cotacao
             SET
