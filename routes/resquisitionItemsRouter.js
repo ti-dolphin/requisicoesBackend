@@ -7,6 +7,14 @@ router.get("/:requisitionID",  function (req, res, next) {
    RequisitionItemController.getRequisitionItemByReqID(req, res);
 });
 
+router.get("/itemToSupplier/:reqId", (req, res) => { 
+  RequisitionItemController.getItemToSupplierMapByReqId(req, res);
+});
+
+router.put("/itemToSupplier/:reqId", (req, res) => { 
+  RequisitionItemController.updateItemToSupplier(req, res);
+});
+
 // POST /requisitionItems/:requisitionID
 router.post("/:requisitionID",  (req, res, next) => {
     RequisitionItemController.createRequisitionItems(req, res);

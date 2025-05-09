@@ -56,8 +56,6 @@ app.use("/opportunity",authorize,  oppoprtunityRouter);
 
 app.use("/supplier/requisition/quote", quoteRouter);
 
-
-
 app.use(function(req, res, next) {
   next(createError(404));
 });
@@ -71,8 +69,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
- OpportunityScheduler.startExpiredOppsVerification();
-  PatrimonyScheduler.startEmailSchedule();
-  PatrimonyScheduler.startchecklistVerification();
+//  OpportunityScheduler.startExpiredOppsVerification();
+//   PatrimonyScheduler.startEmailSchedule();
+//   PatrimonyScheduler.startchecklistVerification();
 
 module.exports = app;

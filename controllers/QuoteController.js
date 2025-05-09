@@ -2,18 +2,28 @@
 const QuoteService = require("../services/QuoteService");
 
 class QuoteController {
+  static async getPaymentMethods(req, res) {
+    try {
+      const paymentMethods = await QuoteService.getPaymentMethods();
+      return res.status(200).send(paymentMethods);
+    } catch (error) {
+      console.log("erro ao buscar condições de pagamento", error.message);
+      return res
+        .status(500)
+        .send(`Erro ao buscar condições de pagamento: ${error.message}`);
+    }
+  }
 
-    static async deleteQuoteFileById(req, res) {
-        try {
-          const { fileId } = req.params;
-          await QuoteService.deleteQuoteFileById(fileId);
-          return res.status(200).json({ message: "File deleted successfully" });
-        } catch (error) {
-          console.log("Error deleting quote file:", error.message);
-          return res.status(500).json({ error: error.message });
-        }
-      }
-
+  static async deleteQuoteFileById(req, res) {
+    try {
+      const { fileId } = req.params;
+      await QuoteService.deleteQuoteFileById(fileId);
+      return res.status(200).json({ message: "File deleted successfully" });
+    } catch (error) {
+      console.log("Error deleting quote file:", error.message);
+      return res.status(500).json({ error: error.message });
+    }
+  }
 
   static getFilesByQuoteId = async (req, res) => {
     try {
@@ -33,7 +43,9 @@ class QuoteController {
       return res.status(200).send(quoteFile);
     } catch (e) {
       console.log("Erro ao criar arquivo de cotação:", e.message);
-      return res.status(500).json({ error: e.message });
+      return res
+        .status(500)
+        .send(`Erro ao criar arquivo de cotação: ${e.message}`);
     }
   };
 
@@ -59,13 +71,22 @@ class QuoteController {
     }
   };
 
+  static createQuoteFileFromLink = async (req, res ) =>  {
+    try{ 
+      const createdFile = await QuoteService.createFileFromLink(req.params.quoteId, req.body.link);
+      return res.status(200).send(createdFile);
+    }catch(e){ 
+      console.log('Erro ao criar arquivo de cotação: ', e)
+      return res.status(500).json({ error: e.message });
+    }
+  };
+
   static getQuotesByRequisitionId = async (req, res) => {
     try {
       const { requisitionId } = req.params;
       const quotes = await QuoteService.getQuotesByRequisitionId(requisitionId);
       return res.status(200).send(quotes);
     } catch (e) {
-      console.log("ERRO COTAÇÂO: ", error.message);
       return res.status(500).json({ error: error.message });
     }
   };

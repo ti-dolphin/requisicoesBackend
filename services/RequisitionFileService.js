@@ -4,13 +4,13 @@ const utils = require("../utils");
 const { firebase } = require("googleapis/build/src/apis/firebase");
 
 class RequisitionFilesService {
-  static async createRequisitionFile(requisitionID, file) {
+  static async createRequisitionFile(requisitionID, file, codpessoa) {
     console.log("createRequisitionFile SERVICE");
     const filePath = file.path;
     const query = `
       INSERT INTO dsecombr_controle.anexos_requisicao 
-      (id_requisicao, arquivo, nome_arquivo) 
-      VALUES (?, ?, ?)
+      (id_requisicao, arquivo, nome_arquivo, criado_por, criado_em) 
+      VALUES (?, ?, ?, ?, ?)
     `;
     try {
       await fireBaseService.uploadFileToFireBase(filePath);
@@ -22,6 +22,8 @@ class RequisitionFilesService {
         requisitionID,
         fileUrl,
         file.filename,
+        codpessoa,
+        utils.getCurrentDateTime(),
       ]);
 
       if (fileUrl) {
@@ -34,19 +36,21 @@ class RequisitionFilesService {
     }
   }
 
-  static async createRequisitionFileFromLink(id, link) {
+  static async createRequisitionFileFromLink(id, link, codpessoa) {
     const query = `
       INSERT INTO dsecombr_controle.anexos_requisicao 
-      (id_requisicao, arquivo, nome_arquivo) 
-      VALUES (?, ?, ?)
+      (id_requisicao, arquivo, nome_arquivo, criado_por, criado_em) 
+      VALUES (?, ?, ?, ?, ?)
     `;
 
     try {
-      const sanitizedLink = link.replace(/https?:\/\/|\/.*/g, '');
+      const sanitizedLink = link.replace(/https?:\/\/|\/.*/g, "");
       const [result] = await RequisitionFilesService.executeQuery(query, [
         id,
         link,
         sanitizedLink,
+        codpessoa,
+        utils.getCurrentDateTime(),
       ]);
       return result;
     } catch (e) {
@@ -56,11 +60,16 @@ class RequisitionFilesService {
   }
 
   static async getRequisitionFiles(requisitionID) {
-    const query = `
-      SELECT * 
-      FROM dsecombr_controle.anexos_requisicao 
-      WHERE id_requisicao = ?
-    `;
+    const query = `SELECT 
+      id_requisicao, arquivo, nome_arquivo, id, criado_por,
+      criado_em,
+      JSON_OBJECT(
+        'CODPESSOA', PESSOA.CODPESSOA,
+        'NOME', PESSOA.NOME
+      ) AS criado_por_pessoa
+    FROM anexos_requisicao 
+    LEFT JOIN PESSOA ON anexos_requisicao.criado_por = PESSOA.CODPESSOA
+    WHERE id_requisicao = ?`;
 
     try {
       const [rows, fields] = await RequisitionFilesService.executeQuery(query, [
@@ -81,7 +90,7 @@ class RequisitionFilesService {
     `;
     try {
       const fireBasefile = await fireBaseService.getFileByName(filename);
-      if(fireBasefile) {
+      if (fireBasefile) {
         await fireBasefile.delete();
         console.log("Arquivo deletado do Firebase: ", filename);
       }

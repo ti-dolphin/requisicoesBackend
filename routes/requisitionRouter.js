@@ -6,6 +6,10 @@ const RequisitionController = require("../controllers/requisitionController");
 router.get("/", RequisitionController.getRequisitions);
 
 router.get("/status", RequisitionController.getStatusList);
+router.get(
+  "/status/previous/:requisitionID",
+  RequisitionController.getPreviousStatus
+);
 
 router.get('/types', RequisitionController.getTypes);
 

@@ -1,13 +1,16 @@
 class QuoteRepository {
+  static getPaymentMethods = () => {
+    return `SELECT * FROM web_condicao_pagamento`;
+  };
 
-static deleteQuoteFileByIdQuery = () => {
+  static deleteQuoteFileByIdQuery = () => {
     return `
-                DELETE FROM web_anexo_cotacao
-                WHERE id_anexo_cotacao = ?;
+          DELETE FROM web_anexo_cotacao
+         WHERE id_anexo_cotacao = ?;
         `;
-};
+  };
 
-  static getFilesByQuoteIdQuery = ( ) => { 
+  static getFilesByQuoteIdQuery = () => {
     return `
         SELECT
             id_anexo_cotacao,
@@ -53,23 +56,41 @@ static deleteQuoteFileByIdQuery = () => {
 
   static getQuotesByRequisitionId = () => {
     return `
-            SELECT
-                c.*,
-                TF.nome AS nome_frete,
-                SUM(i.subtotal) + c.valor_frete AS total, -- Soma correta
-                COUNT(i.id_item_cotacao) AS quantidade_itens
-            FROM
-                web_cotacao c
-            LEFT JOIN web_tipo_frete TF ON TF.id_tipo_frete = c.id_tipo_frete
-            LEFT JOIN
-                web_items_cotacao i ON c.id_cotacao = i.id_cotacao
-            WHERE
-                c.id_requisicao = ?
-            GROUP BY
-                c.id_cotacao, c.valor_frete, TF.nome -- Adicionar c.valor_frete e TF.nome ao GROUP BY
-            ORDER BY
-                c.id_cotacao;
-        `;
+        SELECT
+          c.*,
+          TF.nome AS nome_frete,
+          SUM(i.subtotal) + c.valor_frete AS total, -- Soma correta
+          COUNT(i.id_item_cotacao) AS quantidade_itens,
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'id_item_cotacao', i.id_item_cotacao,
+              'id_cotacao', i.id_cotacao,
+              'descricao_item', i.descricao_item,
+              'preco_unitario', i.preco_unitario,
+              'quantidade_solicitada', i.quantidade_solicitada,
+              'subtotal', i.subtotal,
+              'id_item_requisicao', i.id_item_requisicao,
+              'observacao', i.observacao,
+              'ICMS', i.ICMS,
+              'IPI', i.IPI,
+              'ST', i.ST,
+              'quantidade_cotada', i.quantidade_cotada,
+              'id_produto', i.id_produto,
+              'fornecedor', c.fornecedor,
+              'valor_frete', c.valor_frete
+            )
+          ) AS itens
+        FROM
+          web_cotacao c
+        LEFT JOIN web_tipo_frete TF ON TF.id_tipo_frete = c.id_tipo_frete
+        LEFT JOIN web_items_cotacao i ON c.id_cotacao = i.id_cotacao
+        WHERE
+          c.id_requisicao = ?
+        GROUP BY
+          c.id_cotacao, c.valor_frete, TF.nome -- Adicionar c.valor_frete e TF.nome ao GROUP BY
+        ORDER BY
+          c.id_cotacao;
+      `;
   };
 
   static createQuoteQuery = () => {
@@ -82,8 +103,8 @@ static deleteQuoteFileByIdQuery = () => {
   };
 
   static getQuoteByIdQuery = () => {
-    return `
-                    SELECT
+    return `  
+        SELECT
                 c.id_cotacao,
                 c.id_requisicao,
                 c.fornecedor,
@@ -95,6 +116,9 @@ static deleteQuoteFileByIdQuery = () => {
                 c.valor_frete,
                 c.cnpj_fornecedor,
                 c.cnpj_faturamento,
+                c.id_condicao_pagamento,
+                fornecedor.NOME as nome_fornecedor,
+                faturamento.NOME as nome_faturamento,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id_item_cotacao', i.id_item_cotacao,
@@ -109,14 +133,15 @@ static deleteQuoteFileByIdQuery = () => {
                         'id_item_requisicao', i.id_item_requisicao,
                         'observacao', i.observacao
                     )
-                ) AS items
+                ) AS itens
             FROM
                 web_cotacao c
                 LEFT JOIN web_items_cotacao i ON c.id_cotacao = i.id_cotacao
+                LEFT JOIN CLIENTE fornecedor on fornecedor.CNPJ = c.cnpj_fornecedor
+                LEFT JOIN CLIENTE faturamento on faturamento.CNPJ = c.cnpj_faturamento
             WHERE c.id_cotacao = ?
-            GROUP BY
-                c.id_cotacao, c.id_requisicao, c.fornecedor, c.data_cotacao, c.observacao;
-    
+             GROUP BY
+                c.id_cotacao, c.id_requisicao, c.fornecedor, c.data_cotacao, c.observacao, fornecedor.NOME, faturamento.NOME;
         `;
   };
 
@@ -145,17 +170,26 @@ static deleteQuoteFileByIdQuery = () => {
 
   static updateQuoteQuery = () => {
     return `
-            UPDATE  web_cotacao SET fornecedor = ?, observacao = ?, descricao = ?, id_tipo_frete = ?, id_classificacao_fiscal = ?, valor_frete = ?, cnpj_fornecedor = ?, cnpj_faturamento = ?  WHERE
-            id_cotacao = ?
-        `;
+      UPDATE web_cotacao
+      SET
+        fornecedor = ?,
+        observacao = ?,
+        descricao = ?,
+        id_tipo_frete = ?,
+        id_classificacao_fiscal = ?,
+        valor_frete = ?,
+        cnpj_fornecedor = ?,
+        cnpj_faturamento = ?,
+        id_condicao_pagamento = ?
+      WHERE
+        id_cotacao = ?;
+    `;
   };
 
   static updateItemsQuery = (items) => {
-    // Inicia a construção da query
+ 
     let query = "";
-    // Itera sobre cada item do array
     items.forEach((item) => {
-      // Calcula o subtotal (preco_unitario * quantidade)
       query += `
             UPDATE web_items_cotacao
             SET

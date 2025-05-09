@@ -2,22 +2,43 @@ const RequisitionService = require("../services/RequisitionService");
 const userController = require("./userController");
 
 class RequisitionController {
-
+  static async getPreviousStatus(req, res) {
+    try {
+      const { requisitionID } = req.params;
+      const previousStatus = await RequisitionService.getPreviousStatus(
+        requisitionID
+      );
+      if (previousStatus) {
+        return res.status(200).json(previousStatus);
+      }
+      return res
+        .status(404)
+        .json({ error: "status anterior da requisição não encontrado" });
+    } catch (e) {
+      console.log("Erro ao buscar status anterior da requisição", e);
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar status anterior da requisição" });
+    }
+  }
 
   static async getStatusChangesByRequisition(req, res) {
     try {
       const { requisitionID } = req.params;
-      const statusChanges = await RequisitionService.getStatusChangesByRequisition(requisitionID);
+      const statusChanges =
+        await RequisitionService.getStatusChangesByRequisition(requisitionID);
       if (statusChanges) {
-      return res.status(200).json(statusChanges);
+        return res.status(200).json(statusChanges);
       } else {
-      return res.status(404).json({ error: "Status changes not found" });
+        return res.status(404).json({ error: "Status changes not found" });
       }
     } catch (e) {
       console.log("Erro ao buscar alterações de status da requisição", e);
-      return res.status(500).json({ error: "Erro ao buscar alterações de status da requisição" });
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar alterações de status da requisição" });
     }
-    }
+  }
 
   static async getStatusList(req, res) {
     console.log("getStatusList");
@@ -55,6 +76,7 @@ class RequisitionController {
       const requisition = await RequisitionService.getRequisitionByID(id);
       return res.status(200).json(requisition);
     } catch (e) {
+      console.log('Erro ao buscar dados da requisição: ', e)
       return res
         .status(500)
         .json({ error: "Erro ao buscar dados da requisição" });
@@ -74,7 +96,8 @@ class RequisitionController {
   }
 
   static async updateRequisitionById(req, res) {
-    const { codpessoa, requisition, justification, id_status_anterior } = req.body;
+    const { codpessoa, requisition, justification, id_status_anterior } =
+      req.body;
     const result = await RequisitionService.updateRequisitionById(
       codpessoa,
       requisition,

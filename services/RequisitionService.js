@@ -4,6 +4,17 @@ const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
 const utiils = require('../utils');
 class RequisitionService {
+  static getPreviousStatus = async (requisitionID ) => { 
+      const [data] = await this.executeQuery(
+        RequisitionRepository.getPreviousStatus(),
+        [requisitionID]
+      );
+      if(data){ 
+        return data.status;
+      }
+      return null;
+  };
+
   static async getStatusChangesByRequisition(requisitionID) {
     try {
       const query = RequisitionRepository.getStatusChangesByRequisition();
@@ -45,12 +56,21 @@ class RequisitionService {
   }
 
   static async getRequisitionByID(id) {
-    console.log('id: ', id)
-    console.log("getRequisitionByID");
+
     const query = RequisitionRepository.getById();
+    const status_anterior = await this.getPreviousStatus(id);
+
     try {
       const [requisition] = await this.executeQuery(query, [id]);
-      return requisition;
+       if (status_anterior) {
+         return {
+           ...requisition,
+           status_anterior,
+         };
+       }
+       return requisition;
+      
+      
     } catch (err) {
       throw err;
     }

@@ -3,12 +3,14 @@ const ItemFileService = require("../services/ItemFileService");
 class ItemFileController {
   static async createItemFile(req, res) {
     const { itemID } = req.params;
+    const {codpessoa} = user.query;
+
     const file = req.file;
       if (!file) {
         return res.status(400).send("No file uploaded");
       }
       try {
-        const fileUrl = await ItemFileService.createItemFile(itemID, file);
+        const fileUrl = await ItemFileService.createItemFile(itemID, file, codpessoa);
         if (fileUrl) {
           res.status(200).send({ fileUrl });
         } else {

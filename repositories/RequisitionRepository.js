@@ -1,5 +1,27 @@
 class RequisitionRepository {
 
+  static getPreviousStatus() {
+    return `
+      SELECT 
+      JSON_OBJECT( 
+      'id_status_requisicao', S.id_status_requisicao,
+      'nome', S.nome,
+      'acao_posterior', S.acao_posterior,
+      'etapa', S.etapa,
+      'acao_anterior', S.acao_anterior
+      ) AS status
+      FROM 
+        web_alteracao_req_status alteracao
+      INNER JOIN 
+        web_status_requisicao S ON S.id_status_requisicao = alteracao.id_status_anterior
+      WHERE 
+        id_requisicao = ? 
+      ORDER BY 
+        data_alteracao DESC 
+      LIMIT 1
+    `;
+  }
+
   static getStatusChangesByRequisition() {
     return `
       SELECT 
