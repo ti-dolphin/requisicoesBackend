@@ -77,7 +77,6 @@ class QuoteController {
       const quotes = await QuoteService.getQuotesByRequisitionId(requisitionId);
       return res.status(200).send(quotes);
     } catch (e) {
-      console.log("ERRO COTAÇÂO: ", error.message);
       return res.status(500).json({ error: error.message });
     }
   };

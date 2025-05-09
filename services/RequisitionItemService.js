@@ -6,9 +6,7 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       let [originalRows] = await connection.query(query, [requisitionID]);
-      console.log('originalRows: ', originalRows);
       const responseObject = this.getItemsComparedByPrices(originalRows);
-      console.log("req items: ", responseObject.rows);
       return responseObject;
     } catch (err) {
       console.error("Erro na query", err);
