@@ -9,7 +9,10 @@ class RequisitionService {
         RequisitionRepository.getPreviousStatus(),
         [requisitionID]
       );
-      return data.status;
+      if(data){ 
+        return data.status;
+      }
+      return null;
   };
 
   static async getStatusChangesByRequisition(requisitionID) {
@@ -59,14 +62,14 @@ class RequisitionService {
 
     try {
       const [requisition] = await this.executeQuery(query, [id]);
-      console.log("requsition: ", {
-        ...requisition,
-        status_anterior,
-      });
-      return { 
-        ...requisition,
-        status_anterior 
-      };
+       if (status_anterior) {
+         return {
+           ...requisition,
+           status_anterior,
+         };
+       }
+       return requisition;
+      
       
     } catch (err) {
       throw err;

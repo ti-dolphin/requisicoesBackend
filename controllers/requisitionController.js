@@ -76,6 +76,7 @@ class RequisitionController {
       const requisition = await RequisitionService.getRequisitionByID(id);
       return res.status(200).json(requisition);
     } catch (e) {
+      console.log('Erro ao buscar dados da requisição: ', e)
       return res
         .status(500)
         .json({ error: "Erro ao buscar dados da requisição" });
