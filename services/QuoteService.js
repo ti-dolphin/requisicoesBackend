@@ -4,17 +4,43 @@ const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
 
 class QuoteService {
+  static createFileFromLink = async (quoteId, file ) => { 
+      const {
+        id_cotacao,
+        nome_arquivo,
+        url
+      } = file;
+      const result = await this.executeQuery(`
+          INSERT INTO web_anexo_cotacao (id_cotacao, nome_arquivo, url)
+          VALUES (?, ?, ?)
+      `, 
+    [
+      id_cotacao,
+      nome_arquivo,
+      url
+    ]);
+      const {insertId} = result;
+      const insertedFile = await this.executeQuery(
+        `
+            SELECT * FROM web_anexo_cotacao WHERE id_anexo_cotacao = ?
+        `,
+        [insertId]
+      );7
+      console.log("insertedFile: ", insertedFile)
+      return insertedFile;
+  };
 
   static async getPaymentMethods() {
     try {
-      const paymentMethods = await this.executeQuery(QuoteRepository.getPaymentMethods());
+      const paymentMethods = await this.executeQuery(
+        QuoteRepository.getPaymentMethods()
+      );
       return paymentMethods;
     } catch (error) {
       console.error("Erro ao buscar métodos de pagamento", error.message);
       throw error;
     }
-    }
-
+  }
 
   static async deleteQuoteFileById(fileId) {
     try {
@@ -161,12 +187,10 @@ class QuoteService {
       valor_frete,
       cnpj_fornecedor,
       cnpj_faturamento,
-      id_condicao_pagamento
+      id_condicao_pagamento,
     } = req.body;
 
-     
-
-      await this.executeQuery(QuoteRepository.updateQuoteQuery(), [
+    await this.executeQuery(QuoteRepository.updateQuoteQuery(), [
       fornecedor,
       observacao,
       descricao,

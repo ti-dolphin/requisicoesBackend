@@ -28,6 +28,9 @@ router.get("/payment-method", (req, res) => {
 
 router.get("/file/:quoteId", QuoteController.getFilesByQuoteId);
 
+router.post('/file/link/:quoteId', QuoteController.createQuoteFileFromLink);
+
+
 router.post(
   "/file/:quoteId",
   upload.single("file"),
