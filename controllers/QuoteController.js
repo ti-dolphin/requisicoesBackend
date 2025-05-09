@@ -87,7 +87,8 @@ class QuoteController {
       const quotes = await QuoteService.getQuotesByRequisitionId(requisitionId);
       return res.status(200).send(quotes);
     } catch (e) {
-      return res.status(500).json({ error: error.message });
+      console.log('erro ao buscar cotações da requisição: ', e.message)
+      return res.status(500).json({ error: e.message });
     }
   };
 

@@ -59,6 +59,8 @@ class QuoteRepository {
         SELECT
           c.*,
           TF.nome AS nome_frete,
+          CP.nome AS nome_condicao_pagamento,
+          c.valor_frete,
           SUM(i.subtotal) + c.valor_frete AS total, -- Soma correta
           COUNT(i.id_item_cotacao) AS quantidade_itens,
           JSON_ARRAYAGG(
@@ -84,6 +86,7 @@ class QuoteRepository {
           web_cotacao c
         LEFT JOIN web_tipo_frete TF ON TF.id_tipo_frete = c.id_tipo_frete
         LEFT JOIN web_items_cotacao i ON c.id_cotacao = i.id_cotacao
+        LEFT JOIN web_condicao_pagamento CP on CP.id_condicao_pagamento = c.id_condicao_pagamento
         WHERE
           c.id_requisicao = ?
         GROUP BY
