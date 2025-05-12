@@ -1,7 +1,18 @@
 const RequisitionService = require("../services/RequisitionService");
-const userController = require("./userController");
 
 class RequisitionController {
+
+  static async getRequisitionKanban(req, res){ 
+    try {
+       const kanbans = await RequisitionService.getRequisitionKanban();
+       return res.status(200).json(kanbans);
+    } catch (e) {
+      return res.status(500).json({
+        error: e.message,
+      });
+    }
+  }
+
   static async getPreviousStatus(req, res) {
     try {
       const { requisitionID } = req.params;
@@ -61,8 +72,8 @@ class RequisitionController {
   }
 
   static async getRequisitions(req, res) {
-    const { user, currentKanbanFilter } = req.query;
-    const requisitions = await RequisitionService.getRequisitions();
+    const { user, kanban } = req.query;
+    const requisitions = await RequisitionService.getRequisitions(user, kanban);
     if (requisitions) {
       return res.status(200).json(requisitions);
     } else {

@@ -11,6 +11,8 @@ router.get(
   RequisitionController.getPreviousStatus
 );
 
+router.get('/kanban', RequisitionController.getRequisitionKanban)
+
 router.get('/types', RequisitionController.getTypes);
 
 router.get(

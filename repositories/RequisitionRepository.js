@@ -1,4 +1,9 @@
 class RequisitionRepository {
+  static getKanbans() {
+    return `
+      SELECT * FROM web_kanban_requisicao
+    `;
+  }
 
   static getPreviousStatus() {
     return `
@@ -58,7 +63,7 @@ class RequisitionRepository {
     `;
   }
 
-  static insertStatusChange = ( ) => { 
+  static insertStatusChange = () => {
     return `
       INSERT INTO web_alteracao_req_status (
         id_requisicao,
@@ -148,54 +153,6 @@ class RequisitionRepository {
     `;
   }
 
-  static getAll() {
-    return `SELECT 
-      R.ID_REQUISICAO,
-      R.DESCRIPTION,
-      R.ID_PROJETO,
-      R.ID_RESPONSAVEL,
-      R.OBSERVACAO,
-      R.TIPO,
-      R.criado_por,
-      R.alterado_por,
-      R.data_alteracao,
-      R.data_criacao,
-      R.id_status_requisicao,
-      JSON_OBJECT(
-        'id_status_requisicao', S.id_status_requisicao,
-        'nome', S.nome,
-        'acao_posterior', S.acao_posterior,
-        'etapa', S.etapa,
-        'acao_anterior', S.acao_anterior
-      ) AS status,
-      JSON_OBJECT(
-        'NOME', P1.NOME,
-        'CODPESSOA', P1.CODPESSOA
-      ) AS responsavel_pessoa,
-      JSON_OBJECT(
-        'NOME', P2.NOME,
-        'CODPESSOA', P2.CODPESSOA
-      ) AS alterado_por_pessoa,
-      JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO,
-        'gerente', JSON_OBJECT(
-          'NOME', P3.NOME,
-          'CODPESSOA', P3.CODPESSOA
-        )
-      ) AS projeto_gerente,
-        JSON_OBJECT(
-        'ID_PROJETO', PR.ID,
-        'DESCRICAO', PR.DESCRICAO
-      ) AS projeto_descricao
-    FROM WEB_REQUISICAO R
-    INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
-    INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
-    LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
-    LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
-    INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao`;
-  }
-
   static insertRequisition(requisition) {
     const nowDateTime = new Date();
     const opcoes = {
@@ -255,6 +212,188 @@ class RequisitionRepository {
       ${data_criacao},
       ${data_alteracao}
     )
+  `;
+  }
+
+  static getStatusInKanbanQuery(kanbanId) {
+    return `SELECT id_status_requisicao 
+            FROM web_kanban_status_requisicao 
+            WHERE id_kanban_requisicao = ${kanbanId}`;
+  }
+  /**
+   * Obtém requisições filtradas por kanban com base nas permissões do usuário
+   * @param {Object} user - Dados do usuário logado
+   * @param {Object} kanban - Dados do kanban selecionado
+   * @returns {string} Query SQL completa
+   */
+  static getFilteredRequisitions(user, kanban) {
+    const userPermissions = this.normalizeUserPermissions(user);
+    const kanbanType = this.determineKanbanType(kanban.id_kanban_requisicao);
+    const statusQuery = this.getStatusInKanbanQuery(
+      kanban.id_kanban_requisicao
+    );
+
+    const whereCondition = this.buildWhereCondition({
+      kanbanType,
+      userPermissions,
+      statusQuery,
+    });
+
+    return this.buildCompleteQuery(whereCondition, statusQuery);
+  }
+
+  /**
+   * Define o tipo de kanban com constantes semânticas
+   */
+  static determineKanbanType(kanbanId) {
+    const id = Number(kanbanId);
+    return {
+      isAll: id === 5,
+      isConcluded: id === 4,
+      isAcompanhamento: id === 3,
+      isDefault: ![3, 4, 5].includes(id),
+    };
+  }
+
+  /**
+   * Normaliza e tipifica as permissões do usuário
+   */
+  static normalizeUserPermissions(user) {
+    return {
+      userId: Number(user.CODPESSOA || 0),
+      managerId: Number(user.CODGERENTE || 0),
+      isBuyer: Boolean(Number(user.PERM_COMPRADOR || 0)),
+      isDirector: Boolean(Number(user.PERM_DIRETOR || 0)),
+    };
+  }
+
+  /**
+   * Constrói a condição WHERE de forma dinâmica
+   */
+  static buildWhereCondition({ kanbanType, userPermissions, statusQuery }) {
+    const { userId, managerId, isBuyer, isDirector } = userPermissions;
+
+    if (kanbanType.isAll) {
+      return "1=1"; // Retorna todos os registros
+    }
+
+    if (kanbanType.isConcluded) {
+      return "S.id_status_requisicao = 9"; // Status 9 = Concluído
+    }
+
+    if (kanbanType.isAcompanhamento) {
+      console.log("acompanhamento")
+      return `
+          CASE
+              WHEN S.id_status_requisicao = 2 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                isDirector
+              )}
+              WHEN S.id_status_requisicao = 3 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                isDirector
+              )}
+              WHEN S.id_status_requisicao = 6 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                isDirector
+              )}
+              WHEN S.id_status_requisicao = 7 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                false
+              )}
+              WHEN S.id_status_requisicao = 8 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                isDirector
+              )}
+              ELSE 1=0
+          END
+      `;
+    }
+
+    // Condição padrão para outros kanbans
+    return `
+      CASE
+          WHEN S.id_status_requisicao = 1 THEN R.ID_RESPONSAVEL = ${userId}
+          WHEN S.id_status_requisicao IN (2, 3, 8) THEN ${Number(isBuyer)}
+          WHEN S.id_status_requisicao = 6 THEN PR.CODGERENTE = ${managerId}
+          WHEN S.id_status_requisicao = 7 THEN ${Number(isDirector)}
+          ELSE 1=0
+      END
+  `;
+  }
+
+  /**
+   * Helper para construir condições de responsabilidade
+   */
+  static buildResponsibleCondition(userId, managerId, includeDirector) {
+    const conditions = [
+      `R.ID_RESPONSAVEL = ${userId}`,
+      `PR.CODGERENTE = ${managerId}`
+    ];
+
+    if (includeDirector) {
+      conditions.push("1=1"); // Permite se for diretor
+    }
+
+    return conditions.join(" OR ");
+  }
+
+  /**
+   * Monta a query completa com joins e seleção de campos
+   */
+  static buildCompleteQuery(whereCondition, statusQuery) {
+    return `
+      SELECT 
+          R.ID_REQUISICAO, R.DESCRIPTION, R.ID_PROJETO, R.ID_RESPONSAVEL,
+          R.OBSERVACAO, R.TIPO, R.criado_por, R.alterado_por,
+          R.data_alteracao, R.data_criacao, R.id_status_requisicao,
+          
+          JSON_OBJECT(
+              'id_status_requisicao', S.id_status_requisicao,
+              'nome', S.nome,
+              'acao_posterior', S.acao_posterior,
+              'etapa', S.etapa,
+              'acao_anterior', S.acao_anterior
+          ) AS status,
+          
+          JSON_OBJECT(
+              'NOME', P1.NOME,
+              'CODPESSOA', P1.CODPESSOA
+          ) AS responsavel_pessoa,
+          
+          JSON_OBJECT(
+              'NOME', P2.NOME,
+              'CODPESSOA', P2.CODPESSOA
+          ) AS alterado_por_pessoa,
+          
+          JSON_OBJECT(
+              'ID_PROJETO', PR.ID,
+              'DESCRICAO', PR.DESCRICAO,
+              'gerente', JSON_OBJECT(
+                  'NOME', P3.NOME,
+                  'CODPESSOA', P3.CODPESSOA
+              )
+          ) AS projeto_gerente,
+          
+          JSON_OBJECT(
+              'ID_PROJETO', PR.ID,
+              'DESCRICAO', PR.DESCRICAO
+          ) AS projeto_descricao
+          
+      FROM WEB_REQUISICAO R
+      INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
+      INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
+      LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
+      LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
+      INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
+      WHERE 
+          R.id_status_requisicao IN (${statusQuery})
+          AND ${whereCondition}
   `;
   }
 

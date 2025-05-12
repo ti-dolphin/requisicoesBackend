@@ -115,6 +115,7 @@ WHERE
       username,
       encryptedPassword,
     ]);
+  
     if (result.length) {
       return result;
     }

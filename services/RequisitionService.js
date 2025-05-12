@@ -4,15 +4,20 @@ const userController = require("../controllers/userController");
 const RequisitionRepository = require("../repositories/RequisitionRepository");
 const utiils = require('../utils');
 class RequisitionService {
-  static getPreviousStatus = async (requisitionID ) => { 
-      const [data] = await this.executeQuery(
-        RequisitionRepository.getPreviousStatus(),
-        [requisitionID]
-      );
-      if(data){ 
-        return data.status;
-      }
-      return null;
+  static getRequisitionKanban = async () => {
+    const data = await this.executeQuery(RequisitionRepository.getKanbans());
+    return data;
+  };
+
+  static getPreviousStatus = async (requisitionID) => {
+    const [data] = await this.executeQuery(
+      RequisitionRepository.getPreviousStatus(),
+      [requisitionID]
+    );
+    if (data) {
+      return data.status;
+    }
+    return null;
   };
 
   static async getStatusChangesByRequisition(requisitionID) {
@@ -45,9 +50,12 @@ class RequisitionService {
     return types;
   }
 
-  static async getRequisitions() {
+  static async getRequisitions(user, kanban) {
     try {
-      const rows = await this.executeQuery(RequisitionRepository.getAll());
+      let rows = await this.executeQuery(
+        RequisitionRepository.getFilteredRequisitions(user, kanban)
+      );
+   
       return rows;
     } catch (err) {
       console.log(err);
@@ -56,21 +64,18 @@ class RequisitionService {
   }
 
   static async getRequisitionByID(id) {
-
     const query = RequisitionRepository.getById();
     const status_anterior = await this.getPreviousStatus(id);
 
     try {
       const [requisition] = await this.executeQuery(query, [id]);
-       if (status_anterior) {
-         return {
-           ...requisition,
-           status_anterior,
-         };
-       }
-       return requisition;
-      
-      
+      if (status_anterior) {
+        return {
+          ...requisition,
+          status_anterior,
+        };
+      }
+      return requisition;
     } catch (err) {
       throw err;
     }
