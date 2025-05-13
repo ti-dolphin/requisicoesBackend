@@ -127,7 +127,7 @@ class RequisitionRepository {
           'CODPESSOA', P4.CODPESSOA
         )
       ) AS projeto_gerente,
-      SON_OBJECT(
+      JSON_OBJECT(
         'ID_PROJETO', PR.ID,
         'DESCRICAO', PR.DESCRICAO,
         'responsavel', JSON_OBJECT(
