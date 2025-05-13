@@ -127,6 +127,14 @@ class RequisitionRepository {
           'CODPESSOA', P4.CODPESSOA
         )
       ) AS projeto_gerente,
+      SON_OBJECT(
+        'ID_PROJETO', PR.ID,
+        'DESCRICAO', PR.DESCRICAO,
+        'responsavel', JSON_OBJECT(
+          'NOME', P4.NOME,
+          'CODPESSOA', P4.CODPESSOA
+        )
+      ) AS projeto_responsavel,
         JSON_OBJECT(
         'ID_PROJETO', PR.ID,
         'DESCRICAO', PR.DESCRICAO
@@ -394,7 +402,13 @@ class RequisitionRepository {
                   'CODPESSOA', P4.CODPESSOA)
             
           ) AS projeto_gerente,
-          
+           JSON_OBJECT(
+              'ID_PROJETO', PR.ID,
+              'DESCRICAO', PR.DESCRICAO,
+              'responsavel', JSON_OBJECT(
+                  'NOME', P4.NOME,
+                  'CODPESSOA', P4.CODPESSOA)
+          ) AS projeto_responsavel,
           JSON_OBJECT(
               'ID_PROJETO', PR.ID,
               'DESCRICAO', PR.DESCRICAO
