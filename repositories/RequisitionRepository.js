@@ -83,7 +83,7 @@ class RequisitionRepository {
     `;
   };
   static getStatusListQuery = `
-    SELECT * FROM dsecombr_controle.web_status_requisicao
+    SELECT * FROM dsecombr_controle.web_status_requisicao ORDER BY etapa;
   `;
 
   static getById() {
@@ -121,6 +121,10 @@ class RequisitionRepository {
         'gerente', JSON_OBJECT(
           'NOME', P3.NOME,
           'CODPESSOA', P3.CODPESSOA
+        ),
+        'responsavel', JSON_OBJECT(
+          'NOME', P4.NOME,
+          'CODPESSOA', P4.CODPESSOA
         )
       ) AS projeto_gerente,
         JSON_OBJECT(
@@ -143,6 +147,7 @@ class RequisitionRepository {
     LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
     INNER JOIN PROJETOS PR ON PR.ID = R.ID_PROJETO
     LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
+    LEFT JOIN PESSOA P4 ON P4.CODPESSOA = PR.ID_RESPONSAVEL
     INNER JOIN web_tipo_requisicao T ON T.id_tipo_requisicao = R.TIPO
     WHERE R.ID_REQUISICAO = ?`;
   }
@@ -274,6 +279,7 @@ class RequisitionRepository {
     const { userId, managerId, isBuyer, isDirector } = userPermissions;
 
     if (kanbanType.isAll) {
+      console.log('all')
       return "1=1"; // Retorna todos os registros
     }
 
@@ -286,6 +292,11 @@ class RequisitionRepository {
       return `
           CASE
               WHEN S.id_status_requisicao = 2 THEN ${this.buildResponsibleCondition(
+                userId,
+                managerId,
+                isDirector
+              )}
+              WHEN S.id_status_requisicao = 10 THEN ${this.buildResponsibleCondition(
                 userId,
                 managerId,
                 isDirector
@@ -314,12 +325,11 @@ class RequisitionRepository {
           END
       `;
     }
-
-    // Condição padrão para outros kanbans
     return `
       CASE
           WHEN S.id_status_requisicao = 1 THEN R.ID_RESPONSAVEL = ${userId}
           WHEN S.id_status_requisicao IN (2, 3, 8) THEN ${Number(isBuyer)}
+          WHEN S.id_status_requisicao = 10 THEN PR.ID_RESPONSAVEL = ${userId} 
           WHEN S.id_status_requisicao = 6 THEN PR.CODGERENTE = ${managerId}
           WHEN S.id_status_requisicao = 7 THEN ${Number(isDirector)}
           ELSE 1=0
@@ -333,7 +343,8 @@ class RequisitionRepository {
   static buildResponsibleCondition(userId, managerId, includeDirector) {
     const conditions = [
       `R.ID_RESPONSAVEL = ${userId}`,
-      `PR.CODGERENTE = ${managerId}`
+      `PR.CODGERENTE = ${managerId}`,
+      `PR.ID_RESPONSAVEL = ${userId}`,
     ];
 
     if (includeDirector) {
@@ -377,7 +388,11 @@ class RequisitionRepository {
               'gerente', JSON_OBJECT(
                   'NOME', P3.NOME,
                   'CODPESSOA', P3.CODPESSOA
-              )
+              ), 
+              'responsavel', JSON_OBJECT(
+                  'NOME', P4.NOME,
+                  'CODPESSOA', P4.CODPESSOA)
+            
           ) AS projeto_gerente,
           
           JSON_OBJECT(
@@ -390,6 +405,7 @@ class RequisitionRepository {
       INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
       LEFT JOIN PESSOA P2 ON P2.CODPESSOA = R.alterado_por
       LEFT JOIN PESSOA P3 ON P3.CODGERENTE = PR.CODGERENTE
+      LEFT JOIN PESSOA P4 ON P4.CODPESSOA = PR.ID_RESPONSAVEL
       INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
       WHERE 
           R.id_status_requisicao IN (${statusQuery})
