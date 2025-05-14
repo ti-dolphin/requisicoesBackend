@@ -4,7 +4,7 @@ class PatrimonyRepository {
      SELECT 
           web_patrimonio.pat_legado AS patrimonio,
           web_patrimonio.id_patrimonio,
-          web_patrimonio.id_responsavel,
+          movimentacao_patrimonio.id_responsavel,
           GERENTE.NOME AS gerente,
           PROJETOS.DESCRICAO AS projeto,
           RESPONSAVEL.NOME AS responsavel,
@@ -40,7 +40,7 @@ class PatrimonyRepository {
         SELECT 
             web_patrimonio.pat_legado AS patrimonio,
             web_patrimonio.id_patrimonio,
-            web_patrimonio.id_responsavel,
+            movimentacao_patrimonio.id_responsavel,
             GERENTE.NOME AS gerente,
             PROJETOS.DESCRICAO AS projeto,
             RESPONSAVEL.NOME AS responsavel,
@@ -130,7 +130,7 @@ class PatrimonyRepository {
           SELECT 
           web_patrimonio.pat_legado AS patrimonio,
           web_patrimonio.id_patrimonio,
-          web_patrimonio.id_responsavel,
+          movimentacao_patrimonio.id_responsavel,
           GERENTE.NOME AS gerente,
           PROJETOS.DESCRICAO AS projeto,
           RESPONSAVEL.NOME AS responsavel,
