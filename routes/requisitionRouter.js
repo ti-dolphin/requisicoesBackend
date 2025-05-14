@@ -6,12 +6,13 @@ const RequisitionController = require("../controllers/requisitionController");
 router.get("/", RequisitionController.getRequisitions);
 
 router.get("/status", RequisitionController.getStatusList);
+
 router.get(
   "/status/previous/:requisitionID",
   RequisitionController.getPreviousStatus
 );
 
-router.get('/kanban', RequisitionController.getRequisitionKanban)
+router.get('/kanban', RequisitionController.getRequisitionKanban);
 
 router.get('/types', RequisitionController.getTypes);
 
@@ -22,10 +23,11 @@ router.get(
 
 router.get("/:id", RequisitionController.getRequisitionByID);
 
-
 router.post("/", RequisitionController.insertRequisitions);
 
 router.put("/:requisitionID", RequisitionController.updateRequisitionById);
+
+router.get("/:requisitionID/acao", RequisitionController.getStatusAction);
 
 router.delete("/:requisitionID", RequisitionController.deleteRequisitionById);
 

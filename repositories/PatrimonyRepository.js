@@ -1,5 +1,5 @@
 class PatrimonyRepository {
-  static getPatrimonyInfoQueryByResponsable = ( ) => { 
+  static getPatrimonyInfoQueryByResponsable = () => {
     return `
      SELECT 
           web_patrimonio.pat_legado AS patrimonio,

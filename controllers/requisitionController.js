@@ -81,10 +81,23 @@ class RequisitionController {
     }
   }
 
+  static async getStatusAction(req, res) { 
+   
+    try{ 
+      const acao = await RequisitionService.getStatusAction(req.query.user, req.query.requisition);
+      return res.status(200).json({permissao: acao});
+    }catch(e){ 
+      console.log('ERRO AO PEGAR ACAO: ', e)
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar dados da requisição" });
+    }
+  }
+
   static async getRequisitionByID(req, res) {
     try {
-      const { id } = req.params;
-      const requisition = await RequisitionService.getRequisitionByID(id);
+      const { id, user } = req.params;
+      const requisition = await RequisitionService.getRequisitionByID(id, user);
       return res.status(200).json(requisition);
     } catch (e) {
       console.log('Erro ao buscar dados da requisição: ', e)
@@ -107,13 +120,14 @@ class RequisitionController {
   }
 
   static async updateRequisitionById(req, res) {
-    const { codpessoa, requisition, justification, id_status_anterior } =
+    const { codpessoa, requisition, justification, id_status_anterior, id_status_requisicao } =
       req.body;
     const result = await RequisitionService.updateRequisitionById(
       codpessoa,
       requisition,
       justification,
-      id_status_anterior
+      id_status_anterior,
+      id_status_requisicao
     );
     if (result) {
       return res.status(200).json(result);

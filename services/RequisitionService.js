@@ -9,6 +9,10 @@ class RequisitionService {
     return data;
   };
 
+  static getPermissionsToNextStatus = async (requisitionID, nextStatus) => {
+    //
+  };
+
   static getPreviousStatus = async (requisitionID) => {
     const [data] = await this.executeQuery(
       RequisitionRepository.getPreviousStatus(),
@@ -19,6 +23,38 @@ class RequisitionService {
     }
     return null;
   };
+
+  
+  static getStatusAction = async (user, requisition) => {
+    const query = RequisitionRepository.getStatusAction(
+      requisition,
+      user
+    );
+    
+    const [acao] = await this.executeQuery(query);
+    return acao;
+  };
+
+
+  static async getRequisitionByID(id, user) {
+    const query = RequisitionRepository.getById(id, user);
+    const previousStatus = await this.getPreviousStatus(id);
+
+    try {
+      const [requisition] = await this.executeQuery(query, [id]);
+      if (previousStatus) {
+        return {
+          ...requisition,
+          status_anterior: previousStatus,
+        };
+      }
+      return requisition;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  
 
   static async getStatusChangesByRequisition(requisitionID) {
     try {
@@ -55,29 +91,11 @@ class RequisitionService {
       let rows = await this.executeQuery(
         RequisitionRepository.getFilteredRequisitions(user, kanban)
       );
-   
+
       return rows;
     } catch (err) {
       console.log(err);
       return null;
-    }
-  }
-
-  static async getRequisitionByID(id) {
-    const query = RequisitionRepository.getById();
-    const status_anterior = await this.getPreviousStatus(id);
-
-    try {
-      const [requisition] = await this.executeQuery(query, [id]);
-      if (status_anterior) {
-        return {
-          ...requisition,
-          status_anterior,
-        };
-      }
-      return requisition;
-    } catch (err) {
-      throw err;
     }
   }
 
@@ -96,13 +114,18 @@ class RequisitionService {
     codpessoa,
     requisition,
     justification,
-    id_status_anterior
+    id_status_anterior,
+    id_status_requisicao
   ) {
     try {
       const reqBeforeUpdate = await this.getRequisitionByID(
         requisition.ID_REQUISICAO
       );
-      const query = await RequisitionRepository.update(codpessoa, requisition);
+      const query = await RequisitionRepository.update(
+        codpessoa,
+        requisition,
+        id_status_requisicao
+      );
       const result = await this.executeQuery(query);
       const reqAfterUpdate = await this.getRequisitionByID(
         requisition.ID_REQUISICAO
