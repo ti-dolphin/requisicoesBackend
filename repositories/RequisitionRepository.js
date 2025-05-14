@@ -86,6 +86,56 @@ class RequisitionRepository {
     SELECT * FROM dsecombr_controle.web_status_requisicao ORDER BY etapa;
   `;
 
+  static convertToNumber(value) { 
+    const number = Number(value);
+    return isNaN(number) ? 0 : number;
+  }
+
+  static getStatusAction(requisition, user){
+    console.log("getStatusAction");
+    let { PERM_ADMINISTRADOR, PERM_COMPRADOR, PERM_DIRETOR, CODPESSOA } = user;
+    const { id_status_requisicao, projeto_gerente, projeto_responsavel } = requisition;
+
+     PERM_ADMINISTRADOR = this.convertToNumber(PERM_ADMINISTRADOR);
+     PERM_COMPRADOR = this.convertToNumber(PERM_COMPRADOR);
+     PERM_DIRETOR = this.convertToNumber(PERM_DIRETOR);
+     CODPESSOA = this.convertToNumber(CODPESSOA);
+
+    const CODPESSOA_GERENTE = this.convertToNumber(
+      projeto_gerente.gerente.CODPESSOA
+    );
+    const CODPESSOA_RESPONSAVEL_PROJETO = this.convertToNumber(
+      projeto_responsavel.responsavel.CODPESSOA
+    ); ;
+    const CODPESSOA_RESPONSAVEL = this.convertToNumber(
+      requisition.ID_RESPONSAVEL
+    );
+
+    console.log("Converted Variables:");
+    console.log("PERM_ADMINISTRADOR:", PERM_ADMINISTRADOR);
+    console.log("PERM_COMPRADOR:", PERM_COMPRADOR);
+    console.log("PERM_DIRETOR:", PERM_DIRETOR);
+    console.log("CODPESSOA:", CODPESSOA);
+    console.log("CODPESSOA_GERENTE:", CODPESSOA_GERENTE);
+    console.log("CODPESSOA_RESPONSAVEL_PROJETO:", CODPESSOA_RESPONSAVEL_PROJETO);
+    console.log("CODPESSOA_RESPONSAVEL:", CODPESSOA_RESPONSAVEL);
+    return `
+          SELECT 
+          CASE WHEN SUM(acao) > 0 THEN 1 ELSE 0 END AS acao
+      FROM 
+          web_perfil_acao_status_requisicao
+      WHERE 
+          id_status_requisicao = ${id_status_requisicao}
+          AND acao = 1
+          AND id_perfil_usuario IN (SELECT 1 AS result WHERE  1 = ${PERM_ADMINISTRADOR}
+                  UNION SELECT 2 WHERE ${CODPESSOA_RESPONSAVEL} = ${CODPESSOA}
+                  UNION SELECT 3 WHERE ${CODPESSOA_RESPONSAVEL_PROJETO} = ${CODPESSOA}
+                  UNION SELECT 4 WHERE ${CODPESSOA_GERENTE} = ${CODPESSOA}
+                  UNION SELECT 5 WHERE 1 = ${PERM_DIRETOR}
+                  UNION SELECT 6 WHERE 1 = ${PERM_COMPRADOR})
+    `;
+  }
+
   static getById() {
     return `SELECT 
       R.ID_REQUISICAO,
@@ -139,9 +189,6 @@ class RequisitionRepository {
         'ID_PROJETO', PR.ID,
         'DESCRICAO', PR.DESCRICAO
       ) AS projeto_descricao,
-      
-      ,
-
       JSON_OBJECT('label', P1.NOME, 'id', P1.CODPESSOA) AS responsableOption,
       JSON_OBJECT('label', PR.DESCRICAO, 'id', PR.ID) AS projectOption,
       JSON_OBJECT('label', T.nome_tipo, 'id', T.id_tipo_requisicao) AS typeOption,
