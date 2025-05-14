@@ -9,6 +9,14 @@ class RequisitionService {
     return data;
   };
 
+  static getPermissionsToNextStatus = async (requisitionID ) => { 
+    const [data] = await this.executeQuery(`
+          SELECT * FROM web_status_requisicao S INNER JOIN 
+          WEB_REQUISICAO R ON R.id_status_requisicao = S.id_status_requisicao
+          WHERE R.ID_REQUISICAO = ${requisitionID}
+      `);
+  }
+
   static getPreviousStatus = async (requisitionID) => {
     const [data] = await this.executeQuery(
       RequisitionRepository.getPreviousStatus(),

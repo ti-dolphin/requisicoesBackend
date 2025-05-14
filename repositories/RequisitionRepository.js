@@ -139,6 +139,9 @@ class RequisitionRepository {
         'ID_PROJETO', PR.ID,
         'DESCRICAO', PR.DESCRICAO
       ) AS projeto_descricao,
+      
+      ,
+
       JSON_OBJECT('label', P1.NOME, 'id', P1.CODPESSOA) AS responsableOption,
       JSON_OBJECT('label', PR.DESCRICAO, 'id', PR.ID) AS projectOption,
       JSON_OBJECT('label', T.nome_tipo, 'id', T.id_tipo_requisicao) AS typeOption,
@@ -149,6 +152,7 @@ class RequisitionRepository {
        WHERE p.ATIVO = 1) AS projectOptions,
       (SELECT JSON_ARRAYAGG(JSON_OBJECT('label', PESSOA.NOME, 'id', PESSOA.CODPESSOA))
        FROM PESSOA WHERE PERM_REQUISITAR = 1) AS responsableOptions
+
     FROM WEB_REQUISICAO R
     INNER JOIN web_status_requisicao S ON S.id_status_requisicao = R.id_status_requisicao
     INNER JOIN PESSOA P1 ON P1.CODPESSOA = R.ID_RESPONSAVEL
