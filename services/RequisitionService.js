@@ -58,7 +58,6 @@ class RequisitionService {
 
   static async getStatusChangesByRequisition(requisitionID) {
     try {
-      const query = RequisitionRepository.getStatusChangesByRequisition();
       const statusChanges = await this.executeQuery(query, [requisitionID]);
       return statusChanges;
     } catch (err) {
@@ -89,6 +88,12 @@ class RequisitionService {
   static async getRequisitions(user, kanban, subFilter) {
   
     try {
+      const query = RequisitionRepository.getFilteredRequisitions(
+        user,
+        kanban,
+        subFilter
+      );
+      console.log("query: ", query)
       let rows = await this.executeQuery(
         RequisitionRepository.getFilteredRequisitions(user, kanban, subFilter)
       );

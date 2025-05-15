@@ -330,19 +330,22 @@ class RequisitionRepository {
     let minhasClause = '';
     if(minhasSubfilter){ 
       minhasClause = `
-      AND ${userId} in (SELECT DISTINCT alterado_por FROM web_alteracao_req_status ALTERACAO WHERE ALTERACAO.id_requisicao = R.ID_REQUISICAO)
-      AND S.id_status_requisicao not in (1,9, 99)
-      OR PR.CODGERENTE = ${managerId} 
+      AND (${userId} in (SELECT DISTINCT alterado_por FROM web_alteracao_req_status ALTERACAO WHERE ALTERACAO.id_requisicao = R.ID_REQUISICAO)
+      OR PR.CODGERENTE = ${managerId} )
+      
+    
       `;
+      console.log("minhasClause: ", minhasClause);
     }
     if (kanbanType.isAll) {
       console.log('all')
       return "1=1"; // Retorna todos os registros
     }
     if (kanbanType.isConcluded) {
-      return "S.id_status_requisicao = 9"; // Status 9 = Concluído
+      return `S.id_status_requisicao = 9 ${minhasClause}`; // Status 9 = Concluído
     }
     if (kanbanType.isAcompanhamento) {
+      console.log('acompanhamento')
       return `R.ID_REQUISICAO > 0 ${minhasClause}`
     }
     //é a fazer
