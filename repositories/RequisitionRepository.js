@@ -92,33 +92,21 @@ class RequisitionRepository {
   }
 
   static getStatusAction(requisition, user){
-    console.log("getStatusAction");
     let { PERM_ADMINISTRADOR, PERM_COMPRADOR, PERM_DIRETOR, CODPESSOA } = user;
     const { id_status_requisicao, projeto_gerente, projeto_responsavel } = requisition;
-
      PERM_ADMINISTRADOR = this.convertToNumber(PERM_ADMINISTRADOR);
      PERM_COMPRADOR = this.convertToNumber(PERM_COMPRADOR);
      PERM_DIRETOR = this.convertToNumber(PERM_DIRETOR);
      CODPESSOA = this.convertToNumber(CODPESSOA);
-
     const CODPESSOA_GERENTE = this.convertToNumber(
       projeto_gerente.gerente.CODPESSOA
     );
-    const CODPESSOA_RESPONSAVEL_PROJETO = this.convertToNumber(
-      projeto_responsavel.responsavel.CODPESSOA
-    ); ;
+    const CODPESSOA_RESPONSAVEL_PROJETO = projeto_responsavel.responsavel ?  this.convertToNumber(
+      projeto_responsavel.responsavel.CODPESSOA 
+    ) : 0;
     const CODPESSOA_RESPONSAVEL = this.convertToNumber(
       requisition.ID_RESPONSAVEL
     );
-
-    console.log("Converted Variables:");
-    console.log("PERM_ADMINISTRADOR:", PERM_ADMINISTRADOR);
-    console.log("PERM_COMPRADOR:", PERM_COMPRADOR);
-    console.log("PERM_DIRETOR:", PERM_DIRETOR);
-    console.log("CODPESSOA:", CODPESSOA);
-    console.log("CODPESSOA_GERENTE:", CODPESSOA_GERENTE);
-    console.log("CODPESSOA_RESPONSAVEL_PROJETO:", CODPESSOA_RESPONSAVEL_PROJETO);
-    console.log("CODPESSOA_RESPONSAVEL:", CODPESSOA_RESPONSAVEL);
     return `
           SELECT 
           CASE WHEN SUM(acao) > 0 THEN 1 ELSE 0 END AS acao
@@ -290,7 +278,7 @@ class RequisitionRepository {
    * @param {Object} kanban - Dados do kanban selecionado
    * @returns {string} Query SQL completa
    */
-  static getFilteredRequisitions(user, kanban) {
+  static getFilteredRequisitions(user, kanban, subFilter) {
     const userPermissions = this.normalizeUserPermissions(user);
     const kanbanType = this.determineKanbanType(kanban.id_kanban_requisicao);
     const statusQuery = this.getStatusInKanbanQuery(
@@ -301,6 +289,7 @@ class RequisitionRepository {
       kanbanType,
       userPermissions,
       statusQuery,
+      subFilter
     });
 
     return this.buildCompleteQuery(whereCondition, statusQuery);
@@ -334,56 +323,29 @@ class RequisitionRepository {
   /**
    * Constrói a condição WHERE de forma dinâmica
    */
-  static buildWhereCondition({ kanbanType, userPermissions, statusQuery }) {
+  static buildWhereCondition({ kanbanType, userPermissions, statusQuery, subFilter }) {
     const { userId, managerId, isBuyer, isDirector } = userPermissions;
 
+    const minhasSubfilter = subFilter && subFilter === 'Minhas';
+    let minhasClause = '';
+    if(minhasSubfilter){ 
+      minhasClause = `
+      AND ${userId} in (SELECT DISTINCT alterado_por FROM web_alteracao_req_status ALTERACAO WHERE ALTERACAO.id_requisicao = R.ID_REQUISICAO)
+      AND S.id_status_requisicao not in (1,9, 99)
+      OR PR.CODGERENTE = ${managerId} 
+      `;
+    }
     if (kanbanType.isAll) {
       console.log('all')
       return "1=1"; // Retorna todos os registros
     }
-
     if (kanbanType.isConcluded) {
       return "S.id_status_requisicao = 9"; // Status 9 = Concluído
     }
-
     if (kanbanType.isAcompanhamento) {
-      console.log("acompanhamento")
-      return `
-          CASE
-              WHEN S.id_status_requisicao = 2 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                isDirector
-              )}
-              WHEN S.id_status_requisicao = 10 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                isDirector
-              )}
-              WHEN S.id_status_requisicao = 3 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                isDirector
-              )}
-              WHEN S.id_status_requisicao = 6 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                isDirector
-              )}
-              WHEN S.id_status_requisicao = 7 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                false
-              )}
-              WHEN S.id_status_requisicao = 8 THEN ${this.buildResponsibleCondition(
-                userId,
-                managerId,
-                isDirector
-              )}
-              ELSE 1=0
-          END
-      `;
+      return `R.ID_REQUISICAO > 0 ${minhasClause}`
     }
+    //é a fazer
     return `
       CASE
           WHEN S.id_status_requisicao = 1 THEN R.ID_RESPONSAVEL = ${userId}
