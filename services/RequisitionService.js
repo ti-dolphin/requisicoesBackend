@@ -86,10 +86,11 @@ class RequisitionService {
     return types;
   }
 
-  static async getRequisitions(user, kanban) {
+  static async getRequisitions(user, kanban, subFilter) {
+  
     try {
       let rows = await this.executeQuery(
-        RequisitionRepository.getFilteredRequisitions(user, kanban)
+        RequisitionRepository.getFilteredRequisitions(user, kanban, subFilter)
       );
 
       return rows;
