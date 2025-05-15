@@ -58,6 +58,7 @@ class RequisitionService {
 
   static async getStatusChangesByRequisition(requisitionID) {
     try {
+      const query = RequisitionRepository.getStatusChangesByRequisition();
       const statusChanges = await this.executeQuery(query, [requisitionID]);
       return statusChanges;
     } catch (err) {
