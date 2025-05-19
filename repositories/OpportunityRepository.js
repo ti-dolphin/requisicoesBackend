@@ -378,15 +378,14 @@ FROM
       os.VALORFATDIRETO AS valorFaturamentoDireto,
       (os.VALORFATDOLPHIN + os.VALORFATDIRETO) AS valorTotal,
       os.CODOS AS numeroOs,
-      /* Date status indicators */
-      CASE WHEN os.DATAINTERACAO < CURDATE() THEN 1 ELSE 0 END AS dataInteracao_vencida,
-      CASE WHEN os.DATAINTERACAO >= CURDATE() 
-            AND os.DATAINTERACAO < DATE_ADD(CURDATE(), INTERVAL 5 DAY) 
-         THEN 1 ELSE 0 END AS dataInteracao_a_vencer,
-      CASE WHEN os.DATAINTERACAO >= DATE_ADD(CURDATE(), INTERVAL 5 DAY) 
-         THEN 1 ELSE 0 END AS dataInteracao_em_dia
+      CASE WHEN  s.ACAO != 1 AND (os.DATAINTERACAO < CURDATE())
+              THEN 1 ELSE 0 END AS dataInteracao_vencida,
+      CASE WHEN s.ACAO != 1  AND (os.DATAINTERACAO >= CURDATE() AND os.DATAINTERACAO < DATE_ADD(CURDATE(), INTERVAL 5 DAY))
+             THEN 1 ELSE 0 END AS dataInteracao_a_vencer,
+      CASE WHEN  s.ACAO != 1 AND (os.DATAINTERACAO >= DATE_ADD(CURDATE(), INTERVAL 5 DAY) OR s.ACAO = 1)
+             THEN 1 ELSE 0 END AS dataInteracao_em_dia
     FROM 
-      ORDEMSERVICO os
+    ORDEMSERVICO os
     LEFT JOIN PROJETOS p ON os.ID_PROJETO = p.ID
     LEFT JOIN CLIENTE c ON os.FK_CODCLIENTE = c.CODCLIENTE AND os.FK_CODCOLIGADA = c.CODCOLIGADA
     LEFT JOIN PESSOA vendedor ON os.RESPONSAVEL = vendedor.CODPESSOA
@@ -395,7 +394,7 @@ FROM
     LEFT JOIN ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
     WHERE 
        s.ATIVO = 1  
-      ${action ? "AND s.ACAO IN (1, 0) AND" : "AND s.ACAO = 0 AND"}
+      ${action ? "AND s.ACAO IN (1) AND" : "AND s.ACAO = 0 AND"}
       (
         os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
         OR os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))

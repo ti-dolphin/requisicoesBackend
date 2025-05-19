@@ -86,24 +86,25 @@ class RequisitionRepository {
     SELECT * FROM dsecombr_controle.web_status_requisicao ORDER BY etapa;
   `;
 
-  static convertToNumber(value) { 
+  static convertToNumber(value) {
     const number = Number(value);
     return isNaN(number) ? 0 : number;
   }
 
-  static getStatusAction(requisition, user){
+  static getStatusAction(requisition, user) {
     let { PERM_ADMINISTRADOR, PERM_COMPRADOR, PERM_DIRETOR, CODPESSOA } = user;
-    const { id_status_requisicao, projeto_gerente, projeto_responsavel } = requisition;
-     PERM_ADMINISTRADOR = this.convertToNumber(PERM_ADMINISTRADOR);
-     PERM_COMPRADOR = this.convertToNumber(PERM_COMPRADOR);
-     PERM_DIRETOR = this.convertToNumber(PERM_DIRETOR);
-     CODPESSOA = this.convertToNumber(CODPESSOA);
+    const { id_status_requisicao, projeto_gerente, projeto_responsavel } =
+      requisition;
+    PERM_ADMINISTRADOR = this.convertToNumber(PERM_ADMINISTRADOR);
+    PERM_COMPRADOR = this.convertToNumber(PERM_COMPRADOR);
+    PERM_DIRETOR = this.convertToNumber(PERM_DIRETOR);
+    CODPESSOA = this.convertToNumber(CODPESSOA);
     const CODPESSOA_GERENTE = this.convertToNumber(
       projeto_gerente.gerente.CODPESSOA
     );
-    const CODPESSOA_RESPONSAVEL_PROJETO = projeto_responsavel.responsavel ?  this.convertToNumber(
-      projeto_responsavel.responsavel.CODPESSOA 
-    ) : 0;
+    const CODPESSOA_RESPONSAVEL_PROJETO = projeto_responsavel.responsavel
+      ? this.convertToNumber(projeto_responsavel.responsavel.CODPESSOA)
+      : 0;
     const CODPESSOA_RESPONSAVEL = this.convertToNumber(
       requisition.ID_RESPONSAVEL
     );
@@ -289,7 +290,7 @@ class RequisitionRepository {
       kanbanType,
       userPermissions,
       statusQuery,
-      subFilter
+      subFilter,
     });
 
     return this.buildCompleteQuery(whereCondition, statusQuery);
@@ -323,12 +324,17 @@ class RequisitionRepository {
   /**
    * Constrói a condição WHERE de forma dinâmica
    */
-  static buildWhereCondition({ kanbanType, userPermissions, statusQuery, subFilter }) {
+  static buildWhereCondition({
+    kanbanType,
+    userPermissions,
+    statusQuery,
+    subFilter,
+  }) {
     const { userId, managerId, isBuyer, isDirector } = userPermissions;
 
-    const minhasSubfilter = subFilter && subFilter === 'Minhas';
-    let minhasClause = '';
-    if(minhasSubfilter){ 
+    const minhasSubfilter = subFilter && subFilter === "Minhas";
+    let minhasClause = "";
+    if (minhasSubfilter) {
       minhasClause = `
       AND (${userId} in (SELECT DISTINCT alterado_por FROM web_alteracao_req_status ALTERACAO WHERE ALTERACAO.id_requisicao = R.ID_REQUISICAO)
       OR PR.CODGERENTE = ${managerId} )
@@ -338,15 +344,15 @@ class RequisitionRepository {
       console.log("minhasClause: ", minhasClause);
     }
     if (kanbanType.isAll) {
-      console.log('all')
+      console.log("all");
       return "1=1"; // Retorna todos os registros
     }
     if (kanbanType.isConcluded) {
       return `S.id_status_requisicao = 9 ${minhasClause}`; // Status 9 = Concluído
     }
     if (kanbanType.isAcompanhamento) {
-      console.log('acompanhamento')
-      return `R.ID_REQUISICAO > 0 ${minhasClause}`
+      console.log("acompanhamento");
+      return `R.ID_REQUISICAO > 0 ${minhasClause}`;
     }
     //é a fazer
     return `
