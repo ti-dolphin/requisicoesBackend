@@ -69,8 +69,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-//  OpportunityScheduler.startExpiredOppsVerification();
-//   PatrimonyScheduler.startEmailSchedule();
-//   PatrimonyScheduler.startchecklistVerification();
+ OpportunityScheduler.startExpiredOppsVerification();
+  PatrimonyScheduler.startEmailSchedule();
+  PatrimonyScheduler.startchecklistVerification();
 
 module.exports = app;
