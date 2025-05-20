@@ -7,7 +7,26 @@ const utils = {
       
     });
   },
-
+  getSQLFormatedDate : ( dateReceived) => { 
+    let date = new Date(dateReceived);
+    const opcoes = {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    };
+     date = date
+      .toLocaleString("sv-SE", opcoes)
+      .replace("T", " ");
+      if(date === 'Invalid Date'){ 
+        return null
+      }
+    return `'${date}'`;
+  },
   getCurrentDateTime : ( ) => { 
        const nowDateTime = new Date();
        const opcoes = {
