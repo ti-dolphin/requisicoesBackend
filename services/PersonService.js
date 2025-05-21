@@ -26,14 +26,9 @@ class PersonService {
         INNER JOIN CLIENTE C ON C.CODCLIENTE = OS.FK_CODCLIENTE
         where OS.ID_PROJETO = ${projectId} AND A.NUMERO = 0
       `
-
     }else  { 
       query = `
-      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE WHERE CODCLIENTE IN (
-        SELECT FK_CODCLIENTE FROM dsecombr_controle.ORDEMSERVICO OS INNER JOIN
-          PROJETOS P ON P.ID = OS.ID_PROJETO WHERE
-          P.ATIVO = 1
-      );
+      SELECT CODCLIENTE, NOMEFANTASIA FROM CLIENTE WHERE CODCLIENTE
     `;
     }
     try {
