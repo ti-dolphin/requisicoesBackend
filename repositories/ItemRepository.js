@@ -1,19 +1,24 @@
+const utils = require('../utils');
 class ItemRepository {
   static update(items) {
+    
     const queries = items
       .map(
-        (item) => `
-                    UPDATE WEB_REQUISICAO_ITEMS
-                    SET
-                        QUANTIDADE = ${item.QUANTIDADE},
-                        OBSERVACAO = '${item.OBSERVACAO}',
-                        ID_PRODUTO = ${item.ID_PRODUTO},
-                        OC = ${item.OC},
-                        ATIVO = ${item.ATIVO}    
-                    WHERE
-                        ID = ${item.ID};
-                    `
-      )
+        (item) => { 
+          const date = utils.getSQLFormatedDate(item.data_entrega);
+         return `
+              UPDATE WEB_REQUISICAO_ITEMS
+              SET
+                  QUANTIDADE = ${item.QUANTIDADE},
+                  OBSERVACAO = '${item.OBSERVACAO}',
+                  ID_PRODUTO = ${item.ID_PRODUTO},
+                  data_entrega = ${date ? date : null},
+                  OC = ${item.OC},
+                  ATIVO = ${item.ATIVO}    
+              WHERE
+                  ID = ${item.ID};
+              `;
+        })
       .join("\n");
     return queries;
   }
@@ -43,6 +48,7 @@ class ItemRepository {
               IR.ID_PRODUTO, 
               IR.ATIVO,
               IR.id_item_cotacao_selecionado,
+              IR.data_entrega,
               P.nome_fantasia, P.codigo, P.unidade,
               C.fornecedor,
               C.valor_frete,
