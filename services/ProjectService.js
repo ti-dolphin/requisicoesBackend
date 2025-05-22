@@ -13,37 +13,40 @@ class ProjectService {
       );
     return result.insertId;
   }
+  // Busca todos os projetos ativos, com regras baseadas nas permissões do usuário
   static async getAllProjects(userID) {
-    let isAdm;
-    let query;
-    if(userID){ 
-      const [data] = await this.executeQuery(`SELECT PERM_ADMINISTRADOR FROM PESSOA where CODPESSOA = ${userID}`);
-      isAdm = Number(data[0].PERM_ADMINISTRADOR);
-    }
-    if (userID && !isAdm) {
-      console.log(' não adm')
-      query = `
-      SELECT 
-        * 
-      FROM 
-        PROJETOS
+    let query = `
+      SELECT * 
+      FROM PROJETOS
       WHERE ATIVO = 1 AND DESCRICAO != 'null'
-      and
-      ID IN (SELECT id_projeto from web_seguidores_projeto where codpessoa = ${userID});
-    `
-    } else {
-      console.log('adm')
-      query = ` SELECT 
-        * 
-      FROM 
-        PROJETOS
-      WHERE ATIVO = 1 AND DESCRICAO != 'null'`;
-    }
+    `;
+    let params = [];
 
+    if (userID) {
+      // Busca permissões do usuário de forma segura
+      const [data] = await this.executeQuery(
+        `SELECT PERM_ADMINISTRADOR, PERM_COMERCIAL FROM PESSOA WHERE CODPESSOA = ?`,
+        [userID]
+      );
+      if (!data || !data[0]) {
+        // Retorna lista vazia se usuário não encontrado
+        return [];
+      }
+      const isAdm = Number(data[0].PERM_ADMINISTRADOR);
+      const isComercial = Number(data[0].PERM_COMERCIAL);
+      if (!isAdm && !isComercial) {
+        // Se não for admin nem comercial, retorna apenas projetos que o usuário segue
+        query += ` AND ID IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)`;
+        params.push(userID);
+      }
+      // Se for comercial ou admin, retorna todos os projetos ativos
+    }
     try {
-      const [rows, fields] = await this.executeQuery(query);
+      // Executa a consulta e retorna os projetos encontrados
+      const [rows] = await this.executeQuery(query, params);
       return rows;
     } catch (err) {
+      // Em caso de erro, exibe no console e retorna null
       console.log(err);
       return null;
     }
