@@ -7,7 +7,7 @@ const pool = mysql.createPool({
   password: "password",
   port: 3306,
   waitForConnections: true,
-  timezone: "Z",
+  timezone: "-03:00",
   connectionLimit: 20, // Aumentar para suportar mais conexões simultâneas
   maxIdle: 10,
   idleTimeout: 30000, // Reduzir para liberar conexões ociosas mais rápido

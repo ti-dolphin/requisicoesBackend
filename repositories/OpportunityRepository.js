@@ -394,7 +394,11 @@ FROM
     LEFT JOIN ADICIONAIS ad ON ad.ID = os.ID_ADICIONAL
     WHERE 
        s.ATIVO = 1  
-      ${action ? "AND s.ACAO IN (1) AND" : "AND s.ACAO = 0 AND"}
+      ${
+        action
+          ? "AND s.ACAO IN (1, 0) AND CODTIPOOS = 21 AND"
+          : "AND s.ACAO = 0 AND CODTIPOOS = 21 AND"
+      }
       (
         os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)
         OR os.ID_PROJETO IN (SELECT ID FROM PROJETOS WHERE PROJETOS.CODGERENTE IN (SELECT CODGERENTE FROM PESSOA WHERE CODPESSOA = ?))
