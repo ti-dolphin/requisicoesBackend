@@ -1,7 +1,7 @@
 const utils = require('../utils');
 class ItemRepository {
   static update(items) {
-    
+    console.log("items: ", items);
     const queries = items
       .map(
         (item) => { 

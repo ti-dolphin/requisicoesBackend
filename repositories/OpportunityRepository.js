@@ -396,8 +396,8 @@ FROM
        s.ATIVO = 1  
       ${
         action
-          ? "AND s.ACAO IN (1, 0) AND os.CODTIPOOS = 21 AND"
-          : "AND s.ACAO = 0 AND os.CODTIPOOS = 21 AND"
+          ? "AND s.ACAO IN (1, 0) AND CODTIPOOS = 21 AND"
+          : "AND s.ACAO = 0 AND CODTIPOOS = 21 AND"
       }
       (
         os.ID_PROJETO IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)

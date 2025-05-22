@@ -8,6 +8,9 @@ const utils = {
     });
   },
   getSQLFormatedDate : ( dateReceived) => { 
+    if(dateReceived === null || dateReceived === undefined || dateReceived === ''){ 
+      return null
+    }
     let date = new Date(dateReceived);
     const opcoes = {
       timeZone: "America/Sao_Paulo",
@@ -22,9 +25,6 @@ const utils = {
      date = date
       .toLocaleString("sv-SE", opcoes)
       .replace("T", " ");
-      if(date === 'Invalid Date'){ 
-        return null
-      }
     return `'${date}'`;
   },
   getCurrentDateTime : ( ) => { 
