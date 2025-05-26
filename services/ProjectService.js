@@ -27,8 +27,9 @@ class ProjectService {
       const [user] = await this.executeQuery(`SELECT PERM_ADMINISTRADOR, PERM_COMERCIAL, CODGERENTE FROM PESSOA WHERE CODPESSOA = ?`,[userID]);
       console.log(user);
       const isAdm = Number(user[0].PERM_ADMINISTRADOR);
-      if (!isAdm) { //se o usuário não for administrador e o contexto for crm
-        query += `AND (
+      if (!isAdm) { 
+        query += `
+        AND (
         ID IN (SELECT ID FROM PROJETOS WHERE CODGERENTE = ?)
         OR ID IN (SELECT ID_PROJETO FROM ORDEMSERVICO OS WHERE OS.RESPONSAVEL = ?) 
         OR ID IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?) 
