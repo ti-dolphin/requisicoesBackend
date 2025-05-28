@@ -73,7 +73,7 @@ class RequisitionItemController {
   }
 
   static async updateRequisitionItems(req, res) {
-    try {
+    try {      
       const resultCount = await RequisitionItemService.updateRequisitionItems(
         req.body
       );

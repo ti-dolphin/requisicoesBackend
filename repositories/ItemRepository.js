@@ -1,7 +1,7 @@
 const utils = require('../utils');
 class ItemRepository {
   static update(items) {
-    console.log("items: ", items);
+
     const queries = items
       .map(
         (item) => { 
@@ -10,11 +10,11 @@ class ItemRepository {
               UPDATE WEB_REQUISICAO_ITEMS
               SET
                   QUANTIDADE = ${item.QUANTIDADE},
-                  OBSERVACAO = '${item.OBSERVACAO}',
                   ID_PRODUTO = ${item.ID_PRODUTO},
-                  data_entrega = ${date ? date : null},
                   OC = ${item.OC},
-                  ATIVO = ${item.ATIVO}    
+                  ATIVO = ${item.ATIVO},
+                  data_entrega = ${date ? date : null},
+                  OBSERVACAO = "${item.OBSERVACAO}"
               WHERE
                   ID = ${item.ID};
               `;
@@ -49,11 +49,12 @@ class ItemRepository {
               IR.ATIVO,
               IR.id_item_cotacao_selecionado,
               IR.data_entrega,
+              IR.OBSERVACAO,
               P.nome_fantasia, P.codigo, P.unidade,
               C.fornecedor,
               C.valor_frete,
               IC.preco_unitario,
-              IC.OBSERVACAO,
+              IC.observacao,
               IC.id_item_cotacao,
               IC.quantidade_cotada,
               IC.ICMS,

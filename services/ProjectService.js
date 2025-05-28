@@ -14,7 +14,8 @@ class ProjectService {
     return result.insertId;
   }
   // Busca todos os projetos ativos, com regras baseadas nas permissões do usuário
-  static async getAllProjects(userID) {
+  static async getAllProjects(userID, context) {
+    //query inicialmente busca todos os projetos ativos
     let query = `
       SELECT * 
       FROM PROJETOS
@@ -23,30 +24,28 @@ class ProjectService {
     let params = [];
 
     if (userID) {
-      // Busca permissões do usuário de forma segura
-      const [data] = await this.executeQuery(
-        `SELECT PERM_ADMINISTRADOR, PERM_COMERCIAL FROM PESSOA WHERE CODPESSOA = ?`,
-        [userID]
-      );
-      if (!data || !data[0]) {
-        // Retorna lista vazia se usuário não encontrado
-        return [];
-      }
-      const isAdm = Number(data[0].PERM_ADMINISTRADOR);
-      const isComercial = Number(data[0].PERM_COMERCIAL);
-      if (!isAdm && !isComercial) {
-        // Se não for admin nem comercial, retorna apenas projetos que o usuário segue
-        query += ` AND ID IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?)`;
+      const [user] = await this.executeQuery(`SELECT PERM_ADMINISTRADOR, PERM_COMERCIAL, CODGERENTE FROM PESSOA WHERE CODPESSOA = ?`,[userID]);
+      console.log(user);
+      const isAdm = Number(user[0].PERM_ADMINISTRADOR);
+      if (!isAdm) { 
+        query += `
+        AND (
+        ID IN (SELECT ID FROM PROJETOS WHERE CODGERENTE = ?)
+        OR ID IN (SELECT ID_PROJETO FROM ORDEMSERVICO OS WHERE OS.RESPONSAVEL = ?) 
+        OR ID IN (SELECT id_projeto FROM web_seguidores_projeto WHERE codpessoa = ?) 
+        )`;
+        params.push(user[0].CODGERENTE);
         params.push(userID);
+        params.push(userID);
+       
       }
-      // Se for comercial ou admin, retorna todos os projetos ativos
     }
+
+    //retorna todos
     try {
-      // Executa a consulta e retorna os projetos encontrados
       const [rows] = await this.executeQuery(query, params);
       return rows;
     } catch (err) {
-      // Em caso de erro, exibe no console e retorna null
       console.log(err);
       return null;
     }
