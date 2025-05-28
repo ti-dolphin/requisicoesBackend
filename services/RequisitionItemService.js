@@ -6,6 +6,7 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       let [originalRows] = await connection.query(query, [requisitionID]);
+      console.log("items: ", originalRows);
       const responseObject = this.getItemsComparedByPrices(originalRows);
       return responseObject;
     } catch (err) {
@@ -178,7 +179,8 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       const queries = ItemRepository.update(items);
-      const result = await connection.query(ItemRepository.update(items));
+      console.log("queries: ", queries)
+      const result = await this.executeQuery(ItemRepository.update(items));
       if (result) {
         return result.length;
       }
