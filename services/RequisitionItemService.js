@@ -6,8 +6,8 @@ class RequisitionItemService {
     const connection = await pool.getConnection();
     try {
       let [originalRows] = await connection.query(query, [requisitionID]);
-      console.log("items: ", originalRows);
       const responseObject = this.getItemsComparedByPrices(originalRows);
+      console.log("items: ", responseObject.items.length);
       return responseObject;
     } catch (err) {
       console.error("Erro na query", err);
@@ -72,72 +72,58 @@ class RequisitionItemService {
     return updatedMap;
   }
 
+  /**
+   * Compara os itens da requisição com os itens de cotação, agrupando preços e quantidades por fornecedor.
+   * Retorna todos os itens, tanto os que possuem cotação quanto os que não possuem.
+   * @param {Array} originalRows - Linhas originais do banco de dados.
+   * @returns {Object} - { columns: [fornecedores], items: [itens agrupados] }
+   */
   getItemsComparedByPrices(originalRows) {
-    let composedRows = [];
-    let columns = [];
-    let quoteItemIds = [];
-
-    for (let row of originalRows) {
-      const { fornecedor } = row;
-      const { id_item_cotacao } = row;
-      if (id_item_cotacao) {
-        quoteItemIds.push(id_item_cotacao);
-      }
-      if (fornecedor) {
-        const notInColumns = !(columns.indexOf(fornecedor) > -1);
-        if (notInColumns) {
-          columns.push(fornecedor);
+    // Map para agrupar itens por ID
+    const itemsMap = new Map();
+    // Set para armazenar fornecedores únicos
+    const suppliersSet = new Set();
+    // Primeiro, percorre todas as linhas para identificar fornecedores e agrupar por ID
+    for (const row of originalRows) {
+      const { ID, fornecedor, id_item_cotacao } = row;
+      if (fornecedor) suppliersSet.add(fornecedor);
+      // Se já existe o item, apenas adiciona as informações do fornecedor
+      if (itemsMap.has(ID)) {
+        const item = itemsMap.get(ID);
+        if (fornecedor) {
+          item[fornecedor] = row.preco_unitario;
+          item[`quantidade_cotada_${fornecedor}`] = row.quantidade_cotada;
         }
+      } else {
+        // Cria uma cópia do item base
+        const baseItem = { ...row };
+        // Inicializa campos de fornecedores como null
+        for (const supplier of suppliersSet) {
+          baseItem[supplier] = null;
+          baseItem[`quantidade_cotada_${supplier}`] = null;
+        }
+        // Preenche se já houver fornecedor
+        if (fornecedor) {
+          baseItem[fornecedor] = row.preco_unitario;
+          baseItem[`quantidade_cotada_${fornecedor}`] = row.quantidade_cotada;
+        }
+        itemsMap.set(ID, baseItem);
       }
     }
 
-    for (let quoteItemId of quoteItemIds) {
-      let quoteIdRow = originalRows.find(
-        (r) => r.id_item_cotacao === quoteItemId
-      );
-      const notInComposedRows = !composedRows.find(
-        (r) => quoteIdRow.ID === r.ID
-      );
-      columns.forEach((c) => {
-        quoteIdRow = {
-          ...quoteIdRow,
-          [c]: null,
-        };
-      });
-      if (!(quoteItemIds.length > 0)) {
-        return {
-          columns: [],
-          rows: originalRows,
-        };
-      }
-      const itemIdRows = [];
-      originalRows.forEach((r) => {
-        const sameIdRow = r.ID === quoteIdRow.ID;
-        if (sameIdRow) {
-          itemIdRows.push(r);
-        }
-      });
-    
-      itemIdRows.forEach((itemIdRow) => {
-        const columnToInsertPrice = Object.keys(quoteIdRow).filter(
-          (key) => key === itemIdRow.fornecedor
-        );
-         let columnToInsertQuotedQuantity = 'quantidade_cotada';
-         columnToInsertQuotedQuantity = `${columnToInsertQuotedQuantity}_${itemIdRow.fornecedor}`;
-        quoteIdRow = {
-          ...quoteIdRow,
-          [columnToInsertPrice]: itemIdRow.preco_unitario,
-          [columnToInsertQuotedQuantity]: itemIdRow.quantidade_cotada,
-        };
-      });
-      if (notInComposedRows) {
-        composedRows.push(quoteIdRow);
+    // Garante que todos os itens tenham as colunas de todos os fornecedores
+    const suppliers = Array.from(suppliersSet);
+    for (const item of itemsMap.values()) {
+      for (const supplier of suppliers) {
+        if (!(supplier in item)) item[supplier] = null;
+        const qtyKey = `quantidade_cotada_${supplier}`;
+        if (!(qtyKey in item)) item[qtyKey] = null;
       }
     }
 
     return {
-      columns,
-      items: quoteItemIds.length > 0 ? composedRows : originalRows,
+      columns: suppliers,
+      items: Array.from(itemsMap.values()),
     };
   }
 
