@@ -110,7 +110,8 @@ class PatrimonyRepository {
             pat_legado = ?,
             ativo = ?,
             valor_compra = ?,
-            fabricante =?
+            fabricante =?,
+            id_produto = ?
             WHERE id_patrimonio = ?
 
     `;
@@ -118,10 +119,25 @@ class PatrimonyRepository {
 
   static getSinglePatrimonyInfo() {
     return `
-      SELECT id_patrimonio, nome, data_compra, nserie, descricao, pat_legado, nome_tipo, ativo, fabricante, valor_compra
-       FROM web_patrimonio
-        INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo
-       WHERE id_patrimonio = ?
+      SELECT 
+        id_patrimonio,
+        nome,
+        PAT.data_compra,
+        PAT.nserie,
+        PAT.descricao,
+        PAT.pat_legado,
+        nome_tipo,
+        PAT.ativo,
+        PAT.fabricante,
+        PAT.valor_compra,
+        PAT.id_produto,
+        P.nome_fantasia as nome_produto
+      FROM web_patrimonio PAT
+      INNER JOIN web_tipo_patrimonio 
+        ON web_tipo_patrimonio.id_tipo_patrimonio = PAT.tipo
+      LEFT JOIN produtos P 
+        ON P.ID = PAT.id_produto
+      WHERE id_patrimonio = ?
     `;
   }
 

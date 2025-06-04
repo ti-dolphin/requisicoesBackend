@@ -127,6 +127,7 @@ class PatrimonyService {
       ativo,
       valor_compra,
       fabricante,
+      id_produto,
     } = patrimony;
    
     const result = await this.executeQuery(
@@ -143,6 +144,7 @@ class PatrimonyService {
         ativo,
         valor_compra,
         fabricante,
+        id_produto,
         id_patrimonio,
       ]
     );
