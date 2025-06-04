@@ -135,7 +135,7 @@ class PatrimonyRepository {
       FROM web_patrimonio PAT
       INNER JOIN web_tipo_patrimonio 
         ON web_tipo_patrimonio.id_tipo_patrimonio = PAT.tipo
-      INNER JOIN produtos P 
+      LEFT JOIN produtos P 
         ON P.ID = PAT.id_produto
       WHERE id_patrimonio = ?
     `;
