@@ -350,6 +350,8 @@ INNER JOIN (
     ) AS max_movimentacao
         ON mp.id_patrimonio = max_movimentacao.id_patrimonio
         AND mp.id_movimentacao = max_movimentacao.max_id_movimentacao;
+
+    where wp.ativo = 1
     `;
   };
 
@@ -378,7 +380,7 @@ INNER JOIN (
         INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
         INNER JOIN PESSOA on PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel
       WHERE 
-        web_checklist_movimentacao.realizado = 0 
+        web_checklist_movimentacao.realizado = 0 AND web_patrimonio.ativo = 1
     `;
   };
 
@@ -408,6 +410,7 @@ INNER JOIN (
       WHERE 
         web_checklist_movimentacao.realizado = 1
         AND web_checklist_movimentacao.aprovado = 0 
+        AND web_patrimonio.ativo = 1
     `;
   };
 
