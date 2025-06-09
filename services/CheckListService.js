@@ -19,7 +19,7 @@ class CheckListService {
     const checklists = await this.executeQuery(
       CheckListRepository.getLastChecklistPerMovementationQuery()
     );
-
+    console.log("checklists: ", checklists.length);
     const currentDate = new Date();
     for (let checklist of checklists) {
       const {
@@ -32,7 +32,8 @@ class CheckListService {
       if (realizado) {
         const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
         const createdDate = new Date(data_criacao);
-        if (currentDate - createdDate > periodicidadeInMilliseconds) {
+        if (currentDate - createdDate > periodicidadeInMilliseconds) { // se a data do checklist for a mais de 15 dias atrás
+          console.log("criando checklist")
           const result = await this.executeQuery(
             CheckListRepository.createChecklistQuery(),
             [id_movimentacao]
@@ -41,13 +42,6 @@ class CheckListService {
             CheckListRepository.createChecklistItemsQuery(result.insertId),
             [result.insertId, result.inserId]
           );
-        } else {
-          console.log("checklist em dia: ", {
-            id_checklist_movimentacao,
-            id_movimentacao,
-            data_criacao,
-            periodicidade,
-          });
         }
       }
     }

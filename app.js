@@ -70,7 +70,7 @@ app.use(function(err, req, res, next) {
 });
 
 //  OpportunityScheduler.startExpiredOppsVerification();
-//   PatrimonyScheduler.startEmailSchedule();
-//   PatrimonyScheduler.startchecklistVerification();
+//  PatrimonyScheduler.startEmailSchedule();
+//  PatrimonyScheduler.startchecklistVerification();
 
 module.exports = app;
