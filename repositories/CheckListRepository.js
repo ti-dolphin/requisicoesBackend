@@ -95,15 +95,14 @@ class CheckListRepository {
   }
 
   static createChecklistItemsQuery = (insertID) => {
-    console.log("createChecklistItemsQuery");
     return `
-     INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist) 
-    SELECT ${insertID}, ict.nome_item_checklist 
-    FROM web_checklist_movimentacao
-    INNER JOIN movimentacao_patrimonio AS mp ON mp.id_movimentacao = web_checklist_movimentacao.id_movimentacao
-    INNER JOIN web_patrimonio AS p ON p.id_patrimonio = mp.id_patrimonio
-    INNER JOIN web_items_checklist_tipo AS ict ON ict.id_tipo_patrimonio = p.tipo
-    WHERE web_checklist_movimentacao.id_checklist_movimentacao = ${insertID};
+        INSERT INTO web_items_checklist_movimentacao (id_checklist_movimentacao, nome_item_checklist) 
+        SELECT ${insertID}, ict.nome_item_checklist 
+        FROM web_checklist_movimentacao
+        INNER JOIN movimentacao_patrimonio AS mp ON mp.id_movimentacao = web_checklist_movimentacao.id_movimentacao
+        INNER JOIN web_patrimonio AS p ON p.id_patrimonio = mp.id_patrimonio
+        INNER JOIN web_items_checklist_tipo AS ict ON ict.id_tipo_patrimonio = p.tipo
+        WHERE web_checklist_movimentacao.id_checklist_movimentacao = ${insertID};
     `;
   };
 
@@ -274,7 +273,7 @@ WHERE
 
   static getLastChecklistPerMovementationQuery = () => {
     return `
-    SELECT
+        SELECT
     wcm.id_checklist_movimentacao,
     mp.id_movimentacao,
     wcm.data_criacao,
@@ -283,13 +282,14 @@ WHERE
     wcm.aprovado,
     wcm.data_aprovado,
     mp.observacao,
-    periodicidade
+    wtp.periodicidade
 FROM
     movimentacao_patrimonio AS mp
 INNER JOIN web_patrimonio AS wp ON mp.id_patrimonio = wp.id_patrimonio
 INNER JOIN web_tipo_patrimonio AS wtp ON wtp.id_tipo_patrimonio = wp.tipo
 INNER JOIN web_checklist_movimentacao AS wcm
-    ON wcm.id_movimentacao = mp.id_movimentacao
+ON wcm.id_movimentacao = mp.id_movimentacao
+    /* checklist deve estar entre os ultimos checklists por movimentação*/
 INNER JOIN (
     SELECT
         id_movimentacao,
@@ -301,6 +301,7 @@ INNER JOIN (
 ) AS max_checklist
     ON wcm.id_checklist_movimentacao = max_checklist.max_id_checklist_movimentacao
     AND wcm.id_movimentacao = max_checklist.id_movimentacao
+    /*movimentação deve estar entre as ultimas movimentações por patrimônio*/
 INNER JOIN (
     SELECT
         id_patrimonio,
@@ -309,47 +310,11 @@ INNER JOIN (
         movimentacao_patrimonio
     GROUP BY
         id_patrimonio
-) AS max_movimentacao
+)
+ AS max_movimentacao
     ON mp.id_patrimonio = max_movimentacao.id_patrimonio
-    AND mp.id_movimentacao = max_movimentacao.max_id_movimentacao;
-        SELECT
-        wcm.id_checklist_movimentacao,
-        mp.id_movimentacao,
-        wcm.data_criacao,
-        wcm.realizado,
-        wcm.data_realizado,
-        wcm.aprovado,
-        wcm.data_aprovado,
-        mp.observacao,
-        periodicidade
-    FROM
-        movimentacao_patrimonio AS mp
-    INNER JOIN web_patrimonio AS wp ON mp.id_patrimonio = wp.id_patrimonio
-    INNER JOIN web_tipo_patrimonio AS wtp ON wtp.id_tipo_patrimonio = wp.tipo
-    INNER JOIN web_checklist_movimentacao AS wcm
-        ON wcm.id_movimentacao = mp.id_movimentacao
-    INNER JOIN (
-        SELECT
-            id_movimentacao,
-            MAX(id_checklist_movimentacao) AS max_id_checklist_movimentacao
-        FROM
-            web_checklist_movimentacao
-        GROUP BY
-            id_movimentacao
-    ) AS max_checklist
-        ON wcm.id_checklist_movimentacao = max_checklist.max_id_checklist_movimentacao
-        AND wcm.id_movimentacao = max_checklist.id_movimentacao
-    INNER JOIN (
-        SELECT
-            id_patrimonio,
-            MAX(id_movimentacao) AS max_id_movimentacao
-        FROM
-            movimentacao_patrimonio
-        GROUP BY
-            id_patrimonio
-    ) AS max_movimentacao
-        ON mp.id_patrimonio = max_movimentacao.id_patrimonio
-        AND mp.id_movimentacao = max_movimentacao.max_id_movimentacao;
+    AND mp.id_movimentacao = max_movimentacao.max_id_movimentacao
+WHERE wp.ativo = 1;
     `;
   };
 
@@ -378,7 +343,7 @@ INNER JOIN (
         INNER JOIN web_tipo_patrimonio ON web_tipo_patrimonio.id_tipo_patrimonio = web_patrimonio.tipo 
         INNER JOIN PESSOA on PESSOA.CODPESSOA = movimentacao_patrimonio.id_responsavel
       WHERE 
-        web_checklist_movimentacao.realizado = 0 
+        web_checklist_movimentacao.realizado = 0 AND web_patrimonio.ativo = 1
     `;
   };
 
@@ -408,6 +373,7 @@ INNER JOIN (
       WHERE 
         web_checklist_movimentacao.realizado = 1
         AND web_checklist_movimentacao.aprovado = 0 
+        AND web_patrimonio.ativo = 1
     `;
   };
 
