@@ -6,4 +6,8 @@ router.get('/',  (req, res) => {
      ProductsController.getProductsBySearch(req, res);
 });
 
+router.put("/updateMany", ProductsController.updateProducts);
+   
+
+
 module.exports = router;

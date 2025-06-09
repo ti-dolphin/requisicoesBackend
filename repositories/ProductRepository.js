@@ -1,9 +1,22 @@
  class ProductRepository {
-  static searchProductsQuery(typeId) { 
+   static updateManyProducts = (products ) => { 
+            let query = ``;
+            products.forEach((p) => { 
+                query += `\n
+                    UPDATE produtos
+                    SET quantidade_estoque = '${p.quantidade_estoque}'
+                    WHERE ID = ${p.ID};
+                    `;
+            });
+          
+            return query;
+   };
+
+   static searchProductsQuery(typeId) {
      if (Number(typeId) !== 0) {
        const query = `
     SELECT 
-          ID, codigo, nome_fantasia, produtos.familia
+          ID, codigo, nome_fantasia, produtos.familia, quantidade_estoque
       FROM 
           produtos 
       INNER JOIN
@@ -22,9 +35,9 @@
     `;
        return query;
      }
-    const query = `
+     const query = `
        SELECT 
-          ID, codigo, nome_fantasia, produtos.familia
+          ID, codigo, nome_fantasia, produtos.familia, quantidade_estoque
       FROM 
           produtos 
         WHERE 
@@ -34,7 +47,7 @@
       ORDER BY 
           nome_fantasia ASC
     `;
-   return query;
-  }
-}
+     return query;
+   }
+ }
 module.exports = ProductRepository;

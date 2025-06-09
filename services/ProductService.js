@@ -2,6 +2,18 @@ const pool = require("../database");
 const ProductRepository  = require("../repositories/ProductRepository");
 
 class ProductService {
+
+  static async updateProducts (data) { 
+    try{ 
+      const result = await this.executeQuery(ProductRepository.updateManyProducts(data));
+      console.log('result: ', result);
+      return result;
+    }catch(e){ 
+      console.log(e);
+      return null;
+    }
+  }
+
   static async getProductsBySearch(search, typeId) {
     const params = Number(typeId) ? [typeId, `%${search}%`] : [`%${search}%`];
     try {
