@@ -15,6 +15,18 @@ class ProductsController {
       res.status(500).send("Internal Server Error");
     }
   }
+
+  static updateProducts = async (req, res ) =>  {
+    console.log("updateProducts");
+    try{ 
+      const data = req.body;
+      const result = await ProductService.updateProducts(data);
+      return res.status(200).send(result);
+    }catch(e){ 
+      console.log("Erro ao atualizar produtos: ", e);
+      res.status(500).send("Internal Server Error");
+    }
+  }
 }
 
 module.exports = ProductsController;

@@ -102,7 +102,8 @@ const userController = {
   PERM_ADMINISTRADOR, 
   PERM_CADASTRAR_PAT,
   PERM_DIRETOR,
-  responsavel_tipo
+  responsavel_tipo,
+  PERM_EDITAR_PRODUTOS
 FROM 
   PESSOA 
   LEFT JOIN web_tipo_patrimonio ON web_tipo_patrimonio.responsavel_tipo = CODPESSOA
