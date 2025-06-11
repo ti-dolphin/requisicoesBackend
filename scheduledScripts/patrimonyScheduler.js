@@ -11,7 +11,10 @@ class PatrimonyScheduler {
        } catch (e) {
          console.error("Error during checklist verification:", e);
        }
-     }, interval);
+     },
+      // 10*1000
+      interval
+    );
   }
 
   static startEmailSchedule() {
