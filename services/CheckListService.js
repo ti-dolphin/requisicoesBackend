@@ -4,46 +4,36 @@ const fireBaseService = require("./fireBaseService");
 const utils = require("../utils");
 const EmailService = require("../services/EmailService");
 class CheckListService {
+  static finishChecklistByPatrimonyId = async (patrimonyId) => {
+    const { affectedRows } = await this.executeQuery(
+      CheckListRepository.finishChecklistByPatrimonyId(),
+      [patrimonyId]
+    );
+    return affectedRows;
+  };
 
-  static finishChecklistByPatrimonyId = async(patrimonyId )=> { 
-    const { affectedRows } = await this.executeQuery(CheckListRepository.finishChecklistByPatrimonyId(), [patrimonyId])
-      return affectedRows;
-  }
-
-  static  getNonRealizedChecklistByPatrimonyId = async (patrimonyId) => {
-    const [nonRealizedChecklist] = await this.executeQuery(CheckListRepository.getNonRealizedByPatrimonyId(), [patrimonyId]);
+  static getNonRealizedChecklistByPatrimonyId = async (patrimonyId) => {
+    const [nonRealizedChecklist] = await this.executeQuery(
+      CheckListRepository.getNonRealizedByPatrimonyId(),
+      [patrimonyId]
+    );
     return nonRealizedChecklist;
-  }
+  };
 
   static async verifyAndCreateChecklists() {
     const checklists = await this.executeQuery(
-      CheckListRepository.getLastChecklistPerMovementationQuery()
+      CheckListRepository.getToBeRenewdChecklists()
     );
-    console.log("checklists: ", checklists.length);
-    const currentDate = new Date();
-    for (let checklist of checklists) {
-      const {
-        id_checklist_movimentacao,
-        id_movimentacao,
-        data_criacao,
-        periodicidade,
-        realizado,
-      } = checklist;
-      if (realizado) {
-        const periodicidadeInMilliseconds = periodicidade * 24 * 60 * 60 * 1000;
-        const createdDate = new Date(data_criacao);
-        if (currentDate - createdDate > periodicidadeInMilliseconds) { // se a data do checklist for a mais de 15 dias atrás
-          console.log("criando checklist")
-          const result = await this.executeQuery(
-            CheckListRepository.createChecklistQuery(),
-            [id_movimentacao]
-          );
-          await this.executeQuery(
-            CheckListRepository.createChecklistItemsQuery(result.insertId),
-            [result.insertId, result.inserId]
-          );
-        }
-      }
+      for (let checklist of checklists) {
+      const { id_movimentacao } = checklist;
+      const result = await this.executeQuery(
+        CheckListRepository.createChecklistQuery(),
+        [id_movimentacao]
+      );
+      await this.executeQuery(
+        CheckListRepository.createChecklistItemsQuery(result.insertId),
+        [result.insertId, result.inserId]
+      );
     }
   }
 
@@ -284,7 +274,6 @@ class CheckListService {
     id_item_checklist_movimentacao,
     file
   ) => {
-  
     if (!file) {
       throw new Error("File not provided");
     }
@@ -339,7 +328,7 @@ class CheckListService {
       CheckListRepository.createChecklistItemsQuery(result.insertId),
       [result.insertId, result.inserId]
     );
-   
+
     return result.insertId;
   };
 
