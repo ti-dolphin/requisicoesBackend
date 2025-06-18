@@ -128,21 +128,20 @@ class RequisitionItemService {
   }
 
   async createRequisitionItems(items, requisitionID) {
-    const query = ItemRepository.createItems(items, requisitionID);
-    const connection = await pool.getConnection();
     try {
-      const [result] = await connection.query(query);
-      const productIds = items.map((item) => item.ID_PRODUTO);
-      const [insertedItems] = await connection.query(`
-        SELECT * FROM WEB_REQUISICAO_ITEMS WHERE ID_PRODUTO IN (${productIds.join(
-          ","
-        )})`);
+      const insertedIds = [];
+      for(let item of items){ 
+          const result = await this.executeQuery(ItemRepository.createItem(item, requisitionID));
+          insertedIds.push(result.insertId);
+      }
+      const insertedItems = await this.executeQuery(`SELECT * FROM WEB_REQUISICAO_ITEMS WHERE ID IN (${insertedIds.join(',')})`);
+
+      console.log('insertedItems: ', insertedItems)
+    
       return insertedItems;
     } catch (err) {
       console.error("Erro na query", err);
       throw err;
-    } finally {
-      connection.release();
     }
   }
 
@@ -181,7 +180,7 @@ class RequisitionItemService {
   async executeQuery(query, params) {
     const connection = await pool.getConnection();
     try {
-      const [result] = await connection.query(query, params);
+      const [result, rows] = await connection.query(query, params);
       connection.release();
       return result;
     } catch (queryError) {
