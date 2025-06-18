@@ -28,14 +28,10 @@ class ItemRepository {
     return `DELETE FROM WEB_REQUISICAO_ITEMS
       WHERE ID_REQUISICAO = ? AND ID IN (${idsParam});`;
   }
-  static createItems(items, requisitionID) {
-    const values = items
-      .map(
-        (item) => `( ${item.QUANTIDADE}, ${requisitionID}, ${item.ID_PRODUTO} )`
-      )
-      .join(", ");
+  static createItem(item, requisitionID) {
+    const value = `(${item.QUANTIDADE}, ${requisitionID}, ${item.ID_PRODUTO} )`;
     return ` INSERT INTO WEB_REQUISICAO_ITEMS (QUANTIDADE, ID_REQUISICAO, ID_PRODUTO)
-      VALUES ${values};
+      VALUES ${value};
     `;
   }
   static getItemsByRequisitionID() {
