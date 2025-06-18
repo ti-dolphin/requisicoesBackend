@@ -569,6 +569,7 @@ class OpportunityService {
           map.expiredOpportunities,
           map.toExpireOpportunities
         );
+        console.log("enviando email para: ", map.EMAIL)
         await EmailService.sendEmail(
           map.EMAIL,
           "Relatório Semanal de Oportunidades",
